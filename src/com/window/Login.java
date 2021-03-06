@@ -9,10 +9,11 @@ import javax.swing.JOptionPane;
  */
 public class Login extends javax.swing.JFrame {
 
-    private HashMap<String, String> users = new HashMap<>();
+    private final HashMap<String, String> users = new HashMap<>();
     
     public Login() {
         initComponents();
+        Gambar.scaleImage(new java.io.File("C:\\Users\\Robotics Law\\Documents\\logo-smk.png"));
         this.setLocationRelativeTo(null);
         users.put("admin", "root");
         users.put("siswa", "root");
@@ -148,7 +149,7 @@ public class Login extends javax.swing.JFrame {
                         java.awt.EventQueue.invokeLater(new Runnable(){
                             @Override
                             public void run(){
-                                new  Siswa().setVisible(true);
+                                new Siswa().setVisible(true);
                             }
                         });
                     }
