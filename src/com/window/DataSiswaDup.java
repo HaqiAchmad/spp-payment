@@ -1,5 +1,7 @@
 package com.window;
 
+import java.awt.event.ActionEvent;
+
 /**
  *
  * @author Achmad Baihaqi
@@ -10,7 +12,20 @@ public class DataSiswaDup extends javax.swing.JFrame {
 
     public DataSiswaDup() {
         initComponents();
+        this.setTitle("Menu Input Data Siswa");
+        this.setSize(1366, 768);
+        this.btnSimpan.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        this.btnBatal.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        this.btnExit.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.setLocationRelativeTo(null);
+        
+        btnExit.addActionListener(new java.awt.event.ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -26,12 +41,12 @@ public class DataSiswaDup extends javax.swing.JFrame {
         lblGender = new javax.swing.JLabel();
         inpNis = new javax.swing.JTextField();
         inpTglLahir = new javax.swing.JTextField();
-        inpKelas = new javax.swing.JComboBox<>();
+        inpKelas = new javax.swing.JComboBox<String>();
         inpNama = new javax.swing.JTextField();
         lblTempatLhr = new javax.swing.JLabel();
         inpTempatLhr = new javax.swing.JTextField();
         lblKelas = new javax.swing.JLabel();
-        inpGender = new javax.swing.JComboBox<>();
+        inpGender = new javax.swing.JComboBox<String>();
         lblNis1 = new javax.swing.JLabel();
         lblNama1 = new javax.swing.JLabel();
         lblGender1 = new javax.swing.JLabel();
@@ -43,11 +58,11 @@ public class DataSiswaDup extends javax.swing.JFrame {
         inpNama1 = new javax.swing.JTextField();
         inpNama2 = new javax.swing.JTextField();
         inpTglLahir2 = new javax.swing.JTextField();
-        inpKelas1 = new javax.swing.JComboBox<>();
+        inpKelas1 = new javax.swing.JComboBox<String>();
         line3 = new javax.swing.JSeparator();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        btnSimpan = new javax.swing.JButton();
+        btnBatal = new javax.swing.JButton();
+        btnExit = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         lblSpp1 = new javax.swing.JLabel();
         lblMain = new javax.swing.JLabel();
@@ -111,7 +126,7 @@ public class DataSiswaDup extends javax.swing.JFrame {
         inpKelas.setBackground(new java.awt.Color(55, 61, 75));
         inpKelas.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         inpKelas.setForeground(new java.awt.Color(255, 255, 255));
-        inpKelas.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tenik Pemesinan", "Teknik Instalasi Tenaga Listrik", "Teknik Otomasi", "Tata Boga", "Tata Busana", "Rekayasa Perangkat Lunak" }));
+        inpKelas.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Tenik Pemesinan", "Teknik Instalasi Tenaga Listrik", "Teknik Otomasi", "Tata Boga", "Tata Busana", "Rekayasa Perangkat Lunak" }));
         getContentPane().add(inpKelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 200, 330, 30));
 
         inpNama.setBackground(new java.awt.Color(55, 61, 75));
@@ -141,7 +156,7 @@ public class DataSiswaDup extends javax.swing.JFrame {
         inpGender.setBackground(new java.awt.Color(55, 61, 75));
         inpGender.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         inpGender.setForeground(new java.awt.Color(255, 255, 255));
-        inpGender.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Laki-Laki", "Perempuan" }));
+        inpGender.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Laki-Laki", "Perempuan" }));
         getContentPane().add(inpGender, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 300, 330, 30));
 
         lblNis1.setBackground(new java.awt.Color(255, 255, 255));
@@ -213,42 +228,42 @@ public class DataSiswaDup extends javax.swing.JFrame {
         inpKelas1.setBackground(new java.awt.Color(55, 61, 75));
         inpKelas1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         inpKelas1.setForeground(new java.awt.Color(255, 255, 255));
-        inpKelas1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "X (sepuluh)", "XI (sebelas)", "XII (dua belas)", "XIII (tiga belas)" }));
+        inpKelas1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "X (sepuluh)", "XI (sebelas)", "XII (dua belas)", "XIII (tiga belas)" }));
         getContentPane().add(inpKelas1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 450, 330, 30));
 
         line3.setForeground(new java.awt.Color(255, 255, 255));
         getContentPane().add(line3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 540, 1360, 20));
 
-        jButton1.setBackground(new java.awt.Color(12, 76, 163));
-        jButton1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/ic-save-24.png"))); // NOI18N
-        jButton1.setText("Simpan");
-        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 590, -1, -1));
+        btnSimpan.setBackground(new java.awt.Color(12, 76, 163));
+        btnSimpan.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        btnSimpan.setForeground(new java.awt.Color(255, 255, 255));
+        btnSimpan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/ic-save-24.png"))); // NOI18N
+        btnSimpan.setText("Simpan");
+        getContentPane().add(btnSimpan, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 590, -1, -1));
 
-        jButton2.setBackground(new java.awt.Color(17, 159, 77));
-        jButton2.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        jButton2.setForeground(new java.awt.Color(255, 255, 255));
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/ic-batal-24.png"))); // NOI18N
-        jButton2.setText("Batal");
-        getContentPane().add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1130, 590, 100, -1));
+        btnBatal.setBackground(new java.awt.Color(17, 159, 77));
+        btnBatal.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        btnBatal.setForeground(new java.awt.Color(255, 255, 255));
+        btnBatal.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/ic-batal-24.png"))); // NOI18N
+        btnBatal.setText("Batal");
+        getContentPane().add(btnBatal, new org.netbeans.lib.awtextra.AbsoluteConstraints(1130, 590, 100, -1));
 
-        jButton3.setBackground(new java.awt.Color(234, 34, 34));
-        jButton3.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        jButton3.setForeground(new java.awt.Color(255, 255, 255));
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/ic-keluar-24.png"))); // NOI18N
-        jButton3.setText("Exit");
-        getContentPane().add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(1240, 590, 90, -1));
+        btnExit.setBackground(new java.awt.Color(234, 34, 34));
+        btnExit.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        btnExit.setForeground(new java.awt.Color(255, 255, 255));
+        btnExit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/ic-keluar-24.png"))); // NOI18N
+        btnExit.setText("Exit");
+        getContentPane().add(btnExit, new org.netbeans.lib.awtextra.AbsoluteConstraints(1240, 590, 90, -1));
 
         jLabel1.setFont(new java.awt.Font("Dialog", 1, 13)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText(" Copyright © 2021. Achmad Baihaqi.");
+        jLabel1.setText(" Copyright © 2021. Achmad Baihaqi. All Rights Reserved.");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 680, 1360, 90));
 
         lblSpp1.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
-        lblSpp1.setForeground(new java.awt.Color(255, 0, 0));
+        lblSpp1.setForeground(new java.awt.Color(255, 255, 51));
         lblSpp1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblSpp1.setText("SISTEM INFORMASI PEMBAYARAN SPP");
         getContentPane().add(lblSpp1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 1370, 40));
@@ -300,6 +315,9 @@ public class DataSiswaDup extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBatal;
+    private javax.swing.JButton btnExit;
+    private javax.swing.JButton btnSimpan;
     private javax.swing.JComboBox<String> inpGender;
     private javax.swing.JComboBox<String> inpKelas;
     private javax.swing.JComboBox<String> inpKelas1;
@@ -312,9 +330,6 @@ public class DataSiswaDup extends javax.swing.JFrame {
     private javax.swing.JTextField inpTglLahir;
     private javax.swing.JTextField inpTglLahir1;
     private javax.swing.JTextField inpTglLahir2;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel lblGender;
     private javax.swing.JLabel lblGender1;
