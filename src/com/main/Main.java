@@ -3,6 +3,7 @@ package com.main;
 /**
  *
  * @author Achmad Baihaqi
+ * @since 2021-03-01
  */
 public class Main {
     
@@ -11,7 +12,7 @@ public class Main {
             
             @Override
             public void run(){
-                new com.window.Login().setVisible(true);
+                new com.window.LoginWindow().setVisible(true);
             }
         });
     }
