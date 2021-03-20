@@ -1,3 +1,3 @@
 # spp-payment
 
-### Latihan UKK pada tanggal 28 Februari 2021
+### Persiapan untuk UKK SMKN 1 Kertosono yang akan dilaksanakan pada tanggal 29 Maret 2021
