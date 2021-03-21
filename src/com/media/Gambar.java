@@ -16,13 +16,6 @@ public class Gambar {
     
     private static final String DIREKTORY_ICONS = "src\\resources\\image\\icons\\";
     
-    public static final String IC_CLOSE_BLACK = "ic-close-black.png", IC_CLOSE_WHITE = "ic-close-white.png", 
-                               IC_MINIMAZE_BLACK = "ic-minimaze-black.png", IC_MINIMAZE_WHITE = "ic-minimaze-white.png",
-                               IC_BACK = "ic-back.png", IC_BACK_ENTERED = "ic-back-entered.png",
-                               IC_CLOSE_ENTERED = "ic-close-entered.png", IC_MINIMAZE_ENTERED = "ic-minimaze-entered.png";
-    
-    
-    
     public static Image getWindowIcon(){
         return icWindow.getImage();
     }
