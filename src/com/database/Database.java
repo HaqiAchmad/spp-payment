@@ -54,7 +54,7 @@ public class Database {
      * Tabel tabel yang ada didalam database
      */
     public static final String FOTO_PROFILE = "foto_profile", PETUGAS = "petugas", SISWA = "siswa",
-                               PEMBAYARAN = "pembayaran", KELAS = "kelas", SPP = "spp";
+                               PEMBAYARAN = "pembayaran", KELAS = "kelas", SPP = "spp", LOGIN = "login";
     
     /**
      * Digunakan untuk menghubungkan aplikasi ke <B>Database</B>. 
