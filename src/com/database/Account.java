@@ -62,11 +62,12 @@ public class Account extends Database{
     }
     
     public boolean loginAsPetugas(String id, String password){
+        this.logout();
         String pass;
         if(this.isExistData(PETUGAS, "id_petugas", id) || this.isExistData(PETUGAS, "username", id)){
             pass = this.getDataAkun(id, "password");
             if(password.equals(pass)){
-                return true;
+                return setLogin(id);
             }else{
                 Audio.play(Audio.SOUND_WARNING);
                 JOptionPane.showMessageDialog(null, "Password Anda tidak cocok!", "Pesan", JOptionPane.INFORMATION_MESSAGE);
@@ -78,21 +79,32 @@ public class Account extends Database{
         return false;
     }
     
-    public boolean loginAsSiswa(int nis, String email){
-        String getEmail;
+    public boolean loginAsSiswa(int nis, String password){
+        this.logout();
         if(this.isExistData(SISWA, "nis", Integer.toString(nis))){
-            getEmail = this.getDataAkun(Integer.toString(nis), "email");
-            if(email.equalsIgnoreCase(getEmail)){
-                return true;
+            if(password.equalsIgnoreCase("root")){
+                return setLogin(Integer.toString(nis));
             }else{
                 Audio.play(Audio.SOUND_WARNING);
-                JOptionPane.showMessageDialog(null, "Email Anda tidak cocok!", "Pesan", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Password Anda tidak cocok!", "Pesan", JOptionPane.INFORMATION_MESSAGE);
             }
         }else{
             Audio.play(Audio.SOUND_WARNING);
             JOptionPane.showMessageDialog(null, "'"+nis+"' NIS tersebut tidak ditemukan!", "Pesan", JOptionPane.INFORMATION_MESSAGE);
         }
         return false;
+    }
+    
+    public boolean setLogin(String id){
+        return this.addData("INSERT INTO login VALUES ('"+id+"')");
+    }
+    
+    public String getLogin(){
+        return this.getData(LOGIN, "id_user");
+    }
+    
+    public boolean logout(){
+        return this.addData("TRUNCATE login");
     }
     
     public int getTotalAkun(String tipeAkun){
@@ -119,8 +131,41 @@ public class Account extends Database{
         }
     }
     
+    public String getGenderName(String gender){
+        if(gender.equalsIgnoreCase("L")){
+            return "Laki-Laki";
+        }else if(gender.equalsIgnoreCase("P")){
+            return "Perempuan";
+        }else{
+            return "Tidak Dicantumkan";
+        }
+    }
+    
+    public String getKekuatanPassword(String password){
+        if(password.length() > 5){
+            if(password.length() >= 5 && password.length() < 10 && Validation.containsNumber(password)){
+                if(password.length() >= 10 && password.length() < 25 && Validation.containsNumber(password)){
+                    if(password.length() >= 25 && Validation.containsNumber(password)){
+                        return "Sangat Kuat";
+                    }
+                }else{
+                    return "Kuat";
+                }
+            }else{
+                return "Rendah";
+            }
+        }else{
+            return "Sangat Rendah";
+        }
+        return "null";
+    }
+    
     public String getProfile(int id){
         return this.getData(FOTO_PROFILE, "foto", "WHERE id_user = '"+id+"'");
+    }
+    
+    public String getProfile(String username){
+        return this.getProfile(Integer.parseInt(this.getDataAkun(username, "id_petugas")));
     }
     
     public boolean setProfile(int id, String newFoto){
@@ -155,4 +200,5 @@ public class Account extends Database{
             return deleteSiswa && deleteProfile;
         }
     }
+    
 }
