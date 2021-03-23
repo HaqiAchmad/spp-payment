@@ -132,8 +132,26 @@ public class Transaksi extends Database{
         return 0;
     }
     
+    public int sppDibayar(int nis, int tahun){
+        int dibayar = 
+                sppDibayar(nis, Waktu.JANUARI, tahun) + sppDibayar(nis, Waktu.FEBRUARI, tahun) + sppDibayar(nis, Waktu.MARET, tahun) + 
+                sppDibayar(nis, Waktu.APRIL, tahun) + sppDibayar(nis, Waktu.MEI, tahun) + sppDibayar(nis, Waktu.JUNI, tahun) + 
+                sppDibayar(nis, Waktu.JULI, tahun) + sppDibayar(nis, Waktu.AGUSTUS, tahun) + sppDibayar(nis, Waktu.SEPTEMBER, tahun) +
+                sppDibayar(nis, Waktu.OKTOBER, tahun) + sppDibayar(nis, Waktu.NOVEMBER, tahun) + sppDibayar(nis, Waktu.DESEMBER, tahun);
+        return dibayar;
+    }
+    
     public int kekuranganSpp(int nis, String bulan, int tahun){
         return this.getNominalSpp(Integer.parseInt(acc.getDataAkun(Integer.toString(nis), "id_spp"))) - this.sppDibayar(nis, bulan, tahun);
+    }
+    
+    public int kekuranganSpp(int nis, int tahun){
+        int kekurangan = 
+                kekuranganSpp(nis, Waktu.JANUARI, tahun) + kekuranganSpp(nis, Waktu.FEBRUARI, tahun) + kekuranganSpp(nis, Waktu.MARET, tahun) + 
+                kekuranganSpp(nis, Waktu.APRIL, tahun) + kekuranganSpp(nis, Waktu.MEI, tahun) + kekuranganSpp(nis, Waktu.JUNI, tahun) + 
+                kekuranganSpp(nis, Waktu.JULI, tahun) + kekuranganSpp(nis, Waktu.AGUSTUS, tahun) + kekuranganSpp(nis, Waktu.SEPTEMBER, tahun) +
+                kekuranganSpp(nis, Waktu.OKTOBER, tahun) + kekuranganSpp(nis, Waktu.NOVEMBER, tahun) + kekuranganSpp(nis, Waktu.DESEMBER, tahun);
+        return kekurangan;
     }
     
     public boolean isLunasByBulan(int nis, String bulan, int tahun){
@@ -186,6 +204,29 @@ public class Transaksi extends Database{
             dibayar += this.getJumlahBayar(o.toString());
         }
         return dibayar;
+    }
+    
+    @Override
+    public void closeConnection(){
+        try{
+            // Mengecek apakah conn kosong atau tidak, jika tidak maka akan diclose
+            if(conn != null){
+                conn.close();
+            }
+            // Mengecek apakah stat kosong atau tidak, jika tidak maka akan diclose
+            if(stat != null){
+                stat.close();
+            }
+            // Mengecek apakah res koson atau tidak, jika tidak maka akan diclose
+            if(res != null){
+                res.close();
+            }
+            acc.closeConnection();
+            System.out.println("Berhasil memutus koneksi database");
+        }catch(SQLException ex){
+            Audio.play(Audio.SOUND_ERROR);
+            JOptionPane.showMessageDialog(null, "Terjadi Kesalahan!\n\nError message : "+ex.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+        }
     }
     
     public static void main(String[] args) {
