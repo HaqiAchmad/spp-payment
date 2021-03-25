@@ -54,6 +54,11 @@ public class Kelas extends Database{
         return this.getData(KELAS, "level_kelas", "WHERE id_kelas = '"+id+"'");
     }    
     
+    public String getGelombang(String id){
+        String namaKelas = getNamaKelas(id);
+        return ""+namaKelas.charAt(namaKelas.length()-1);
+    }
+    
     public boolean setLevelKelas(String id, String newLevel){
         return this.setData(KELAS, "level_kelas", "id_kelas", id, newLevel);
     }
