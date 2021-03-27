@@ -13,7 +13,7 @@ public class Main {
             
             @Override
             public void run(){
-                new com.window.SplashWindow().setVisible(true);
+                new com.window.petugas.TentangAplikasi().setVisible(true);
             }
         });
     }
