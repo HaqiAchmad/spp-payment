@@ -24,7 +24,7 @@ public class DashboardSiswa extends javax.swing.JFrame {
     private final Transaksi tr = new Transaksi();
     private final Kelas kls = new Kelas();
     private final Waktu waktu = new Waktu();
-    private final String userLogin, nis, nama, gender, kelas, email, wali, nominalSpp, sppDibayar, kekuranganSpp, foto;
+    private final String userLogin, nis, nama, gender, kelas, email, wali, nominalSpp, sppDibayar , kekuranganSpp, foto;
     private int x, y;
     
     public DashboardSiswa() {
@@ -38,8 +38,8 @@ public class DashboardSiswa extends javax.swing.JFrame {
         email = acc.getDataAkun(userLogin, "email");
         wali = acc.getDataAkun(userLogin, "nama_wali");
         nominalSpp = tr.addRp(tr.getNominalSpp(Integer.parseInt(acc.getDataAkun(userLogin, "id_spp"))));
-        sppDibayar = tr.addRp(tr.sppDibayar(Integer.parseInt(nis), 2021));
-        kekuranganSpp = tr.addRp(tr.kekuranganSpp(Integer.parseInt(nis), 2021));
+        sppDibayar = tr.addRp(tr.sppDibayar(Integer.parseInt(nis), "2020-2021"));
+        kekuranganSpp = tr.addRp(tr.kekuranganSpp(Integer.parseInt(nis), "2020-2021"));
         foto = acc.getProfile(Integer.parseInt(nis));
         
         this.lblNamaFoto.setText("<html><p>"+nama+"</p></html>");
