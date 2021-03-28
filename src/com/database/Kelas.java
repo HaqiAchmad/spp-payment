@@ -11,21 +11,6 @@ public class Kelas extends Database{
         this.startConnection();
     }
     
-    public static final String
-            // id kelas x
-            ID_X_TPM1 = "x.tpm1", ID_X_TPM2 = "x.tpm2", ID_X_TPM3 = "x.tpm3", ID_X_TOI1 = "x.toi1",
-            ID_X_TITL1 = "x.titl1", ID_X_TITL2 = "x.titl2", ID_X_TITL3 = "x.titl3", ID_X_RPL1 = "x.rpl1", 
-            ID_X_RPL2 = "x.rpl2", ID_X_TBG1 = "x.tbg1", ID_X_TBG2 = "x.tbg2", ID_X_TBS1 = "x.tbs1", ID_X_TBS2 = "x.tbs2",
-            // id kelas xi
-            ID_XI_TPM1 = "xi.tpm1", ID_XI_TPM2 = "xi.tpm2", ID_XI_TPM3 = "xi.tpm3", ID_XI_TOI1 = "xi.toi1",
-            ID_XI_TITL1 = "xi.titl1", ID_XI_TITL2 = "xi.titl2", ID_XI_TITL3 = "xi.titl3", ID_XI_RPL1 = "xi.rpl1", 
-            ID_XI_RPL2 = "xi.rpl2", ID_XI_TBG1 = "xi.tbg1", ID_XI_TBG2 = "xi.tbg2", ID_XI_TBS1 = "xi.tbs1", ID_XI_TBS2 = "xi.tbs2",
-            // id kelas xii & xiii
-            ID_XII_TPM1 = "xii.tpm1", ID_XII_TPM2 = "xii.tpm2", ID_XII_TPM3 = "xii.tpm3", ID_XII_TOI1 = "xii.toi1",
-            ID_XII_TITL1 = "xii.titl1", ID_XII_TITL2 = "xii.titl2", ID_XII_TITL3 = "xii.titl3", ID_XII_RPL1 = "xii.rpl1", 
-            ID_XII_RPL2 = "xii.rpl2", ID_XII_TBG1 = "xii.tbg1", ID_XII_TBG2 = "xii.tbg2", ID_XII_TBS1 = "xii.tbs1", 
-            ID_XII_TBS2 = "xii.tbs2", ID_XIII_TOI = "xiii.toi1";
-    
     public static final String TPM = "TPM", TITL = "TITL", TOI = "TOI", TBS = "TBS", TBG = "TBG", RPL = "RPL";
     
     public boolean addKelas(String id, String namaKelas, String levelKelas, String jurusan){
@@ -67,6 +52,16 @@ public class Kelas extends Database{
         return this.getData(KELAS, "jurusan", "WHERE id_kelas = '"+id+"'");
     }
     
+    public String getLevelName(String id){
+        switch(this.getLevelKelas(id)){
+            case "X": return "X (sepuluh)";
+            case "XI": return "XI (sebelas)";
+            case "XII": return "XII (dua belas)";
+            case "XIII": return "XIII (tiga belas)";
+            default: return null;
+        }
+    }
+    
     public String getJurusanName(String id){
         switch(this.getJurusan(id)){
             case TPM: return "Teknik Pemesinan";
@@ -81,6 +76,16 @@ public class Kelas extends Database{
     
     public boolean setJurusan(String id, String newJurusan){
         return this.setData(KELAS, "jurusan", "id_kelas", id, newJurusan);
+    }
+    
+    public String[] getTahunAjaran(String kelas){
+        switch(kelas){
+            case "X": return new String[]{"2020-2021", "2021-2022", "2022-2023"};
+            case "XI": return new String[]{"2019-2020", "2020-2021", "2021-2022"};
+            case "XII": return new String[]{"2018-2019","2019-2020","2020-2021"};
+            case "XIII": return new String[]{"2017-2018", "2018-2019","2019-2020","2020-2021"};
+            default: return null;
+        }
     }
     
     public boolean deleteKelas(String id){
