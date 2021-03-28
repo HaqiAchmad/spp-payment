@@ -19,6 +19,7 @@ public class PenampilFotoPetugas extends javax.swing.JDialog {
         
         this.setLocationRelativeTo(null);
         this.setTitle(foto.substring(foto.lastIndexOf("\\")+1));
+        this.lblFoto.setText("");
         this.lblFoto.setIcon(Gambar.scaleImage(new File(foto), pnlMain.getWidth(), pnlMain.getHeight()));
     }
 
