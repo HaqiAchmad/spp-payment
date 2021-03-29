@@ -627,7 +627,7 @@
               <Color blue="13" green="13" red="16" type="rgb"/>
             </Property>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/resources/image/icons/ic-datapetugas-logo.png"/>
+              <Image iconType="3" name="/resources/image/icons/icons8_graph_report_35px.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Laporan SPP"/>
             <Property name="iconTextGap" type="int" value="6"/>
@@ -638,7 +638,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Container class="javax.swing.JPanel" name="pnlInfoData">
+        <Container class="javax.swing.JPanel" name="pnlInfoSiswa">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="ff" red="ff" type="rgb"/>
@@ -660,39 +660,39 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="pnlTitleInfo" alignment="0" max="32767" attributes="0"/>
+                  <Component id="pnlTitleInfoSiswa" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Group type="102" attributes="0">
-                              <Component id="lblData1" min="-2" pref="139" max="-2" attributes="0"/>
+                              <Component id="lblNis" min="-2" pref="139" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="val1" min="-2" pref="331" max="-2" attributes="0"/>
+                              <Component id="valNis" min="-2" pref="331" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
-                              <Component id="lblData2" min="-2" pref="139" max="-2" attributes="0"/>
+                              <Component id="lblNama" min="-2" pref="139" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="val2" max="32767" attributes="0"/>
+                              <Component id="valNama" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
-                              <Component id="lblData4" min="-2" pref="139" max="-2" attributes="0"/>
+                              <Component id="lblKelas" min="-2" pref="139" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="val4" max="32767" attributes="0"/>
+                              <Component id="valKelas" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
-                              <Component id="lblData3" min="-2" pref="139" max="-2" attributes="0"/>
+                              <Component id="lblGender" min="-2" pref="139" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="val3" max="32767" attributes="0"/>
+                              <Component id="valGender" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                                  <Component id="lblData6" max="32767" attributes="0"/>
-                                  <Component id="lblData5" pref="139" max="32767" attributes="0"/>
+                                  <Component id="lblNominal" max="32767" attributes="0"/>
+                                  <Component id="lblNoHp" pref="139" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="val5" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="val6" max="32767" attributes="0"/>
+                                  <Component id="valNoHp" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="valNominal" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -703,36 +703,36 @@
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <Component id="pnlTitleInfo" min="-2" max="-2" attributes="0"/>
+                      <Component id="pnlTitleInfoSiswa" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="lblData1" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="val1" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblNis" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="valNis" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="lblData2" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="val2" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblNama" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="valNama" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="lblData3" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="val3" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblGender" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="valGender" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="lblData4" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="val4" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblKelas" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="valKelas" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="val5" min="-2" max="-2" attributes="0"/>
-                          <Component id="lblData5" min="-2" pref="20" max="-2" attributes="0"/>
+                          <Component id="valNoHp" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblNoHp" min="-2" pref="20" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="lblData6" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="val6" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblNominal" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="valNominal" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace pref="18" max="32767" attributes="0"/>
                   </Group>
@@ -740,7 +740,7 @@
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Container class="javax.swing.JPanel" name="pnlTitleInfo">
+            <Container class="javax.swing.JPanel" name="pnlTitleInfoSiswa">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="39" green="aa" red="5" type="rgb"/>
@@ -757,18 +757,18 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="lblTitleInfo" pref="494" max="32767" attributes="0"/>
+                          <Component id="lblTitleInfoSiswa" pref="494" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="lblTitleInfo" alignment="0" pref="30" max="32767" attributes="0"/>
+                      <Component id="lblTitleInfoSiswa" alignment="0" pref="30" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="lblTitleInfo">
+                <Component class="javax.swing.JLabel" name="lblTitleInfoSiswa">
                   <Properties>
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Dialog" size="14" style="1"/>
@@ -781,7 +781,7 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Component class="javax.swing.JLabel" name="lblData1">
+            <Component class="javax.swing.JLabel" name="lblNis">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -789,7 +789,7 @@
                 <Property name="text" type="java.lang.String" value="NIS"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="lblData2">
+            <Component class="javax.swing.JLabel" name="lblNama">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -797,7 +797,7 @@
                 <Property name="text" type="java.lang.String" value="Nama Siswa"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="lblData4">
+            <Component class="javax.swing.JLabel" name="lblKelas">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -805,7 +805,7 @@
                 <Property name="text" type="java.lang.String" value="Kelas"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="lblData3">
+            <Component class="javax.swing.JLabel" name="lblGender">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -813,7 +813,7 @@
                 <Property name="text" type="java.lang.String" value="Jenis Kelamin"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="lblData6">
+            <Component class="javax.swing.JLabel" name="lblNominal">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -821,7 +821,7 @@
                 <Property name="text" type="java.lang.String" value="Nominal SPP"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="lblData5">
+            <Component class="javax.swing.JLabel" name="lblNoHp">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -829,7 +829,7 @@
                 <Property name="text" type="java.lang.String" value="Nomor HP"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="val1">
+            <Component class="javax.swing.JLabel" name="valNis">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -837,7 +837,7 @@
                 <Property name="text" type="java.lang.String" value=": 6156"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="val2">
+            <Component class="javax.swing.JLabel" name="valNama">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -845,7 +845,7 @@
                 <Property name="text" type="java.lang.String" value=": Achmad Baihaqi"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="val3">
+            <Component class="javax.swing.JLabel" name="valGender">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -853,7 +853,7 @@
                 <Property name="text" type="java.lang.String" value=": Laki-Laki"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="val4">
+            <Component class="javax.swing.JLabel" name="valKelas">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -861,7 +861,7 @@
                 <Property name="text" type="java.lang.String" value=": XII RPL 1"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="val5">
+            <Component class="javax.swing.JLabel" name="valNoHp">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -869,7 +869,7 @@
                 <Property name="text" type="java.lang.String" value=": 0856-5586-4624"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="val6">
+            <Component class="javax.swing.JLabel" name="valNominal">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -879,7 +879,7 @@
             </Component>
           </SubComponents>
         </Container>
-        <Component class="javax.swing.JLabel" name="lblUsername">
+        <Component class="javax.swing.JLabel" name="lblCariNis">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Dialog" size="14" style="1"/>
@@ -896,15 +896,14 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JTextField" name="inpUsername">
+        <Component class="javax.swing.JTextField" name="inpNis">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Dialog" size="14" style="1"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="6156"/>
           </Properties>
           <Events>
-            <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="inpUsernameKeyTyped"/>
+            <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="inpNisKeyTyped"/>
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
@@ -955,7 +954,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JButton" name="btnEdit">
+        <Component class="javax.swing.JButton" name="btnCetak">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ed" green="77" red="22" type="rgb"/>
@@ -972,40 +971,13 @@
             <Property name="text" type="java.lang.String" value="Cetak Laporan"/>
           </Properties>
           <Events>
-            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btnEditMouseEntered"/>
-            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btnEditMouseExited"/>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnEditActionPerformed"/>
+            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btnCetakMouseEntered"/>
+            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btnCetakMouseExited"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCetakActionPerformed"/>
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
               <AbsoluteConstraints x="260" y="670" width="140" height="-1"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="javax.swing.JButton" name="btnHapus">
-          <Properties>
-            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="29" green="29" red="dc" type="rgb"/>
-            </Property>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Dialog" size="12" style="1"/>
-            </Property>
-            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="ff" green="ff" red="ff" type="rgb"/>
-            </Property>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/resources/image/icons/ic-data-hapus.png"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Batalkan"/>
-          </Properties>
-          <Events>
-            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btnHapusMouseEntered"/>
-            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btnHapusMouseExited"/>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnHapusActionPerformed"/>
-          </Events>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="410" y="670" width="120" height="-1"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -1037,7 +1009,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Container class="javax.swing.JPanel" name="pnlManipulasiKelas">
+        <Container class="javax.swing.JPanel" name="pnlInfoPembayaran">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="ff" red="ff" type="rgb"/>
@@ -1052,32 +1024,32 @@
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="260" y="390" width="510" height="-1"/>
+              <AbsoluteConstraints x="260" y="390" width="510" height="230"/>
             </Constraint>
           </Constraints>
 
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="pnlInfoKemananTitle" alignment="0" max="32767" attributes="0"/>
+                  <Component id="pnlTitleInfoPembayaran" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="lblKekuatan" alignment="0" max="32767" attributes="0"/>
-                          <Component id="lblPassword" alignment="0" max="32767" attributes="0"/>
-                          <Component id="jLabel1" alignment="1" pref="139" max="32767" attributes="0"/>
-                          <Component id="jLabel3" alignment="1" pref="139" max="32767" attributes="0"/>
-                          <Component id="lblKekuatan1" alignment="0" max="32767" attributes="0"/>
-                          <Component id="lblPassword1" alignment="0" max="32767" attributes="0"/>
+                          <Component id="lblNamaPetugas" alignment="0" max="32767" attributes="0"/>
+                          <Component id="lblId" alignment="0" max="32767" attributes="0"/>
+                          <Component id="lblBulanBayar" alignment="1" pref="139" max="32767" attributes="0"/>
+                          <Component id="lblStatus" alignment="1" pref="139" max="32767" attributes="0"/>
+                          <Component id="lblJumlahBayar" alignment="0" max="32767" attributes="0"/>
+                          <Component id="lblTanggalBayar" alignment="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="jLabel4" max="32767" attributes="0"/>
-                          <Component id="jLabel5" pref="324" max="32767" attributes="0"/>
-                          <Component id="jLabel6" max="32767" attributes="0"/>
-                          <Component id="jLabel7" max="32767" attributes="0"/>
-                          <Component id="jLabel8" max="32767" attributes="0"/>
-                          <Component id="jLabel9" max="32767" attributes="0"/>
+                          <Component id="valId" max="32767" attributes="0"/>
+                          <Component id="valNamaPetugas" pref="324" max="32767" attributes="0"/>
+                          <Component id="valBulanBayar" max="32767" attributes="0"/>
+                          <Component id="valTanggalBayar" max="32767" attributes="0"/>
+                          <Component id="valJumlahBayar" max="32767" attributes="0"/>
+                          <Component id="valStatus" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
                   </Group>
@@ -1086,44 +1058,44 @@
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="pnlInfoKemananTitle" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="pnlTitleInfoPembayaran" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="lblPassword" min="-2" pref="19" max="-2" attributes="0"/>
-                          <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblId" min="-2" pref="19" max="-2" attributes="0"/>
+                          <Component id="valId" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="8" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="lblNamaPetugas" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="valNamaPetugas" alignment="3" min="-2" pref="17" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="lblBulanBayar" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="valBulanBayar" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="lblTanggalBayar" alignment="3" min="-2" pref="19" max="-2" attributes="0"/>
+                          <Component id="valTanggalBayar" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="lblJumlahBayar" min="-2" max="-2" attributes="0"/>
+                          <Component id="valJumlahBayar" min="-2" pref="20" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="lblStatus" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="valStatus" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="lblKekuatan" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel5" alignment="3" min="-2" pref="17" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="lblPassword1" alignment="3" min="-2" pref="19" max="-2" attributes="0"/>
-                          <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="lblKekuatan1" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Container class="javax.swing.JPanel" name="pnlInfoKemananTitle">
+            <Container class="javax.swing.JPanel" name="pnlTitleInfoPembayaran">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="e6" green="62" red="f" type="rgb"/>
@@ -1140,18 +1112,18 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="lblInfoKeamanan" max="32767" attributes="0"/>
+                          <Component id="lblTitleInfoPembayaran" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="lblInfoKeamanan" alignment="0" pref="31" max="32767" attributes="0"/>
+                      <Component id="lblTitleInfoPembayaran" alignment="0" pref="31" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="lblInfoKeamanan">
+                <Component class="javax.swing.JLabel" name="lblTitleInfoPembayaran">
                   <Properties>
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Ebrima" size="14" style="1"/>
@@ -1164,7 +1136,7 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Component class="javax.swing.JLabel" name="lblPassword">
+            <Component class="javax.swing.JLabel" name="lblId">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="14" style="1"/>
@@ -1172,7 +1144,7 @@
                 <Property name="text" type="java.lang.String" value="ID Transaksi"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="lblKekuatan">
+            <Component class="javax.swing.JLabel" name="lblNamaPetugas">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="14" style="1"/>
@@ -1180,7 +1152,7 @@
                 <Property name="text" type="java.lang.String" value="Nama Petugas"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel1">
+            <Component class="javax.swing.JLabel" name="lblBulanBayar">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="14" style="1"/>
@@ -1188,7 +1160,7 @@
                 <Property name="text" type="java.lang.String" value="Bulan &amp; Tahun"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel3">
+            <Component class="javax.swing.JLabel" name="lblStatus">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="14" style="1"/>
@@ -1196,7 +1168,7 @@
                 <Property name="text" type="java.lang.String" value="Status Kelunasan"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="lblKekuatan1">
+            <Component class="javax.swing.JLabel" name="lblJumlahBayar">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="14" style="1"/>
@@ -1204,7 +1176,7 @@
                 <Property name="text" type="java.lang.String" value="Jumlah Bayar"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="lblPassword1">
+            <Component class="javax.swing.JLabel" name="lblTanggalBayar">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="14" style="1"/>
@@ -1212,7 +1184,7 @@
                 <Property name="text" type="java.lang.String" value="Tanggal Bayar"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel4">
+            <Component class="javax.swing.JLabel" name="valId">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -1220,7 +1192,7 @@
                 <Property name="text" type="java.lang.String" value=": TR00003"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel5">
+            <Component class="javax.swing.JLabel" name="valNamaPetugas">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -1228,7 +1200,7 @@
                 <Property name="text" type="java.lang.String" value=": Levi Ackerman"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel6">
+            <Component class="javax.swing.JLabel" name="valBulanBayar">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -1236,7 +1208,7 @@
                 <Property name="text" type="java.lang.String" value=": Juli 2021"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel7">
+            <Component class="javax.swing.JLabel" name="valTanggalBayar">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -1244,7 +1216,7 @@
                 <Property name="text" type="java.lang.String" value=": 27 Maret 2021"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel8">
+            <Component class="javax.swing.JLabel" name="valJumlahBayar">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -1252,7 +1224,7 @@
                 <Property name="text" type="java.lang.String" value=": Rp. 130.000.00"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel9">
+            <Component class="javax.swing.JLabel" name="valStatus">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="15" style="1"/>
@@ -1345,7 +1317,7 @@
             </Component>
           </SubComponents>
         </Container>
-        <Component class="javax.swing.JLabel" name="jLabel2">
+        <Component class="javax.swing.JLabel" name="lblTahunAjaran">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Dialog" size="14" style="1"/>
@@ -1361,7 +1333,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JComboBox" name="jComboBox2">
+        <Component class="javax.swing.JComboBox" name="chooseTahun">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Dialog" size="14" style="1"/>
@@ -1383,7 +1355,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JButton" name="jButton1">
+        <Component class="javax.swing.JButton" name="btnCari">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ed" green="77" red="22" type="rgb"/>
@@ -1394,8 +1366,16 @@
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="ff" red="ff" type="rgb"/>
             </Property>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/resources/image/icons/ic-histori-search.png"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="Cari"/>
           </Properties>
+          <Events>
+            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btnCariMouseEntered"/>
+            <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btnCariMouseExited"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCariActionPerformed"/>
+          </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
               <AbsoluteConstraints x="1173" y="170" width="90" height="30"/>
