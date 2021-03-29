@@ -2,11 +2,18 @@ package com.window.petugas;
 
 import com.database.Account;
 import com.media.Gambar;
+import com.media.Internet;
 
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -77,6 +84,80 @@ public class TentangAplikasi extends javax.swing.JFrame {
                 }
             });
         }
+        
+        JLabel[] lblInfo = new JLabel[]{
+            this.valNamaApp, this.valVersiApp, this.valUkuranApp, this.valDibuat, this.valPengguna, this.valDeveloper
+        };
+        
+        for(JLabel lbl : lblInfo){
+            lbl.addMouseListener(new java.awt.event.MouseListener() {
+
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    lbl.setForeground(new Color(5,170,57));
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    lbl.setForeground(new Color(0,0,0));
+                    
+                }
+            });
+        }    
+            
+        JLabel[] lblSystem = new JLabel[]{
+            this.valRam, this.valDisk, this.valScreen, this.valJdk
+        };
+            
+        for(JLabel lblSys : lblSystem){
+            lblSys.addMouseListener(new java.awt.event.MouseListener() {
+
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    lblSys.setForeground(new Color(246,46,46));
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    lblSys.setForeground(new Color(0,0,0));
+                    
+                }
+            });
+        }
        
     }
 
@@ -106,51 +187,51 @@ public class TentangAplikasi extends javax.swing.JFrame {
         btnMinimaze = new javax.swing.JButton();
         lblSekolah = new javax.swing.JLabel();
         lblDashboard = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
-        jPanel1 = new javax.swing.JPanel();
+        lineTop = new javax.swing.JSeparator();
+        pnlDeskripsi = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jPanel2 = new javax.swing.JPanel();
+        txtDeskripsi = new javax.swing.JTextArea();
+        pnlInfoKontak = new javax.swing.JPanel();
         pnlTitleInfo = new javax.swing.JPanel();
-        lblTitleInfo = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
-        pnlTitleInfo1 = new javax.swing.JPanel();
-        lblTitleInfo1 = new javax.swing.JLabel();
-        lblData1 = new javax.swing.JLabel();
-        val1 = new javax.swing.JLabel();
-        lblData2 = new javax.swing.JLabel();
-        val2 = new javax.swing.JLabel();
-        val3 = new javax.swing.JLabel();
-        lblData3 = new javax.swing.JLabel();
-        val4 = new javax.swing.JLabel();
-        lblData4 = new javax.swing.JLabel();
-        lblData5 = new javax.swing.JLabel();
-        val5 = new javax.swing.JLabel();
-        lblData6 = new javax.swing.JLabel();
-        val6 = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
-        pnlTitleInfo2 = new javax.swing.JPanel();
-        lblTitleInfo2 = new javax.swing.JLabel();
-        lblData7 = new javax.swing.JLabel();
-        val7 = new javax.swing.JLabel();
-        val8 = new javax.swing.JLabel();
-        lblData8 = new javax.swing.JLabel();
-        lblData9 = new javax.swing.JLabel();
-        val9 = new javax.swing.JLabel();
-        lblData10 = new javax.swing.JLabel();
-        val10 = new javax.swing.JLabel();
-        jSeparator2 = new javax.swing.JSeparator();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
+        lblTitleKontak = new javax.swing.JLabel();
+        lblIconYT = new javax.swing.JLabel();
+        lblYT = new javax.swing.JLabel();
+        lblIconIG = new javax.swing.JLabel();
+        lblIG = new javax.swing.JLabel();
+        lblIconWA = new javax.swing.JLabel();
+        lblWA = new javax.swing.JLabel();
+        pnlInfoApp = new javax.swing.JPanel();
+        pnlTitleInfoApp = new javax.swing.JPanel();
+        lblTitleInfoApp = new javax.swing.JLabel();
+        lblNamaApp = new javax.swing.JLabel();
+        valNamaApp = new javax.swing.JLabel();
+        lblVersiApp = new javax.swing.JLabel();
+        valVersiApp = new javax.swing.JLabel();
+        valUkuranApp = new javax.swing.JLabel();
+        lblUkuranApp = new javax.swing.JLabel();
+        valDibuat = new javax.swing.JLabel();
+        lblDibuat = new javax.swing.JLabel();
+        lblPengguna = new javax.swing.JLabel();
+        valPengguna = new javax.swing.JLabel();
+        lblDeveloper = new javax.swing.JLabel();
+        valDeveloper = new javax.swing.JLabel();
+        pnlInfoSystem = new javax.swing.JPanel();
+        pnlTitleSystem = new javax.swing.JPanel();
+        lblTitleSystem = new javax.swing.JLabel();
+        lblRam = new javax.swing.JLabel();
+        valRam = new javax.swing.JLabel();
+        valDisk = new javax.swing.JLabel();
+        lblDisk = new javax.swing.JLabel();
+        lblJdk = new javax.swing.JLabel();
+        valJdk = new javax.swing.JLabel();
+        lblScreen = new javax.swing.JLabel();
+        valScreen = new javax.swing.JLabel();
+        lineBottom = new javax.swing.JSeparator();
+        lblSekolahBottom = new javax.swing.JLabel();
+        lblAppName = new javax.swing.JLabel();
+        lblNamaSekolah = new javax.swing.JLabel();
+        lblVersion = new javax.swing.JLabel();
+        lblCopyright = new javax.swing.JLabel();
         lblBgImage = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -500,48 +581,48 @@ public class TentangAplikasi extends javax.swing.JFrame {
 
         lblDashboard.setFont(new java.awt.Font("Ebrima", 1, 21)); // NOI18N
         lblDashboard.setForeground(new java.awt.Color(22, 19, 19));
-        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-dashboard-logo.png"))); // NOI18N
+        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/icons8_about_35px.png"))); // NOI18N
         lblDashboard.setText("Tentang Aplikasi");
         lblDashboard.setIconTextGap(6);
         pnlMain.add(lblDashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 64, 400, -1));
 
-        jSeparator1.setBackground(new java.awt.Color(0, 0, 0));
-        jSeparator1.setForeground(new java.awt.Color(0, 0, 0));
-        pnlMain.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 110, 900, 10));
+        lineTop.setBackground(new java.awt.Color(0, 0, 0));
+        lineTop.setForeground(new java.awt.Color(0, 0, 0));
+        pnlMain.add(lineTop, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 110, 900, 10));
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        pnlDeskripsi.setBackground(new java.awt.Color(255, 255, 255));
+        pnlDeskripsi.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Dialog", 1, 13)); // NOI18N
-        jTextArea1.setRows(5);
-        jTextArea1.setText("Aplikasi ini digunakan untuk melakukan pembayaran SPP di \nsekolah SMK Negeri 1 Kertosono.");
-        jTextArea1.setDisabledTextColor(new java.awt.Color(12, 11, 11));
-        jTextArea1.setEnabled(false);
-        jScrollPane1.setViewportView(jTextArea1);
+        txtDeskripsi.setColumns(20);
+        txtDeskripsi.setFont(new java.awt.Font("Dialog", 1, 13)); // NOI18N
+        txtDeskripsi.setRows(5);
+        txtDeskripsi.setText("Aplikasi ini digunakan untuk melakukan pembayaran SPP di \nsekolah SMK Negeri 1 Kertosono.\n\nTujuan dari dibuatnya aplikasi ini adalah untuk memudahkan\nproses pembayaran SPP yang ada di Sekolah SMK Negeri\n1 Kertosono.\n\nAplikasi in dibuat oleh Achmad Baihaqi dari kelas \nXII RPL 1\n\nAplikasi ini dibuat pada tanggal 01 Maret 2021\n");
+        txtDeskripsi.setDisabledTextColor(new java.awt.Color(12, 11, 11));
+        txtDeskripsi.setEnabled(false);
+        jScrollPane1.setViewportView(txtDeskripsi);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout pnlDeskripsiLayout = new javax.swing.GroupLayout(pnlDeskripsi);
+        pnlDeskripsi.setLayout(pnlDeskripsiLayout);
+        pnlDeskripsiLayout.setHorizontalGroup(
+            pnlDeskripsiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        pnlDeskripsiLayout.setVerticalGroup(
+            pnlDeskripsiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
         );
 
-        pnlMain.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 130, 400, 260));
+        pnlMain.add(pnlDeskripsi, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 130, 400, 260));
 
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        pnlInfoKontak.setBackground(new java.awt.Color(255, 255, 255));
+        pnlInfoKontak.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(15, 98, 230), 2));
 
         pnlTitleInfo.setBackground(new java.awt.Color(15, 98, 230));
         pnlTitleInfo.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        lblTitleInfo.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblTitleInfo.setForeground(new java.awt.Color(255, 255, 255));
-        lblTitleInfo.setText("Kontak Developer");
+        lblTitleKontak.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblTitleKontak.setForeground(new java.awt.Color(255, 255, 255));
+        lblTitleKontak.setText("Kontak Developer");
 
         javax.swing.GroupLayout pnlTitleInfoLayout = new javax.swing.GroupLayout(pnlTitleInfo);
         pnlTitleInfo.setLayout(pnlTitleInfoLayout);
@@ -549,328 +630,361 @@ public class TentangAplikasi extends javax.swing.JFrame {
             pnlTitleInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTitleInfoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblTitleInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 386, Short.MAX_VALUE))
+                .addComponent(lblTitleKontak, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE))
         );
         pnlTitleInfoLayout.setVerticalGroup(
             pnlTitleInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(lblTitleInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+            .addComponent(lblTitleKontak, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
         );
 
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-tentangapp-youtube.png"))); // NOI18N
+        lblIconYT.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblIconYT.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-tentangapp-youtube.png"))); // NOI18N
+        lblIconYT.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblIconYTMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lblIconYTMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lblIconYTMouseExited(evt);
+            }
+        });
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("Youtube");
+        lblYT.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        lblYT.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblYT.setText("Youtube");
 
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-tentangapp-instagram.png"))); // NOI18N
+        lblIconIG.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblIconIG.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-tentangapp-instagram.png"))); // NOI18N
+        lblIconIG.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblIconIGMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lblIconIGMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lblIconIGMouseExited(evt);
+            }
+        });
 
-        jLabel4.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("Instagram");
+        lblIG.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        lblIG.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblIG.setText("Instagram");
 
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-tentangapp-whatsapp.png"))); // NOI18N
+        lblIconWA.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblIconWA.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-tentangapp-whatsapp.png"))); // NOI18N
+        lblIconWA.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblIconWAMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lblIconWAMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lblIconWAMouseExited(evt);
+            }
+        });
 
-        jLabel6.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel6.setText("Whatsapp");
+        lblWA.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        lblWA.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblWA.setText("Whatsapp");
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout pnlInfoKontakLayout = new javax.swing.GroupLayout(pnlInfoKontak);
+        pnlInfoKontak.setLayout(pnlInfoKontakLayout);
+        pnlInfoKontakLayout.setHorizontalGroup(
+            pnlInfoKontakLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(pnlTitleInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlInfoKontakLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(pnlInfoKontakLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblYT, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblIconYT, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(34, 34, 34)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(pnlInfoKontakLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblIconIG, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblIG, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(31, 31, 31)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(pnlInfoKontakLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblIconWA, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblWA, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(23, 23, 23))
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        pnlInfoKontakLayout.setVerticalGroup(
+            pnlInfoKontakLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlInfoKontakLayout.createSequentialGroup()
                 .addComponent(pnlTitleInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE))
+                .addGroup(pnlInfoKontakLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblIconWA, javax.swing.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)
+                    .addComponent(lblIconIG, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblIconYT, javax.swing.GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel6))
-                .addGap(0, 9, Short.MAX_VALUE))
+                .addGroup(pnlInfoKontakLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblYT)
+                    .addComponent(lblIG)
+                    .addComponent(lblWA))
+                .addGap(0, 7, Short.MAX_VALUE))
         );
 
-        pnlMain.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 410, 400, 130));
+        pnlMain.add(pnlInfoKontak, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 410, 400, 130));
 
-        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(5, 170, 57), 2));
+        pnlInfoApp.setBackground(new java.awt.Color(255, 255, 255));
+        pnlInfoApp.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(5, 170, 57), 2));
 
-        pnlTitleInfo1.setBackground(new java.awt.Color(5, 170, 57));
-        pnlTitleInfo1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        pnlTitleInfoApp.setBackground(new java.awt.Color(5, 170, 57));
+        pnlTitleInfoApp.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        lblTitleInfo1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblTitleInfo1.setForeground(new java.awt.Color(255, 255, 255));
-        lblTitleInfo1.setText("Info Aplikasi");
+        lblTitleInfoApp.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblTitleInfoApp.setForeground(new java.awt.Color(255, 255, 255));
+        lblTitleInfoApp.setText("Info Aplikasi");
 
-        javax.swing.GroupLayout pnlTitleInfo1Layout = new javax.swing.GroupLayout(pnlTitleInfo1);
-        pnlTitleInfo1.setLayout(pnlTitleInfo1Layout);
-        pnlTitleInfo1Layout.setHorizontalGroup(
-            pnlTitleInfo1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTitleInfo1Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlTitleInfoAppLayout = new javax.swing.GroupLayout(pnlTitleInfoApp);
+        pnlTitleInfoApp.setLayout(pnlTitleInfoAppLayout);
+        pnlTitleInfoAppLayout.setHorizontalGroup(
+            pnlTitleInfoAppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTitleInfoAppLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblTitleInfo1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(lblTitleInfoApp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        pnlTitleInfo1Layout.setVerticalGroup(
-            pnlTitleInfo1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(lblTitleInfo1, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+        pnlTitleInfoAppLayout.setVerticalGroup(
+            pnlTitleInfoAppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(lblTitleInfoApp, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
         );
 
-        lblData1.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData1.setText("Nama Aplikasi");
+        lblNamaApp.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblNamaApp.setText("Nama Aplikasi");
 
-        val1.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val1.setText(": UKK Pembayaran SPP");
+        valNamaApp.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valNamaApp.setText(": UKK Pembayaran SPP");
 
-        lblData2.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData2.setText("Versi Aplikasi");
+        lblVersiApp.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblVersiApp.setText("Versi Aplikasi");
 
-        val2.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val2.setText(": 1.0.0");
+        valVersiApp.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valVersiApp.setText(": 1.0.0");
 
-        val3.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val3.setText(": 150 Mb");
+        valUkuranApp.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valUkuranApp.setText(": 150 Mb");
 
-        lblData3.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData3.setText("Ukuran Aplikasi");
+        lblUkuranApp.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblUkuranApp.setText("Ukuran Aplikasi");
 
-        val4.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val4.setText(": 01 Maret 2021");
+        valDibuat.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valDibuat.setText(": 01 Maret 2021");
 
-        lblData4.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData4.setText("Dibuat Pada");
+        lblDibuat.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblDibuat.setText("Dibuat Pada");
 
-        lblData5.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData5.setText("Total Pengguna");
+        lblPengguna.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblPengguna.setText("Total Pengguna");
 
-        val5.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val5.setText(": 393 Pengguna");
+        valPengguna.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valPengguna.setText(": 393 Pengguna");
 
-        lblData6.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData6.setText("Developer");
+        lblDeveloper.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblDeveloper.setText("Developer");
 
-        val6.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val6.setText(": Achmad Baihaqi");
+        valDeveloper.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valDeveloper.setText(": Achmad Baihaqi");
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlTitleInfo1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlInfoAppLayout = new javax.swing.GroupLayout(pnlInfoApp);
+        pnlInfoApp.setLayout(pnlInfoAppLayout);
+        pnlInfoAppLayout.setHorizontalGroup(
+            pnlInfoAppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pnlTitleInfoApp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(pnlInfoAppLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(lblData1, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlInfoAppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlInfoAppLayout.createSequentialGroup()
+                        .addComponent(lblNamaApp, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val1, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(lblData2, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(valNamaApp, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlInfoAppLayout.createSequentialGroup()
+                        .addComponent(lblVersiApp, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val2, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(lblData3, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(valVersiApp, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlInfoAppLayout.createSequentialGroup()
+                        .addComponent(lblUkuranApp, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val3, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(valUkuranApp, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlInfoAppLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(lblData4, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlInfoAppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlInfoAppLayout.createSequentialGroup()
+                        .addComponent(lblDibuat, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val4, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(lblData5, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(valDibuat, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlInfoAppLayout.createSequentialGroup()
+                        .addComponent(lblPengguna, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val5, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(lblData6, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(valPengguna, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlInfoAppLayout.createSequentialGroup()
+                        .addComponent(lblDeveloper, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val6, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(valDeveloper, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(pnlTitleInfo1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        pnlInfoAppLayout.setVerticalGroup(
+            pnlInfoAppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlInfoAppLayout.createSequentialGroup()
+                .addComponent(pnlTitleInfoApp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(13, 13, 13)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData1)
-                    .addComponent(val1))
+                .addGroup(pnlInfoAppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblNamaApp)
+                    .addComponent(valNamaApp))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData2)
-                    .addComponent(val2))
+                .addGroup(pnlInfoAppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblVersiApp)
+                    .addComponent(valVersiApp))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(val3)
-                    .addComponent(lblData3))
+                .addGroup(pnlInfoAppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(valUkuranApp)
+                    .addComponent(lblUkuranApp))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(val4)
-                    .addComponent(lblData4))
+                .addGroup(pnlInfoAppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(valDibuat)
+                    .addComponent(lblDibuat))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(val5)
-                    .addComponent(lblData5))
+                .addGroup(pnlInfoAppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(valPengguna)
+                    .addComponent(lblPengguna))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(val6)
-                    .addComponent(lblData6))
+                .addGroup(pnlInfoAppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(valDeveloper)
+                    .addComponent(lblDeveloper))
                 .addGap(0, 16, Short.MAX_VALUE))
         );
 
-        pnlMain.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 130, 470, 240));
+        pnlMain.add(pnlInfoApp, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 130, 470, 240));
 
-        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(246, 46, 46), 2));
+        pnlInfoSystem.setBackground(new java.awt.Color(255, 255, 255));
+        pnlInfoSystem.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(246, 46, 46), 2));
 
-        pnlTitleInfo2.setBackground(new java.awt.Color(246, 46, 46));
-        pnlTitleInfo2.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        pnlTitleSystem.setBackground(new java.awt.Color(246, 46, 46));
+        pnlTitleSystem.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        lblTitleInfo2.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblTitleInfo2.setForeground(new java.awt.Color(255, 255, 255));
-        lblTitleInfo2.setText("System Requirement");
+        lblTitleSystem.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblTitleSystem.setForeground(new java.awt.Color(255, 255, 255));
+        lblTitleSystem.setText("System Requirement");
 
-        javax.swing.GroupLayout pnlTitleInfo2Layout = new javax.swing.GroupLayout(pnlTitleInfo2);
-        pnlTitleInfo2.setLayout(pnlTitleInfo2Layout);
-        pnlTitleInfo2Layout.setHorizontalGroup(
-            pnlTitleInfo2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTitleInfo2Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlTitleSystemLayout = new javax.swing.GroupLayout(pnlTitleSystem);
+        pnlTitleSystem.setLayout(pnlTitleSystemLayout);
+        pnlTitleSystemLayout.setHorizontalGroup(
+            pnlTitleSystemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTitleSystemLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblTitleInfo2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(lblTitleSystem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        pnlTitleInfo2Layout.setVerticalGroup(
-            pnlTitleInfo2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(lblTitleInfo2, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+        pnlTitleSystemLayout.setVerticalGroup(
+            pnlTitleSystemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(lblTitleSystem, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
         );
 
-        lblData7.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData7.setText("RAM");
+        lblRam.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblRam.setText("RAM");
 
-        val7.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val7.setText(": 2 GB (4 GB Recomended)");
+        valRam.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valRam.setText(": 2 GB (4 GB Recomended)");
 
-        val8.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val8.setText(": 150 MB (200 MB Recomended)");
+        valDisk.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valDisk.setText(": 150 MB (200 MB Recomended)");
 
-        lblData8.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData8.setText("Free Disk Space");
+        lblDisk.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblDisk.setText("Free Disk Space");
 
-        lblData9.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData9.setText("JDK Minimum");
+        lblJdk.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblJdk.setText("JDK Minimum");
 
-        val9.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val9.setText(": Java Development Kit 8");
+        valJdk.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valJdk.setText(": Java Development Kit 8");
 
-        lblData10.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData10.setText("Screen Resolution");
+        lblScreen.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblScreen.setText("Screen Resolution");
 
-        val10.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val10.setText(": 1336x768 (1440x900 Recomended)");
+        valScreen.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valScreen.setText(": 1336x768 (1440x900 Recomended)");
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlTitleInfo2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlInfoSystemLayout = new javax.swing.GroupLayout(pnlInfoSystem);
+        pnlInfoSystem.setLayout(pnlInfoSystemLayout);
+        pnlInfoSystemLayout.setHorizontalGroup(
+            pnlInfoSystemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pnlTitleSystem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(pnlInfoSystemLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                        .addComponent(lblData7, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlInfoSystemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlInfoSystemLayout.createSequentialGroup()
+                        .addComponent(lblRam, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val7, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                        .addComponent(lblData8, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(valRam, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlInfoSystemLayout.createSequentialGroup()
+                        .addComponent(lblDisk, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val8, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(lblData9, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(valDisk, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlInfoSystemLayout.createSequentialGroup()
+                        .addComponent(lblJdk, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val9, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(lblData10, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(valJdk, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlInfoSystemLayout.createSequentialGroup()
+                        .addComponent(lblScreen, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val10, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(valScreen, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addComponent(pnlTitleInfo2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        pnlInfoSystemLayout.setVerticalGroup(
+            pnlInfoSystemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlInfoSystemLayout.createSequentialGroup()
+                .addComponent(pnlTitleSystem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData7)
-                    .addComponent(val7))
+                .addGroup(pnlInfoSystemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblRam)
+                    .addComponent(valRam))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData8)
-                    .addComponent(val8))
+                .addGroup(pnlInfoSystemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblDisk)
+                    .addComponent(valDisk))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData9)
-                    .addComponent(val9))
+                .addGroup(pnlInfoSystemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblJdk)
+                    .addComponent(valJdk))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData10)
-                    .addComponent(val10))
+                .addGroup(pnlInfoSystemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblScreen)
+                    .addComponent(valScreen))
                 .addGap(0, 13, Short.MAX_VALUE))
         );
 
-        pnlMain.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 380, 470, 180));
+        pnlMain.add(pnlInfoSystem, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 380, 470, 180));
 
-        jSeparator2.setBackground(new java.awt.Color(0, 0, 0));
-        jSeparator2.setForeground(new java.awt.Color(0, 0, 0));
-        pnlMain.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 582, 900, 10));
+        lineBottom.setBackground(new java.awt.Color(0, 0, 0));
+        lineBottom.setForeground(new java.awt.Color(0, 0, 0));
+        pnlMain.add(lineBottom, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 582, 900, 10));
 
-        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-dashboard-logo-dark.png"))); // NOI18N
-        pnlMain.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 590, 40, 60));
+        lblSekolahBottom.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblSekolahBottom.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-dashboard-logo-dark.png"))); // NOI18N
+        pnlMain.add(lblSekolahBottom, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 590, 40, 60));
 
-        jLabel9.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        jLabel9.setForeground(new java.awt.Color(16, 81, 200));
-        jLabel9.setText("Sistem Aplikasi Pembayaran SPP");
-        pnlMain.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 620, 390, -1));
+        lblAppName.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        lblAppName.setForeground(new java.awt.Color(16, 81, 200));
+        lblAppName.setText("Sistem Aplikasi Pembayaran SPP");
+        pnlMain.add(lblAppName, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 620, 390, -1));
 
-        jLabel8.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        jLabel8.setForeground(new java.awt.Color(231, 38, 38));
-        jLabel8.setText("SMK Negeri 1 Kertosono");
-        pnlMain.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 600, 390, 20));
+        lblNamaSekolah.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        lblNamaSekolah.setForeground(new java.awt.Color(231, 38, 38));
+        lblNamaSekolah.setText("SMK Negeri 1 Kertosono");
+        pnlMain.add(lblNamaSekolah, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 600, 390, 20));
 
-        jLabel10.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel10.setText("Verison 1.0.0");
-        pnlMain.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 600, 280, -1));
+        lblVersion.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        lblVersion.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblVersion.setText("Verison 1.0.0");
+        pnlMain.add(lblVersion, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 600, 280, -1));
 
-        jLabel11.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel11.setText("Copyright © 2021. Achmad Baihaqi. All Rights Reserved.");
-        pnlMain.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 620, 350, -1));
+        lblCopyright.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        lblCopyright.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblCopyright.setText("Copyright © 2021. Achmad Baihaqi. All Rights Reserved.");
+        pnlMain.add(lblCopyright, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 620, 350, -1));
 
         lblBgImage.setBackground(new java.awt.Color(41, 52, 71));
         pnlMain.add(lblBgImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1200, 650));
@@ -1095,6 +1209,63 @@ public class TentangAplikasi extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_btnTentangAppActionPerformed
 
+    private void lblIconYTMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconYTMouseEntered
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        this.lblIconYT.setIcon(Gambar.getIcon("ic-tentangapp-youtube-entered.png"));
+        this.lblYT.setForeground(new Color(246,46,46));
+    }//GEN-LAST:event_lblIconYTMouseEntered
+
+    private void lblIconYTMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconYTMouseExited
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        this.lblIconYT.setIcon(Gambar.getIcon("ic-tentangapp-youtube.png"));
+        this.lblYT.setForeground(new Color(0,0,0));
+    }//GEN-LAST:event_lblIconYTMouseExited
+
+    private void lblIconYTMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconYTMouseClicked
+
+    }//GEN-LAST:event_lblIconYTMouseClicked
+
+    private void lblIconIGMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconIGMouseClicked
+
+    }//GEN-LAST:event_lblIconIGMouseClicked
+
+    private void lblIconIGMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconIGMouseEntered
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        this.lblIconIG.setIcon(Gambar.getIcon("ic-tentangapp-instagram-entered.png"));
+        this.lblIG.setForeground(new Color(246,46,46));
+    }//GEN-LAST:event_lblIconIGMouseEntered
+
+    private void lblIconIGMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconIGMouseExited
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        this.lblIconIG.setIcon(Gambar.getIcon("ic-tentangapp-instagram.png"));
+        this.lblIG.setForeground(new Color(0,0,0));
+    }//GEN-LAST:event_lblIconIGMouseExited
+
+    private void lblIconWAMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconWAMouseClicked
+        Internet net = new Internet();
+        if(net.isConnectInternet()){
+            try {
+                net.openLink("https://wa.me/625655864624");
+            } catch (IOException | URISyntaxException ex) {
+                Logger.getLogger(DataSiswa.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            JOptionPane.showMessageDialog(null, "Tidak terhubung ke Internet!", "Error", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_lblIconWAMouseClicked
+
+    private void lblIconWAMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconWAMouseEntered
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        this.lblIconWA.setIcon(Gambar.getIcon("ic-tentangapp-whatsapp-entered.png"));
+        this.lblWA.setForeground(new Color(246,46,46));
+    }//GEN-LAST:event_lblIconWAMouseEntered
+
+    private void lblIconWAMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconWAMouseExited
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        this.lblIconWA.setIcon(Gambar.getIcon("ic-tentangapp-whatsapp.png"));
+        this.lblWA.setForeground(new Color(0,0,0));
+    }//GEN-LAST:event_lblIconWAMouseExited
+
     public static void main(String args[]) {
 
         try {
@@ -1128,62 +1299,62 @@ public class TentangAplikasi extends javax.swing.JFrame {
     private javax.swing.JButton btnMinimaze;
     private javax.swing.JButton btnPembayaranSpp;
     private javax.swing.JButton btnTentangApp;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JLabel lblAppName;
     private javax.swing.JLabel lblBgImage;
+    private javax.swing.JLabel lblCopyright;
     private javax.swing.JLabel lblDashboard;
-    private javax.swing.JLabel lblData1;
-    private javax.swing.JLabel lblData10;
-    private javax.swing.JLabel lblData2;
-    private javax.swing.JLabel lblData3;
-    private javax.swing.JLabel lblData4;
-    private javax.swing.JLabel lblData5;
-    private javax.swing.JLabel lblData6;
-    private javax.swing.JLabel lblData7;
-    private javax.swing.JLabel lblData8;
-    private javax.swing.JLabel lblData9;
+    private javax.swing.JLabel lblDeveloper;
+    private javax.swing.JLabel lblDibuat;
+    private javax.swing.JLabel lblDisk;
+    private javax.swing.JLabel lblIG;
+    private javax.swing.JLabel lblIconIG;
+    private javax.swing.JLabel lblIconWA;
+    private javax.swing.JLabel lblIconYT;
+    private javax.swing.JLabel lblJdk;
+    private javax.swing.JLabel lblNamaApp;
+    private javax.swing.JLabel lblNamaSekolah;
     private javax.swing.JLabel lblNamaUser;
+    private javax.swing.JLabel lblPengguna;
     private javax.swing.JLabel lblPhotoProfile;
+    private javax.swing.JLabel lblRam;
+    private javax.swing.JLabel lblScreen;
     private javax.swing.JLabel lblSekolah;
+    private javax.swing.JLabel lblSekolahBottom;
     private javax.swing.JLabel lblTipeAkun;
-    private javax.swing.JLabel lblTitleInfo;
-    private javax.swing.JLabel lblTitleInfo1;
-    private javax.swing.JLabel lblTitleInfo2;
+    private javax.swing.JLabel lblTitleInfoApp;
+    private javax.swing.JLabel lblTitleKontak;
+    private javax.swing.JLabel lblTitleSystem;
+    private javax.swing.JLabel lblUkuranApp;
+    private javax.swing.JLabel lblVersiApp;
+    private javax.swing.JLabel lblVersion;
+    private javax.swing.JLabel lblWA;
+    private javax.swing.JLabel lblYT;
+    private javax.swing.JSeparator lineBottom;
+    private javax.swing.JSeparator lineTop;
     private javax.swing.JPanel pnlAccount;
+    private javax.swing.JPanel pnlDeskripsi;
+    private javax.swing.JPanel pnlInfoApp;
+    private javax.swing.JPanel pnlInfoKontak;
+    private javax.swing.JPanel pnlInfoSystem;
     private javax.swing.JPanel pnlLeftBottom;
     private javax.swing.JPanel pnlMain;
     private javax.swing.JPanel pnlTitle;
     private javax.swing.JPanel pnlTitleInfo;
-    private javax.swing.JPanel pnlTitleInfo1;
-    private javax.swing.JPanel pnlTitleInfo2;
+    private javax.swing.JPanel pnlTitleInfoApp;
+    private javax.swing.JPanel pnlTitleSystem;
     private javax.swing.JPanel pnlTop;
     private javax.swing.JPanel sidePanel;
-    private javax.swing.JLabel val1;
-    private javax.swing.JLabel val10;
-    private javax.swing.JLabel val2;
-    private javax.swing.JLabel val3;
-    private javax.swing.JLabel val4;
-    private javax.swing.JLabel val5;
-    private javax.swing.JLabel val6;
-    private javax.swing.JLabel val7;
-    private javax.swing.JLabel val8;
-    private javax.swing.JLabel val9;
+    private javax.swing.JTextArea txtDeskripsi;
+    private javax.swing.JLabel valDeveloper;
+    private javax.swing.JLabel valDibuat;
+    private javax.swing.JLabel valDisk;
+    private javax.swing.JLabel valJdk;
+    private javax.swing.JLabel valNamaApp;
+    private javax.swing.JLabel valPengguna;
+    private javax.swing.JLabel valRam;
+    private javax.swing.JLabel valScreen;
+    private javax.swing.JLabel valUkuranApp;
+    private javax.swing.JLabel valVersiApp;
     // End of variables declaration//GEN-END:variables
 }
