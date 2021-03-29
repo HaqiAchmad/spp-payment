@@ -21,8 +21,6 @@ public class Transaksi extends Database{
     
     private final Waktu waktu = new Waktu();
     
-    private static final int ID_SPP_17 = 17, ID_SPP_18 = 18, ID_SPP_19 = 19, ID_SPP_20 = 20;
-    
     public boolean addDataSpp(int idSpp, int tahun, int nominal){
         String query = "INSERT INTO spp VALUES "+String.format("('%d', '%d', '%d')", idSpp, tahun, nominal);
         return this.addData(query);
@@ -55,10 +53,16 @@ public class Transaksi extends Database{
         return this.setData(SPP, "nominal", "id_spp", Integer.toString(idSpp), Integer.toString(nominal));
     }
     
-    public Object[] getID(){
+    public int getPresentaseLunas(int idSpp){
+        int dibayar = (int)this.getTotalSppDibayar(idSpp, "2020", "2021"),
+            lunas = (this.getNominalSpp(idSpp) * 12 * this.getJumlahData(SISWA, "WHERE id_spp = '"+idSpp+"' "));
+        return dibayar / lunas * 100;
+    }
+    
+    public Object[] getID(String keyword){
         try{
             ArrayList<String> id = new ArrayList<>();
-            String query = "SELECT id_pembayaran FROM pembayaran;";
+            String query = "SELECT id_pembayaran FROM pembayaran " + keyword;
             res = stat.executeQuery(query);
             while(res.next()){
                 id.add(res.getString("id_pembayaran"));
@@ -69,6 +73,10 @@ public class Transaksi extends Database{
             JOptionPane.showMessageDialog(null, "Terjadi kesalahan : " + ex.getMessage(), "Warning", JOptionPane.WARNING_MESSAGE);
         }
         return null;
+    }
+    
+    public Object[] getID(){
+        return this.getID("");
     }
     
     public String getLastID(){
@@ -94,7 +102,7 @@ public class Transaksi extends Database{
             if(nominal <= kekurangan){
                 String query = "INSERT INTO pembayaran VALUES " + 
                         String.format("('%s', '%d', '%d', '%s', '%d', '%d' , '%s', '%s')", 
-                                createID(), idPetugas, nis, bulan, tahun, nominal, waktu.getDateNow(), acc.getDataAkun("6156", "id_spp"));
+                                createID(), idPetugas, nis, bulan, tahun, nominal, waktu.getDateNow(), acc.getDataAkun(Integer.toString(nis), "id_spp"));
                 return this.addData(query);
             }else{
                 Audio.play(Audio.SOUND_WARNING);
@@ -132,12 +140,14 @@ public class Transaksi extends Database{
         return 0;
     }
     
-    public int sppDibayar(int nis, int tahun){
+    public int sppDibayar(int nis, String tahun){
+        int tahunAwl = Integer.parseInt(tahun.substring(0, tahun.indexOf("-"))), 
+            tahunAkr = Integer.parseInt(tahun.substring(tahun.indexOf("-")+1));
         int dibayar = 
-                sppDibayar(nis, Waktu.JANUARI, tahun) + sppDibayar(nis, Waktu.FEBRUARI, tahun) + sppDibayar(nis, Waktu.MARET, tahun) + 
-                sppDibayar(nis, Waktu.APRIL, tahun) + sppDibayar(nis, Waktu.MEI, tahun) + sppDibayar(nis, Waktu.JUNI, tahun) + 
-                sppDibayar(nis, Waktu.JULI, tahun) + sppDibayar(nis, Waktu.AGUSTUS, tahun) + sppDibayar(nis, Waktu.SEPTEMBER, tahun) +
-                sppDibayar(nis, Waktu.OKTOBER, tahun) + sppDibayar(nis, Waktu.NOVEMBER, tahun) + sppDibayar(nis, Waktu.DESEMBER, tahun);
+                sppDibayar(nis, Waktu.JANUARI, tahunAkr) + sppDibayar(nis, Waktu.FEBRUARI, tahunAkr) + sppDibayar(nis, Waktu.MARET, tahunAkr) + 
+                sppDibayar(nis, Waktu.APRIL, tahunAkr) + sppDibayar(nis, Waktu.MEI, tahunAkr) + sppDibayar(nis, Waktu.JUNI, tahunAkr) + 
+                sppDibayar(nis, Waktu.JULI, tahunAwl) + sppDibayar(nis, Waktu.AGUSTUS, tahunAwl) + sppDibayar(nis, Waktu.SEPTEMBER, tahunAwl) +
+                sppDibayar(nis, Waktu.OKTOBER, tahunAwl) + sppDibayar(nis, Waktu.NOVEMBER, tahunAwl) + sppDibayar(nis, Waktu.DESEMBER, tahunAwl);
         return dibayar;
     }
     
@@ -145,12 +155,14 @@ public class Transaksi extends Database{
         return this.getNominalSpp(Integer.parseInt(acc.getDataAkun(Integer.toString(nis), "id_spp"))) - this.sppDibayar(nis, bulan, tahun);
     }
     
-    public int kekuranganSpp(int nis, int tahun){
+    public int kekuranganSpp(int nis, String tahun){
+        int tahunAwl = Integer.parseInt(tahun.substring(0, tahun.indexOf("-"))), 
+            tahunAkr = Integer.parseInt(tahun.substring(tahun.indexOf("-")+1));
         int kekurangan = 
-                kekuranganSpp(nis, Waktu.JANUARI, tahun) + kekuranganSpp(nis, Waktu.FEBRUARI, tahun) + kekuranganSpp(nis, Waktu.MARET, tahun) + 
-                kekuranganSpp(nis, Waktu.APRIL, tahun) + kekuranganSpp(nis, Waktu.MEI, tahun) + kekuranganSpp(nis, Waktu.JUNI, tahun) + 
-                kekuranganSpp(nis, Waktu.JULI, tahun) + kekuranganSpp(nis, Waktu.AGUSTUS, tahun) + kekuranganSpp(nis, Waktu.SEPTEMBER, tahun) +
-                kekuranganSpp(nis, Waktu.OKTOBER, tahun) + kekuranganSpp(nis, Waktu.NOVEMBER, tahun) + kekuranganSpp(nis, Waktu.DESEMBER, tahun);
+                kekuranganSpp(nis, Waktu.JANUARI, tahunAkr) + kekuranganSpp(nis, Waktu.FEBRUARI, tahunAkr) + kekuranganSpp(nis, Waktu.MARET, tahunAkr) + 
+                kekuranganSpp(nis, Waktu.APRIL, tahunAkr) + kekuranganSpp(nis, Waktu.MEI, tahunAkr) + kekuranganSpp(nis, Waktu.JUNI, tahunAkr) + 
+                kekuranganSpp(nis, Waktu.JULI, tahunAwl) + kekuranganSpp(nis, Waktu.AGUSTUS, tahunAwl) + kekuranganSpp(nis, Waktu.SEPTEMBER, tahunAwl) +
+                kekuranganSpp(nis, Waktu.OKTOBER, tahunAwl) + kekuranganSpp(nis, Waktu.NOVEMBER, tahunAwl) + kekuranganSpp(nis, Waktu.DESEMBER, tahunAwl);
         return kekurangan;
     }
     
@@ -158,11 +170,14 @@ public class Transaksi extends Database{
         return this.sppDibayar(nis, bulan, tahun) >= this.getNominalSpp(Integer.parseInt(acc.getDataAkun(Integer.toString(nis), "id_spp")));
     }
     
-    public boolean isLunasByTahun(int nis, int tahun){
-        return isLunasByBulan(nis, Waktu.JANUARI, tahun) && isLunasByBulan(nis, Waktu.MEI, tahun) && isLunasByBulan(nis, Waktu.SEPTEMBER, tahun) &&
-               isLunasByBulan(nis, Waktu.FEBRUARI, tahun) && isLunasByBulan(nis, Waktu.JUNI, tahun) && isLunasByBulan(nis, Waktu.OKTOBER, tahun) &&
-               isLunasByBulan(nis, Waktu.MARET, tahun) && isLunasByBulan(nis, Waktu.JULI, tahun) && isLunasByBulan(nis, Waktu.NOVEMBER, tahun) &&
-               isLunasByBulan(nis, Waktu.APRIL, tahun) && isLunasByBulan(nis, Waktu.AGUSTUS, tahun) && isLunasByBulan(nis, Waktu.DESEMBER, tahun);
+    public boolean isLunasByTahun(int nis, String tahun){
+        int tahunAwl = Integer.parseInt(tahun.substring(0, tahun.indexOf("-"))), 
+            tahunAkr = Integer.parseInt(tahun.substring(tahun.indexOf("-")+1));
+        
+        return isLunasByBulan(nis, Waktu.JANUARI, tahunAkr) && isLunasByBulan(nis, Waktu.MEI, tahunAkr) && isLunasByBulan(nis, Waktu.SEPTEMBER, tahunAwl) &&
+               isLunasByBulan(nis, Waktu.FEBRUARI, tahunAkr) && isLunasByBulan(nis, Waktu.JUNI, tahunAkr) && isLunasByBulan(nis, Waktu.OKTOBER, tahunAwl) &&
+               isLunasByBulan(nis, Waktu.MARET, tahunAkr) && isLunasByBulan(nis, Waktu.JULI, tahunAwl) && isLunasByBulan(nis, Waktu.NOVEMBER, tahunAwl) &&
+               isLunasByBulan(nis, Waktu.APRIL, tahunAkr) && isLunasByBulan(nis, Waktu.AGUSTUS, tahunAwl) && isLunasByBulan(nis, Waktu.DESEMBER, tahunAwl);
     }
     
     public String getIdPetugas(String idPembayaran){
@@ -185,6 +200,15 @@ public class Transaksi extends Database{
         return Integer.parseInt(this.getData(PEMBAYARAN, "jml_bayar", "WHERE id_pembayaran = '"+idPembayaran+"'"));
     }
     
+    public int getJumlahBayar(int nis, String bulan, int tahun){
+        int res = Integer.parseInt(this.getData(PEMBAYARAN, "jml_bayar", "WHERE nis = '"+nis+"' AND bln_bayar = '"+bulan+"' AND thn_bayar = '"+tahun+"'"));
+        if(Validation.isNumber(""+res)){
+            return res;
+        }else{
+            return 0;
+        }
+    }
+    
     public String getTanggalBayar(String idPembayaran){
         return this.getData(PEMBAYARAN, "tgl_bayar", "WHERE id_pembayaran = '"+idPembayaran+"'");
     }
@@ -194,7 +218,7 @@ public class Transaksi extends Database{
     }
     
     public String addRp(long nominal){
-        return String.format("Rp. %,d", nominal);
+        return String.format("Rp. %,d.00", nominal);
     }
     
     public long getTotalSppDibayar(){
@@ -202,6 +226,32 @@ public class Transaksi extends Database{
         Object[] tr = this.getID();
         for(Object o : tr){
             dibayar += this.getJumlahBayar(o.toString());
+        }
+        return dibayar;
+    }
+    
+    public long getTotalSppDibayar(int id){
+        long dibayar = 0L;
+        for(Object o : this.getID("WHERE id_spp = '"+id+"'")){
+            dibayar += this.getJumlahBayar(o.toString());
+        }
+        return dibayar;
+    }
+    
+    public long getTotalSppDibayar(int id, String thnAwal, String thnAkhir){
+        long dibayar = 0L;
+        for(Object o : this.getID("WHERE id_spp = '"+id+"' AND thn_bayar = '"+thnAwal+"' OR thn_bayar = '"+thnAkhir+"'")){
+            dibayar += this.getJumlahBayar(o.toString());
+        }
+        return dibayar;
+    }
+    
+    public long getTotalSppDibayarKelas(String idKelas){
+        long dibayar = 0L;
+        for(Object o : this.getID("WHERE id_spp = '"+idKelas+"'")){
+            if(acc.getDataAkun(this.getNis(o.toString()), "id_kelas").equalsIgnoreCase(idKelas)){
+                dibayar += this.getJumlahBayar(o.toString());
+            }
         }
         return dibayar;
     }
@@ -229,23 +279,60 @@ public class Transaksi extends Database{
         }
     }
     
+    private String[] nis(){
+        try{
+            int row = 0;
+            String[] nis = new String[this.getJumlahData(SISWA)];
+            String q = "SELECT * FROM siswa;";
+            res = stat.executeQuery(q);
+            while(res.next()){
+                nis[row] = res.getString("nis");
+                row++;
+            }
+            return nis;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public int randID(){
+        java.util.Random rand = new java.util.Random();
+        int r = rand.nextInt(20);
+        while(true){
+            if(r >= 11 && r <= 20){
+                return r;
+            }else{
+                r = rand.nextInt(20);
+            }
+        }
+    }
+    
     public static void main(String[] args) {
-        int nis = 6156, tahun = 2021;
-        String bulan = Waktu.DESEMBER;
+        int nis = 6156, tahun = 2017, uang = 120000;
+        String bulan = Waktu.JANUARI;
+        Kelas kls = new Kelas();
         Transaksi tr = new Transaksi();
         
-//        System.out.println(tr.bayarSpp(12, nis, bulan, tahun, 180000));
-//        System.out.println(tr.bayarSpp(12, nis, bulan, tahun, 10000));
+        System.out.println(tr.getLastID());
         
-        System.out.println("\nNama Siswa : " + tr.acc.getDataAkun(Integer.toString(nis), "nama_siswa"));
-        System.out.println("Nama Petugas : " + tr.acc.getDataAkun("12", "nama_petugas"));
-        System.out.println("Bulan-Tahun : " + bulan + " " + tahun);
-        System.out.println("Spp Dibayar : " + tr.addRp(tr.sppDibayar(nis, bulan, tahun)));
-        System.out.println("Kekurangan  : " + tr.addRp(tr.kekuranganSpp(nis, bulan, tahun)));
-        System.out.println("Tanggal Bayar : " + tr.getTanggalBayar(tr.getLastID()));
-        System.out.println("Lunas by bulan : " + tr.isLunasByBulan(nis, bulan, tahun));
-        System.out.println("Lunas by tahun : " + tr.isLunasByTahun(nis, tahun));
-        System.out.println("\n\nTotal Spp Dibayar : " + tr.addRp(tr.getTotalSppDibayar()));
+//        for(String o : tr.nis()){
+//            if(kls.getLevelKelas(tr.acc.getDataAkun(o, "id_kelas")).equalsIgnoreCase("XIII")){
+//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.JULI, tahun, uang);
+//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.AGUSTUS, tahun, uang);
+//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.SEPTEMBER, tahun, uang);
+//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.OKTOBER, tahun, uang);
+//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.NOVEMBER, tahun, uang);
+//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.DESEMBER, tahun, uang);
+//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.JANUARI, tahun+1, uang);
+//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.FEBRUARI, tahun+1, uang);
+//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.MARET, tahun+1, uang);
+//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.APRIL, tahun+1, uang);
+//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.MEI, tahun+1, uang);
+//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.JUNI, tahun+1, uang);
+//            }
+//        }
+        
     }
     
 }
