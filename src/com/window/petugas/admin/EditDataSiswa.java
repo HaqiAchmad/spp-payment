@@ -41,6 +41,10 @@ public class EditDataSiswa extends javax.swing.JFrame {
         this.lblLogoSmk.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts.png"), 31, 38));
     }
 
+    public EditDataSiswa() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     private void getData(){
         this.namaSiswa = acc.getDataAkun(nis, "nama_siswa");
         this.gender = acc.getGenderName(acc.getDataAkun(nis, "gender"));
