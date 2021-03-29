@@ -1,16 +1,21 @@
 package com.window.petugas;
 
 import com.database.Account;
+import com.database.Database;
 import com.media.Audio;
 import com.media.Gambar;
+import com.media.Waktu;
 import com.window.petugas.admin.EditDataPetugas;
 import com.window.petugas.admin.TambahDataPetugas;
+import com.sun.glass.events.KeyEvent;
 
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -19,16 +24,20 @@ import javax.swing.JLabel;
  */
 public class DataPetugas extends javax.swing.JFrame {
     
+    private final Waktu waktu = new Waktu();
     private final Account acc = new Account();
-    private final String name, foto;
+    private final String name, foto, level;
+    private String keyword = "", idSelected = "", username, namaPetugas, gender, tempatLahir, 
+                  tanggalLahir, ttl, alamat, noHp, email, levelPetugas, transaksi, fotoPetugas;
     private int x, y;
     
     public DataPetugas() {
         initComponents();
         
-        
+        idSelected = "11";
         name = acc.getDataAkun(acc.getLogin(), "nama_petugas");
         foto = acc.getProfile(acc.getLogin());
+        level = acc.getDataAkun(acc.getLogin(), "level");
         
         this.setLocationRelativeTo(null);
         this.setIconImage(Gambar.getWindowIcon());
@@ -44,9 +53,13 @@ public class DataPetugas extends javax.swing.JFrame {
         this.btnTentangApp.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnClose.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnMinimaze.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        this.btnTambah.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        this.btnEdit.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        this.btnHapus.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.lblPhotoProfile.setIcon(Gambar.scaleImage(new java.io.File(foto), lblPhotoProfile.getWidth(), lblPhotoProfile.getHeight()));
         this.lblSekolah.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts-circle.png"), 35, 35));     
-
+        this.lblTotalData.setText("Menampilkan "+acc.getJumlahData(Database.PETUGAS)+" data petugas.");
+        
         this.tabelData.setRowHeight(29);
         this.tabelData.getTableHeader().setBackground(new java.awt.Color(255,255,255));
         this.tabelData.getTableHeader().setForeground(new java.awt.Color(0, 0, 0));
@@ -88,8 +101,8 @@ public class DataPetugas extends javax.swing.JFrame {
         }
         
         JLabel[] lbls = new JLabel[]{
-            this.val1, this.val2, this.val3, this.val4, this.val5,
-            this.val6, this.val7, this.val8, this.val9, this.val10
+            this.valId, this.valUsername, this.valNama, this.valGender, this.valTtl,
+            this.valAlamat, this.valNoHp, this.valEmail, this.valLevel, this.valTransaksi
         };
         
         for(JLabel lbl : lbls){
@@ -123,7 +136,54 @@ public class DataPetugas extends javax.swing.JFrame {
                 }
             });
         }
-       
+        
+        this.updateTabel();
+        this.showData();
+    }
+    
+    private void updateTabel(){
+        this.tabelData.setModel(new javax.swing.table.DefaultTableModel(
+            acc.getData(Database.PETUGAS, new String[]{"id_petugas", "username", "nama_petugas", "level"}, keyword),
+            new String [] {
+                "ID Petugas", "Username", "Nama Petugas", "Level"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+    }
+    
+    private void showData(){
+        this.username = acc.getDataAkun(idSelected, "username");
+        this.namaPetugas  = acc.getDataAkun(idSelected, "nama_petugas");
+        this.gender = acc.getGenderName(this.acc.getDataAkun(idSelected, "gender"));
+        this.tempatLahir = acc.getDataAkun(idSelected, "tempat_lahir");
+        this.tanggalLahir = waktu.getTanggal(acc.getDataAkun(idSelected, "tanggal_lahir"));
+        this.ttl = tempatLahir + ", " + tanggalLahir;
+        this.alamat = acc.getDataAkun(idSelected, "alamat");
+        this.noHp = acc.getDataAkun(idSelected, "no_hp");
+        this.email = acc.getDataAkun(idSelected, "email");
+        this.levelPetugas = acc.getDataAkun(idSelected, "level");
+        this.transaksi = "" + acc.getJumlahData(Database.PEMBAYARAN, "WHERE id_petugas = '"+idSelected+"'");
+        this.fotoPetugas = acc.getProfile(idSelected);
+        
+        this.valId.setText("<html><p>:&nbsp;"+idSelected+"</p></html>");
+        this.valUsername.setText("<html><p>:&nbsp;"+username+"</p></html>");
+        this.valNama.setText("<html><p>:&nbsp;"+namaPetugas+"</p></html>");
+        this.valGender.setText("<html><p>:&nbsp;"+gender+"</p></html>");
+        this.valTtl.setText("<html><p>:&nbsp;"+ttl+"</p></html>");
+        this.valAlamat.setText("<html><p>:&nbsp;"+alamat+"</p></html>");
+        this.valNoHp.setText("<html><p>:&nbsp;"+noHp+"</p></html>");
+        this.valEmail.setText("<html><p>:&nbsp;"+email+"</p></html>");
+        this.valLevel.setText("<html><p>:&nbsp;"+levelPetugas+"</p></html>");
+        this.valTransaksi.setText("<html><p>:&nbsp;"+transaksi+" Transaksi Dilakukan</p></html>");
+        this.lblShowFoto.setIcon(Gambar.scaleImage(new File(fotoPetugas), lblShowFoto.getWidth(), lblShowFoto.getHeight()));
     }
 
     @SuppressWarnings("unchecked")
@@ -159,30 +219,30 @@ public class DataPetugas extends javax.swing.JFrame {
         lblShowFoto = new javax.swing.JLabel();
         lblFoto = new javax.swing.JLabel();
         lblPenampilFoto = new javax.swing.JLabel();
-        lblData1 = new javax.swing.JLabel();
-        lblData2 = new javax.swing.JLabel();
-        lblData4 = new javax.swing.JLabel();
-        lblData3 = new javax.swing.JLabel();
-        lblData8 = new javax.swing.JLabel();
-        lblData7 = new javax.swing.JLabel();
-        lblData6 = new javax.swing.JLabel();
-        lblData5 = new javax.swing.JLabel();
-        lblData9 = new javax.swing.JLabel();
-        lblData10 = new javax.swing.JLabel();
-        val1 = new javax.swing.JLabel();
-        val2 = new javax.swing.JLabel();
-        val3 = new javax.swing.JLabel();
-        val4 = new javax.swing.JLabel();
-        val5 = new javax.swing.JLabel();
-        val6 = new javax.swing.JLabel();
-        val7 = new javax.swing.JLabel();
-        val8 = new javax.swing.JLabel();
-        val9 = new javax.swing.JLabel();
-        val10 = new javax.swing.JLabel();
+        lblId = new javax.swing.JLabel();
         lblUsername = new javax.swing.JLabel();
+        lblGender = new javax.swing.JLabel();
+        lblNama = new javax.swing.JLabel();
+        lblEmail = new javax.swing.JLabel();
+        lblNoHp = new javax.swing.JLabel();
+        lblAlamat = new javax.swing.JLabel();
+        lblTtl = new javax.swing.JLabel();
+        lblLevel = new javax.swing.JLabel();
+        lblTransaksi = new javax.swing.JLabel();
+        valId = new javax.swing.JLabel();
+        valUsername = new javax.swing.JLabel();
+        valNama = new javax.swing.JLabel();
+        valGender = new javax.swing.JLabel();
+        valTtl = new javax.swing.JLabel();
+        valAlamat = new javax.swing.JLabel();
+        valNoHp = new javax.swing.JLabel();
+        valEmail = new javax.swing.JLabel();
+        valLevel = new javax.swing.JLabel();
+        valTransaksi = new javax.swing.JLabel();
+        lblCari = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelData = new javax.swing.JTable();
-        inpUsername = new javax.swing.JTextField();
+        inpCari = new javax.swing.JTextField();
         lineCenter = new javax.swing.JSeparator();
         lineBottom = new javax.swing.JSeparator();
         lblTotalData = new javax.swing.JLabel();
@@ -594,65 +654,65 @@ public class DataPetugas extends javax.swing.JFrame {
             }
         });
 
-        lblData1.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData1.setText("ID Petugas");
+        lblId.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblId.setText("ID Petugas");
 
-        lblData2.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData2.setText("Username");
+        lblUsername.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblUsername.setText("Username");
 
-        lblData4.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData4.setText("Jenis Kelamin");
+        lblGender.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblGender.setText("Jenis Kelamin");
 
-        lblData3.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData3.setText("Nama Petugas");
+        lblNama.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblNama.setText("Nama Petugas");
 
-        lblData8.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData8.setText("Email");
+        lblEmail.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblEmail.setText("Email");
 
-        lblData7.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData7.setText("Nomor HP");
+        lblNoHp.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblNoHp.setText("Nomor HP");
 
-        lblData6.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData6.setText("Alamat");
+        lblAlamat.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblAlamat.setText("Alamat");
 
-        lblData5.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData5.setText("TTL");
+        lblTtl.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblTtl.setText("TTL");
 
-        lblData9.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData9.setText("Level");
+        lblLevel.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblLevel.setText("Level");
 
-        lblData10.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData10.setText("Total Transaksi");
+        lblTransaksi.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblTransaksi.setText("Total Transaksi");
 
-        val1.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val1.setText(": 12");
+        valId.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valId.setText(": 12");
 
-        val2.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val2.setText(": levi");
+        valUsername.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valUsername.setText(": levi");
 
-        val3.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val3.setText(": Levi Ackerman");
+        valNama.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valNama.setText(": Levi Ackerman");
 
-        val4.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val4.setText(": Laki-Laki");
+        valGender.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valGender.setText(": Laki-Laki");
 
-        val5.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val5.setText(": Indonesia, 30 Maret 1980");
+        valTtl.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valTtl.setText(": Indonesia, 30 Maret 1980");
 
-        val6.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val6.setText(": Jawa Timur, Indonesia");
+        valAlamat.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valAlamat.setText(": Jawa Timur, Indonesia");
 
-        val7.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val7.setText(": 0856-5586-4624");
+        valNoHp.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valNoHp.setText(": 0856-5586-4624");
 
-        val8.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val8.setText(": leviackerman@gmail.com");
+        valEmail.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valEmail.setText(": leviackerman@gmail.com");
 
-        val9.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val9.setText(": Admin");
+        valLevel.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valLevel.setText(": Admin");
 
-        val10.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val10.setText(": 180 Transaksi Dilakukan");
+        valTransaksi.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valTransaksi.setText(": 180 Transaksi Dilakukan");
 
         javax.swing.GroupLayout pnlInfoDataLayout = new javax.swing.GroupLayout(pnlInfoData);
         pnlInfoData.setLayout(pnlInfoDataLayout);
@@ -663,9 +723,9 @@ public class DataPetugas extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData1, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblId, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val1, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(valId, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
                         .addComponent(lblShowFoto, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -673,41 +733,41 @@ public class DataPetugas extends javax.swing.JFrame {
                             .addComponent(lblFoto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lblPenampilFoto, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData2, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(valUsername, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData4, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblGender, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(valGender, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData3, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblNama, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(valNama, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData8, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(valEmail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData7, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblNoHp, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(valNoHp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData6, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblAlamat, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(valAlamat, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData5, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblTtl, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(valTtl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
                         .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(lblData10, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblData9, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE))
+                            .addComponent(lblTransaksi, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblLevel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(val9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(val10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(valLevel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(valTransaksi, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlInfoDataLayout.setVerticalGroup(
@@ -723,54 +783,54 @@ public class DataPetugas extends javax.swing.JFrame {
                         .addComponent(lblPenampilFoto)))
                 .addGap(18, 18, 18)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData1)
-                    .addComponent(val1))
+                    .addComponent(lblId)
+                    .addComponent(valId))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData2)
-                    .addComponent(val2))
+                    .addComponent(lblUsername)
+                    .addComponent(valUsername))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData3)
-                    .addComponent(val3))
+                    .addComponent(lblNama)
+                    .addComponent(valNama))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData4)
-                    .addComponent(val4))
+                    .addComponent(lblGender)
+                    .addComponent(valGender))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData5)
-                    .addComponent(val5))
+                    .addComponent(lblTtl)
+                    .addComponent(valTtl))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData6)
-                    .addComponent(val6))
+                    .addComponent(lblAlamat)
+                    .addComponent(valAlamat))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData7)
-                    .addComponent(val7))
+                    .addComponent(lblNoHp)
+                    .addComponent(valNoHp))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData8)
-                    .addComponent(val8))
+                    .addComponent(lblEmail)
+                    .addComponent(valEmail))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData9)
-                    .addComponent(val9))
+                    .addComponent(lblLevel)
+                    .addComponent(valLevel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData10)
-                    .addComponent(val10))
+                    .addComponent(lblTransaksi)
+                    .addComponent(valTransaksi))
                 .addContainerGap(41, Short.MAX_VALUE))
         );
 
         pnlMain.add(pnlInfoData, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 140, 510, 480));
 
-        lblUsername.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblUsername.setForeground(new java.awt.Color(237, 12, 12));
-        lblUsername.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lblUsername.setText("Cari ID / Username :");
-        pnlMain.add(lblUsername, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 130, 210, 30));
+        lblCari.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblCari.setForeground(new java.awt.Color(237, 12, 12));
+        lblCari.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblCari.setText("Cari ID / Username :");
+        pnlMain.add(lblCari, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 130, 210, 30));
 
         tabelData.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
         tabelData.setModel(new javax.swing.table.DefaultTableModel(
@@ -808,13 +868,13 @@ public class DataPetugas extends javax.swing.JFrame {
 
         pnlMain.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 170, 440, 440));
 
-        inpUsername.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        inpUsername.addKeyListener(new java.awt.event.KeyAdapter() {
+        inpCari.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        inpCari.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
-                inpUsernameKeyTyped(evt);
+                inpCariKeyTyped(evt);
             }
         });
-        pnlMain.add(inpUsername, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 130, 220, 30));
+        pnlMain.add(inpCari, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 130, 220, 30));
 
         lineCenter.setBackground(new java.awt.Color(0, 0, 0));
         lineCenter.setForeground(new java.awt.Color(0, 0, 0));
@@ -1116,13 +1176,18 @@ public class DataPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTentangAppActionPerformed
 
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
-        java.awt.EventQueue.invokeLater(new Runnable(){
-            @Override
-            public void run(){
-                new TambahDataPetugas().setVisible(true);
-            }
-        });
-        dispose();
+        if(level.equalsIgnoreCase("admin")){
+            java.awt.EventQueue.invokeLater(new Runnable(){
+                @Override
+                public void run(){
+                    new TambahDataPetugas().setVisible(true);
+                }
+            });
+            dispose();
+        }else{
+            Audio.play(Audio.SOUND_WARNING);
+            JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk menambahkan sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_btnTambahActionPerformed
 
     private void btnTambahMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnTambahMouseEntered
@@ -1134,14 +1199,23 @@ public class DataPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTambahMouseExited
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        String selected = this.tabelData.getValueAt(tabelData.getSelectedRow(), 0).toString();
-        java.awt.EventQueue.invokeLater(new Runnable(){
-            @Override
-            public void run(){
-                new EditDataPetugas(selected).setVisible(true);
+        if(level.equalsIgnoreCase("admin")){
+            if(tabelData.getSelectedRow() > -1){
+                java.awt.EventQueue.invokeLater(new Runnable(){
+                    @Override
+                    public void run(){
+                        new EditDataPetugas(idSelected).setVisible(true);
+                    }
+                });
+                this.dispose();
+            }else{
+                Audio.play(Audio.SOUND_WARNING);
+                JOptionPane.showMessageDialog(null, "Error!\nTidak ada data yang dipilih!!", "Error!", JOptionPane.ERROR_MESSAGE);
             }
-        });
-        dispose();
+        }else{
+            Audio.play(Audio.SOUND_WARNING);
+            JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk mengedit sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnEditMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditMouseEntered
@@ -1153,7 +1227,19 @@ public class DataPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEditMouseExited
 
     private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
-        
+        if(level.equalsIgnoreCase("admin")){
+            if(tabelData.getSelectedRow() > -1){
+                if(acc.deleteAkunById(Integer.parseInt(idSelected))){
+                    JOptionPane.showMessageDialog(null, "Data Berhasil Dihapus", "Sukes", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }else{
+                Audio.play(Audio.SOUND_WARNING);
+                JOptionPane.showMessageDialog(null, "Error!\nTidak ada data yang dipilih!!", "Error!", JOptionPane.ERROR_MESSAGE);
+            }
+        }else{
+            Audio.play(Audio.SOUND_WARNING);
+            JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk menghapus sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_btnHapusActionPerformed
 
     private void btnHapusMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnHapusMouseEntered
@@ -1164,22 +1250,32 @@ public class DataPetugas extends javax.swing.JFrame {
         this.btnHapus.setIcon(Gambar.getIcon("ic-data-hapus.png"));
     }//GEN-LAST:event_btnHapusMouseExited
 
-    private void inpUsernameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inpUsernameKeyTyped
-
-    }//GEN-LAST:event_inpUsernameKeyTyped
+    private void inpCariKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inpCariKeyTyped
+        String key = this.inpCari.getText();
+        this.keyword = "WHERE id_petugas LIKE '%"+key+"%' OR username LIKE '%"+key+"%' OR nama_petugas LIKE '%"+key+"%'";
+        System.out.println("key = " + keyword);
+        this.lblTotalData.setText("Menampilkan "+acc.getJumlahData(Database.PETUGAS, keyword)+" data petugas dengan keyword = \""+key+"\"");
+        this.updateTabel();
+    }//GEN-LAST:event_inpCariKeyTyped
 
     private void tabelDataKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tabelDataKeyPressed
-    
+        if(evt.getKeyCode() == KeyEvent.VK_UP){
+            this.idSelected = this.tabelData.getValueAt(tabelData.getSelectedRow() - 1, 0).toString();
+            this.showData();
+        }else if(evt.getKeyCode() == KeyEvent.VK_DOWN){
+            this.idSelected = this.tabelData.getValueAt(tabelData.getSelectedRow() + 1, 0).toString();
+            this.showData();
+        }
     }//GEN-LAST:event_tabelDataKeyPressed
 
     private void tabelDataMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelDataMouseClicked
-        
+        idSelected = this.tabelData.getValueAt(tabelData.getSelectedRow(), 0).toString();
+        this.showData();
     }//GEN-LAST:event_tabelDataMouseClicked
 
     private void lblPenampilFotoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblPenampilFotoMouseClicked
         Audio.play(Audio.SOUND_INFO);
-        String foto = "";
-        new PenampilFotoPetugas(this, true, foto).setVisible(true);
+        new PenampilFotoPetugas(this, true, fotoPetugas).setVisible(true);
     }//GEN-LAST:event_lblPenampilFotoMouseClicked
 
     private void lblPenampilFotoMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblPenampilFotoMouseEntered
@@ -1228,23 +1324,21 @@ public class DataPetugas extends javax.swing.JFrame {
     private javax.swing.JButton btnPembayaranSpp;
     private javax.swing.JButton btnTambah;
     private javax.swing.JButton btnTentangApp;
-    private javax.swing.JTextField inpUsername;
+    private javax.swing.JTextField inpCari;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblAlamat;
     private javax.swing.JLabel lblBgImage;
+    private javax.swing.JLabel lblCari;
     private javax.swing.JLabel lblCopyright;
     private javax.swing.JLabel lblDashboard;
-    private javax.swing.JLabel lblData1;
-    private javax.swing.JLabel lblData10;
-    private javax.swing.JLabel lblData2;
-    private javax.swing.JLabel lblData3;
-    private javax.swing.JLabel lblData4;
-    private javax.swing.JLabel lblData5;
-    private javax.swing.JLabel lblData6;
-    private javax.swing.JLabel lblData7;
-    private javax.swing.JLabel lblData8;
-    private javax.swing.JLabel lblData9;
+    private javax.swing.JLabel lblEmail;
     private javax.swing.JLabel lblFoto;
+    private javax.swing.JLabel lblGender;
+    private javax.swing.JLabel lblId;
+    private javax.swing.JLabel lblLevel;
+    private javax.swing.JLabel lblNama;
     private javax.swing.JLabel lblNamaUser;
+    private javax.swing.JLabel lblNoHp;
     private javax.swing.JLabel lblPenampilFoto;
     private javax.swing.JLabel lblPhotoProfile;
     private javax.swing.JLabel lblSekolah;
@@ -1253,6 +1347,8 @@ public class DataPetugas extends javax.swing.JFrame {
     private javax.swing.JLabel lblTitleInfo;
     private javax.swing.JSeparator lblTop;
     private javax.swing.JLabel lblTotalData;
+    private javax.swing.JLabel lblTransaksi;
+    private javax.swing.JLabel lblTtl;
     private javax.swing.JLabel lblUsername;
     private javax.swing.JLabel lblVersion;
     private javax.swing.JSeparator lineBottom;
@@ -1266,15 +1362,15 @@ public class DataPetugas extends javax.swing.JFrame {
     private javax.swing.JPanel pnlTop;
     private javax.swing.JPanel sidePanel;
     private javax.swing.JTable tabelData;
-    private javax.swing.JLabel val1;
-    private javax.swing.JLabel val10;
-    private javax.swing.JLabel val2;
-    private javax.swing.JLabel val3;
-    private javax.swing.JLabel val4;
-    private javax.swing.JLabel val5;
-    private javax.swing.JLabel val6;
-    private javax.swing.JLabel val7;
-    private javax.swing.JLabel val8;
-    private javax.swing.JLabel val9;
+    private javax.swing.JLabel valAlamat;
+    private javax.swing.JLabel valEmail;
+    private javax.swing.JLabel valGender;
+    private javax.swing.JLabel valId;
+    private javax.swing.JLabel valLevel;
+    private javax.swing.JLabel valNama;
+    private javax.swing.JLabel valNoHp;
+    private javax.swing.JLabel valTransaksi;
+    private javax.swing.JLabel valTtl;
+    private javax.swing.JLabel valUsername;
     // End of variables declaration//GEN-END:variables
 }
