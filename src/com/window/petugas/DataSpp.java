@@ -1,15 +1,19 @@
 package com.window.petugas;
 
 import com.database.Account;
+import com.database.Database;
+import com.database.Transaksi;
+import com.media.Audio;
 import com.media.Gambar;
-import com.window.petugas.admin.EditDataPetugas;
-import com.window.petugas.admin.TambahDataPetugas;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -18,16 +22,19 @@ import javax.swing.JLabel;
  */
 public class DataSpp extends javax.swing.JFrame {
     
-    private final Account acc = new Account();
-    private final String name, foto;
+    private final Account acc = new Account(), jumlah = new Account();
+    private final Transaksi tr = new Transaksi();
+    private final String name, foto, level;
+    private String idSelected = "", keyword = "", tahunSpp, nominalSpp, pengguna, transaksi, sppDibayar, presentase;
     private int x, y;
     
     public DataSpp() {
         initComponents();
         
-        
+        idSelected = "20";
         name = acc.getDataAkun(acc.getLogin(), "nama_petugas");
         foto = acc.getProfile(acc.getLogin());
+        level = acc.getDataAkun(acc.getLogin(), "level");
         
         this.setLocationRelativeTo(null);
         this.setIconImage(Gambar.getWindowIcon());
@@ -42,7 +49,9 @@ public class DataSpp extends javax.swing.JFrame {
         this.btnLaporan.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnTentangApp.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnClose.setUI(new javax.swing.plaf.basic.BasicButtonUI());
-        this.btnMinimaze.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        this.btnTambah.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        this.btnEdit.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        this.btnHapus.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.lblPhotoProfile.setIcon(Gambar.scaleImage(new java.io.File(foto), lblPhotoProfile.getWidth(), lblPhotoProfile.getHeight()));
         this.lblSekolah.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts-circle.png"), 35, 35));     
 
@@ -87,7 +96,8 @@ public class DataSpp extends javax.swing.JFrame {
         }
         
         JLabel[] lbls = new JLabel[]{
-            this.val1, this.val2, this.val3, this.val4, this.val5, this.val6, this.val7
+            this.valId, this.valTahun, this.valNominal, this.valDigunakan, 
+            this.valTransaksi, this.valSppDibayar, this.valPresentase
         };
         
         for(JLabel lbl : lbls){
@@ -122,6 +132,82 @@ public class DataSpp extends javax.swing.JFrame {
             });
         }
        
+        this.updateTabel();
+        this.showData();
+    }
+    
+    private Object[][] getData(){
+        try{
+            Object[][] obj;
+            int rows = 0;
+            String sql = "SELECT id_spp, tahun, nominal FROM spp " + keyword, id;
+            // mendefinisikan object berdasarkan total rows dan cols yang ada didalam tabel
+            obj = new Object[acc.getJumlahData(Database.SISWA, keyword)][4];
+            // mengeksekusi query
+            acc.res = acc.stat.executeQuery(sql);
+            // mendapatkan semua data yang ada didalam tabel
+            while(acc.res.next()){
+                // menyimpan data dari tabel ke object
+                id = acc.res.getString("id_spp");
+                obj[rows][0] = id;
+                obj[rows][1] = acc.res.getString("tahun");
+                obj[rows][2] = tr.addRp(tr.getNominalSpp(Integer.parseInt(id)));
+                obj[rows][3] = jumlah.getJumlahData(Database.SISWA, "WHERE id_spp = '"+id+"'") + " Siswa";
+                rows++; // rows akan bertambah 1 setiap selesai membaca 1 row pada tabel
+            }
+            return obj;
+        }catch(SQLException ex){
+            Audio.play(Audio.SOUND_ERROR);
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat mengambil data dari database\n" + ex.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+        }
+        return null;
+    }
+    
+    private void updateTabel(){
+        this.tabelData.setModel(new javax.swing.table.DefaultTableModel(
+            getData(),
+            new String [] {
+                "ID SPP", "Tahun SPP", "Nominal SPP", "Total Siswa"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+    }
+    
+    private void edit(){
+        this.inpId.setText(idSelected);
+        this.inpTahun.setText(tahunSpp);
+        this.inpNominal.setText(nominalSpp);
+    }
+    
+    private void showData(){
+        this.tahunSpp = Integer.toString(tr.getTahunSpp(Integer.parseInt(idSelected)));
+        this.nominalSpp = tr.addRp(tr.getNominalSpp(Integer.parseInt(idSelected)));
+        this.pengguna = jumlah.getJumlahData(Database.SISWA, "WHERE id_spp = '"+idSelected+"'") + " Siswa";
+        this.transaksi = jumlah.getJumlahData(Database.PEMBAYARAN, "WHERE id_spp = '"+idSelected+"'") + " Transaksi";
+        this.sppDibayar = tr.addRp(tr.getTotalSppDibayar(Integer.parseInt(idSelected)));
+        this.presentase = "90%";
+        
+        this.valId.setText("<html><p>:&nbsp;"+idSelected+"</p></html>");
+        this.valTahun.setText("<html><p>:&nbsp;"+tahunSpp+"</p></html>");
+        this.valNominal.setText("<html><p>:&nbsp;"+nominalSpp+"</p></html>");
+        this.valDigunakan.setText("<html><p>:&nbsp;"+pengguna+"</p></html>");
+        this.valTransaksi.setText("<html><p>:&nbsp;"+transaksi+"</p></html>");
+        this.valSppDibayar.setText("<html><p>:&nbsp;"+sppDibayar+"</p></html>");
+        this.valPresentase.setText("<html><p>:&nbsp;"+presentase+"</p></html>");
+    }
+    
+    private void reset(){
+        this.inpId.setText("");
+        this.inpTahun.setText("");
+        this.inpNominal.setText("");
     }
 
     @SuppressWarnings("unchecked")
@@ -154,24 +240,24 @@ public class DataSpp extends javax.swing.JFrame {
         pnlInfoData = new javax.swing.JPanel();
         pnlTitleInfo = new javax.swing.JPanel();
         lblTitleInfo = new javax.swing.JLabel();
-        lblData1 = new javax.swing.JLabel();
-        lblData2 = new javax.swing.JLabel();
-        lblData4 = new javax.swing.JLabel();
-        lblData3 = new javax.swing.JLabel();
-        lblData6 = new javax.swing.JLabel();
-        lblData5 = new javax.swing.JLabel();
-        val1 = new javax.swing.JLabel();
-        val2 = new javax.swing.JLabel();
-        val3 = new javax.swing.JLabel();
-        val4 = new javax.swing.JLabel();
-        val5 = new javax.swing.JLabel();
-        val6 = new javax.swing.JLabel();
-        lblData7 = new javax.swing.JLabel();
-        val7 = new javax.swing.JLabel();
-        lblUsername = new javax.swing.JLabel();
+        lblId = new javax.swing.JLabel();
+        lblTahun = new javax.swing.JLabel();
+        lblDigunakan = new javax.swing.JLabel();
+        lblNominal = new javax.swing.JLabel();
+        lblTotalSpp = new javax.swing.JLabel();
+        lblTransaksi = new javax.swing.JLabel();
+        valId = new javax.swing.JLabel();
+        valTahun = new javax.swing.JLabel();
+        valNominal = new javax.swing.JLabel();
+        valDigunakan = new javax.swing.JLabel();
+        valTransaksi = new javax.swing.JLabel();
+        valSppDibayar = new javax.swing.JLabel();
+        lblPresentase = new javax.swing.JLabel();
+        valPresentase = new javax.swing.JLabel();
+        lblCari = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelData = new javax.swing.JTable();
-        inpUsername = new javax.swing.JTextField();
+        inpCari = new javax.swing.JTextField();
         lineCenter = new javax.swing.JSeparator();
         lineBottom = new javax.swing.JSeparator();
         lblTotalData = new javax.swing.JLabel();
@@ -180,15 +266,15 @@ public class DataSpp extends javax.swing.JFrame {
         btnHapus = new javax.swing.JButton();
         lblVersion = new javax.swing.JLabel();
         lblCopyright = new javax.swing.JLabel();
-        pnlManipulasiKelas = new javax.swing.JPanel();
-        pnlInfoKemananTitle = new javax.swing.JPanel();
-        lblInfoKeamanan = new javax.swing.JLabel();
-        lblPassword = new javax.swing.JLabel();
-        lblKekuatan = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
+        pnlManipulasiSpp = new javax.swing.JPanel();
+        pnlTitleManipulasiSpp = new javax.swing.JPanel();
+        lblManipulasiSpp = new javax.swing.JLabel();
+        lblIdSpp = new javax.swing.JLabel();
+        lblTahunSpp = new javax.swing.JLabel();
+        inpId = new javax.swing.JTextField();
+        inpTahun = new javax.swing.JTextField();
+        lblNominalSpp = new javax.swing.JLabel();
+        inpNominal = new javax.swing.JTextField();
         lblBgImage = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -543,7 +629,7 @@ public class DataSpp extends javax.swing.JFrame {
 
         lblDashboard.setFont(new java.awt.Font("Ebrima", 1, 21)); // NOI18N
         lblDashboard.setForeground(new java.awt.Color(22, 19, 19));
-        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-datapetugas-logo.png"))); // NOI18N
+        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/icons8_online_payment_35px.png"))); // NOI18N
         lblDashboard.setText("Data SPP");
         lblDashboard.setIconTextGap(6);
         pnlMain.add(lblDashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 64, 400, -1));
@@ -571,47 +657,47 @@ public class DataSpp extends javax.swing.JFrame {
             .addComponent(lblTitleInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
         );
 
-        lblData1.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData1.setText("ID SPP");
+        lblId.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblId.setText("ID SPP");
 
-        lblData2.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData2.setText("Tahun SPP");
+        lblTahun.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblTahun.setText("Tahun SPP");
 
-        lblData4.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData4.setText("Digunakan Oleh");
+        lblDigunakan.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblDigunakan.setText("Digunakan Oleh");
 
-        lblData3.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData3.setText("Nominal SPP");
+        lblNominal.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblNominal.setText("Nominal SPP");
 
-        lblData6.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData6.setText("Total SPP Dibayar");
+        lblTotalSpp.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblTotalSpp.setText("Total SPP Dibayar");
 
-        lblData5.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData5.setText("Total Transaksi");
+        lblTransaksi.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblTransaksi.setText("Total Transaksi");
 
-        val1.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val1.setText(": xii.rpl1");
+        valId.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valId.setText(": xii.rpl1");
 
-        val2.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val2.setText(": 2021");
+        valTahun.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valTahun.setText(": 2021");
 
-        val3.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val3.setText(": Rp. 200.000.00");
+        valNominal.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valNominal.setText(": Rp. 200.000.00");
 
-        val4.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val4.setText(": 190 Siswa");
+        valDigunakan.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valDigunakan.setText(": 190 Siswa");
 
-        val5.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val5.setText(": 35 Transaksi");
+        valTransaksi.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valTransaksi.setText(": 35 Transaksi");
 
-        val6.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val6.setText(": Rp. 7.970.000.00");
+        valSppDibayar.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valSppDibayar.setText(": Rp. 7.970.000.00");
 
-        lblData7.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData7.setText("Presentase Lunas");
+        lblPresentase.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblPresentase.setText("Presentase Lunas");
 
-        val7.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val7.setText(": 80%");
+        valPresentase.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valPresentase.setText(": 80%");
 
         javax.swing.GroupLayout pnlInfoDataLayout = new javax.swing.GroupLayout(pnlInfoData);
         pnlInfoData.setLayout(pnlInfoDataLayout);
@@ -622,31 +708,31 @@ public class DataSpp extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData1, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblId, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val1, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(valId, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData2, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblTahun, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(valTahun, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData4, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblDigunakan, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(valDigunakan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData3, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblNominal, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(valNominal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
                         .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(lblData6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblData5, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
-                            .addComponent(lblData7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(lblTotalSpp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblTransaksi, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
+                            .addComponent(lblPresentase, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(val5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(val6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(val7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(valTransaksi, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(valSppDibayar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(valPresentase, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlInfoDataLayout.setVerticalGroup(
@@ -655,42 +741,42 @@ public class DataSpp extends javax.swing.JFrame {
                 .addComponent(pnlTitleInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData1)
-                    .addComponent(val1))
+                    .addComponent(lblId)
+                    .addComponent(valId))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData2)
-                    .addComponent(val2))
+                    .addComponent(lblTahun)
+                    .addComponent(valTahun))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData3)
-                    .addComponent(val3))
+                    .addComponent(lblNominal)
+                    .addComponent(valNominal))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData4)
-                    .addComponent(val4))
+                    .addComponent(lblDigunakan)
+                    .addComponent(valDigunakan))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData5)
-                    .addComponent(val5))
+                    .addComponent(lblTransaksi)
+                    .addComponent(valTransaksi))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData6)
-                    .addComponent(val6))
+                    .addComponent(lblTotalSpp)
+                    .addComponent(valSppDibayar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData7)
-                    .addComponent(val7))
+                    .addComponent(lblPresentase)
+                    .addComponent(valPresentase))
                 .addContainerGap(30, Short.MAX_VALUE))
         );
 
         pnlMain.add(pnlInfoData, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 140, 510, 290));
 
-        lblUsername.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblUsername.setForeground(new java.awt.Color(237, 12, 12));
-        lblUsername.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lblUsername.setText("Cari ID / Tahun SPP :");
-        pnlMain.add(lblUsername, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 130, 210, 30));
+        lblCari.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblCari.setForeground(new java.awt.Color(237, 12, 12));
+        lblCari.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblCari.setText("Cari ID / Tahun SPP :");
+        pnlMain.add(lblCari, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 130, 210, 30));
 
         tabelData.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
         tabelData.setModel(new javax.swing.table.DefaultTableModel(
@@ -722,13 +808,13 @@ public class DataSpp extends javax.swing.JFrame {
 
         pnlMain.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 170, 440, 440));
 
-        inpUsername.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        inpUsername.addKeyListener(new java.awt.event.KeyAdapter() {
+        inpCari.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        inpCari.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
-                inpUsernameKeyTyped(evt);
+                inpCariKeyTyped(evt);
             }
         });
-        pnlMain.add(inpUsername, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 130, 220, 30));
+        pnlMain.add(inpCari, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 130, 220, 30));
 
         lineCenter.setBackground(new java.awt.Color(0, 0, 0));
         lineCenter.setForeground(new java.awt.Color(0, 0, 0));
@@ -813,82 +899,82 @@ public class DataSpp extends javax.swing.JFrame {
         lblCopyright.setText("Copyright © 2021. Achmad Baihaqi. All Rights Reserved.");
         pnlMain.add(lblCopyright, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 680, 390, -1));
 
-        pnlManipulasiKelas.setBackground(new java.awt.Color(255, 255, 255));
-        pnlManipulasiKelas.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(15, 98, 230), 2));
+        pnlManipulasiSpp.setBackground(new java.awt.Color(255, 255, 255));
+        pnlManipulasiSpp.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(15, 98, 230), 2));
 
-        pnlInfoKemananTitle.setBackground(new java.awt.Color(15, 98, 230));
-        pnlInfoKemananTitle.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        pnlTitleManipulasiSpp.setBackground(new java.awt.Color(15, 98, 230));
+        pnlTitleManipulasiSpp.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        lblInfoKeamanan.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
-        lblInfoKeamanan.setForeground(new java.awt.Color(255, 255, 255));
-        lblInfoKeamanan.setText("Tambah / Edit SPP");
+        lblManipulasiSpp.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
+        lblManipulasiSpp.setForeground(new java.awt.Color(255, 255, 255));
+        lblManipulasiSpp.setText("Tambah / Edit SPP");
 
-        javax.swing.GroupLayout pnlInfoKemananTitleLayout = new javax.swing.GroupLayout(pnlInfoKemananTitle);
-        pnlInfoKemananTitle.setLayout(pnlInfoKemananTitleLayout);
-        pnlInfoKemananTitleLayout.setHorizontalGroup(
-            pnlInfoKemananTitleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlInfoKemananTitleLayout.createSequentialGroup()
+        javax.swing.GroupLayout pnlTitleManipulasiSppLayout = new javax.swing.GroupLayout(pnlTitleManipulasiSpp);
+        pnlTitleManipulasiSpp.setLayout(pnlTitleManipulasiSppLayout);
+        pnlTitleManipulasiSppLayout.setHorizontalGroup(
+            pnlTitleManipulasiSppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTitleManipulasiSppLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblInfoKeamanan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(lblManipulasiSpp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        pnlInfoKemananTitleLayout.setVerticalGroup(
-            pnlInfoKemananTitleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(lblInfoKeamanan, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+        pnlTitleManipulasiSppLayout.setVerticalGroup(
+            pnlTitleManipulasiSppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(lblManipulasiSpp, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
         );
 
-        lblPassword.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblPassword.setText("ID SPP");
+        lblIdSpp.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblIdSpp.setText("ID SPP");
 
-        lblKekuatan.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblKekuatan.setText("Tahun SPP");
+        lblTahunSpp.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblTahunSpp.setText("Tahun SPP");
 
-        jTextField1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        inpId.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
 
-        jTextField2.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        inpTahun.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        jLabel1.setText("Nominal SPP");
+        lblNominalSpp.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblNominalSpp.setText("Nominal SPP");
 
-        jTextField3.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        inpNominal.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
 
-        javax.swing.GroupLayout pnlManipulasiKelasLayout = new javax.swing.GroupLayout(pnlManipulasiKelas);
-        pnlManipulasiKelas.setLayout(pnlManipulasiKelasLayout);
-        pnlManipulasiKelasLayout.setHorizontalGroup(
-            pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlInfoKemananTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlManipulasiKelasLayout.createSequentialGroup()
+        javax.swing.GroupLayout pnlManipulasiSppLayout = new javax.swing.GroupLayout(pnlManipulasiSpp);
+        pnlManipulasiSpp.setLayout(pnlManipulasiSppLayout);
+        pnlManipulasiSppLayout.setHorizontalGroup(
+            pnlManipulasiSppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pnlTitleManipulasiSpp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlManipulasiSppLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblKekuatan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblPassword, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE))
+                .addGroup(pnlManipulasiSppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblTahunSpp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblIdSpp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblNominalSpp, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
-                    .addComponent(jTextField2)
-                    .addComponent(jTextField3))
+                .addGroup(pnlManipulasiSppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(inpId, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
+                    .addComponent(inpTahun)
+                    .addComponent(inpNominal))
                 .addGap(29, 29, 29))
         );
-        pnlManipulasiKelasLayout.setVerticalGroup(
-            pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlManipulasiKelasLayout.createSequentialGroup()
-                .addComponent(pnlInfoKemananTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        pnlManipulasiSppLayout.setVerticalGroup(
+            pnlManipulasiSppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlManipulasiSppLayout.createSequentialGroup()
+                .addComponent(pnlTitleManipulasiSpp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(pnlManipulasiSppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblIdSpp, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(inpId, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblKekuatan, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE))
+                .addGroup(pnlManipulasiSppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblTahunSpp, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(inpTahun, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                    .addComponent(jTextField3))
+                .addGroup(pnlManipulasiSppLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblNominalSpp, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+                    .addComponent(inpNominal))
                 .addContainerGap(15, Short.MAX_VALUE))
         );
 
-        pnlMain.add(pnlManipulasiKelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 450, 510, 170));
+        pnlMain.add(pnlManipulasiSpp, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 450, 510, 170));
 
         lblBgImage.setBackground(new java.awt.Color(41, 52, 71));
         pnlMain.add(lblBgImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1310, 710));
@@ -1107,13 +1193,21 @@ public class DataSpp extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTentangAppActionPerformed
 
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
-        java.awt.EventQueue.invokeLater(new Runnable(){
-            @Override
-            public void run(){
-                new TambahDataPetugas().setVisible(true);
+        if(level.equalsIgnoreCase("admin")){
+            int id = Integer.parseInt(inpId.getText()),
+                tahun = Integer.parseInt(inpTahun.getText()),
+                nominal = Integer.parseInt(inpNominal.getText());
+            if(tr.addDataSpp(id, tahun, nominal)){
+                JOptionPane.showMessageDialog(null, "Data SPP Berhasil Ditambahkan!", "Info!", JOptionPane.INFORMATION_MESSAGE);
+                this.updateTabel();
+                this.reset();
+            }else{
+                JOptionPane.showMessageDialog(null, "Data SPP Gagal Ditambahkan!", "Info!", JOptionPane.INFORMATION_MESSAGE);
             }
-        });
-        dispose();
+        }else{
+            Audio.play(Audio.SOUND_WARNING);
+            JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk menambahkan sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_btnTambahActionPerformed
 
     private void btnTambahMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnTambahMouseEntered
@@ -1125,14 +1219,24 @@ public class DataSpp extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTambahMouseExited
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        String selected = this.tabelData.getValueAt(tabelData.getSelectedRow(), 0).toString();
-        java.awt.EventQueue.invokeLater(new Runnable(){
-            @Override
-            public void run(){
-                new EditDataPetugas(selected).setVisible(true);
+        if(level.equalsIgnoreCase("admin")){
+            if(tabelData.getSelectedRow() > -1){
+                this.edit();
+                if(tr.setNominalSpp(Integer.parseInt(idSelected), Integer.parseInt(inpNominal.getText())) && 
+                   tr.setTahunSpp(Integer.parseInt(idSelected), Integer.parseInt(inpTahun.getText()))
+                ){
+                    JOptionPane.showMessageDialog(null, "SPP berhasil ditambahkan", "Info!", JOptionPane.ERROR_MESSAGE);
+                }else{
+                    JOptionPane.showMessageDialog(null, "SPP gagal ditambahkan", "Info!", JOptionPane.ERROR_MESSAGE);
+                }
+            }else{
+                Audio.play(Audio.SOUND_WARNING);
+                JOptionPane.showMessageDialog(null, "Error!\nTidak ada data yang dipilih!!", "Error!", JOptionPane.ERROR_MESSAGE);
             }
-        });
-        dispose();
+        }else{
+            Audio.play(Audio.SOUND_WARNING);
+            JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk mengedit sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnEditMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditMouseEntered
@@ -1144,7 +1248,17 @@ public class DataSpp extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEditMouseExited
 
     private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
-        
+        if(level.equalsIgnoreCase("admin")){
+            if(tabelData.getSelectedRow() > -1){
+                
+            }else{
+                Audio.play(Audio.SOUND_WARNING);
+                JOptionPane.showMessageDialog(null, "Error!\nTidak ada data yang dipilih!!", "Error!", JOptionPane.ERROR_MESSAGE);
+            }
+        }else{
+            Audio.play(Audio.SOUND_WARNING);
+            JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk menghapus sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_btnHapusActionPerformed
 
     private void btnHapusMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnHapusMouseEntered
@@ -1155,16 +1269,33 @@ public class DataSpp extends javax.swing.JFrame {
         this.btnHapus.setIcon(Gambar.getIcon("ic-data-hapus.png"));
     }//GEN-LAST:event_btnHapusMouseExited
 
-    private void inpUsernameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inpUsernameKeyTyped
-
-    }//GEN-LAST:event_inpUsernameKeyTyped
+    private void inpCariKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inpCariKeyTyped
+        String key = this.inpCari.getText();
+        this.keyword = "WHERE id_spp LIKE '%"+key+"%' OR tahun LIKE '%"+key+"%'";
+        System.out.println("key = " + keyword);
+        this.lblTotalData.setText("Menampilkan "+acc.getJumlahData(Database.SPP, keyword)+" data spp dengan keyword = \""+key+"\"");
+        this.updateTabel();
+    }//GEN-LAST:event_inpCariKeyTyped
 
     private void tabelDataKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tabelDataKeyPressed
-    
+        if(evt.getKeyCode() == KeyEvent.VK_UP){
+            this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            this.idSelected = this.tabelData.getValueAt(tabelData.getSelectedRow() - 1, 0).toString();
+            this.showData();
+            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        }else if(evt.getKeyCode() == KeyEvent.VK_DOWN){
+            this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            this.idSelected = this.tabelData.getValueAt(tabelData.getSelectedRow() + 1, 0).toString();
+            this.showData();
+            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        }
     }//GEN-LAST:event_tabelDataKeyPressed
 
     private void tabelDataMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelDataMouseClicked
-        
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        this.idSelected = this.tabelData.getValueAt(tabelData.getSelectedRow(), 0).toString();
+        this.showData();
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }//GEN-LAST:event_tabelDataMouseClicked
 
     public static void main(String args[]) {
@@ -1203,53 +1334,53 @@ public class DataSpp extends javax.swing.JFrame {
     private javax.swing.JButton btnPembayaranSpp;
     private javax.swing.JButton btnTambah;
     private javax.swing.JButton btnTentangApp;
-    private javax.swing.JTextField inpUsername;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JTextField inpCari;
+    private javax.swing.JTextField inpId;
+    private javax.swing.JTextField inpNominal;
+    private javax.swing.JTextField inpTahun;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
     private javax.swing.JLabel lblBgImage;
+    private javax.swing.JLabel lblCari;
     private javax.swing.JLabel lblCopyright;
     private javax.swing.JLabel lblDashboard;
-    private javax.swing.JLabel lblData1;
-    private javax.swing.JLabel lblData2;
-    private javax.swing.JLabel lblData3;
-    private javax.swing.JLabel lblData4;
-    private javax.swing.JLabel lblData5;
-    private javax.swing.JLabel lblData6;
-    private javax.swing.JLabel lblData7;
-    private javax.swing.JLabel lblInfoKeamanan;
-    private javax.swing.JLabel lblKekuatan;
+    private javax.swing.JLabel lblDigunakan;
+    private javax.swing.JLabel lblId;
+    private javax.swing.JLabel lblIdSpp;
+    private javax.swing.JLabel lblManipulasiSpp;
     private javax.swing.JLabel lblNamaUser;
-    private javax.swing.JLabel lblPassword;
+    private javax.swing.JLabel lblNominal;
+    private javax.swing.JLabel lblNominalSpp;
     private javax.swing.JLabel lblPhotoProfile;
+    private javax.swing.JLabel lblPresentase;
     private javax.swing.JLabel lblSekolah;
+    private javax.swing.JLabel lblTahun;
+    private javax.swing.JLabel lblTahunSpp;
     private javax.swing.JLabel lblTipeAkun;
     private javax.swing.JLabel lblTitleInfo;
     private javax.swing.JSeparator lblTop;
     private javax.swing.JLabel lblTotalData;
-    private javax.swing.JLabel lblUsername;
+    private javax.swing.JLabel lblTotalSpp;
+    private javax.swing.JLabel lblTransaksi;
     private javax.swing.JLabel lblVersion;
     private javax.swing.JSeparator lineBottom;
     private javax.swing.JSeparator lineCenter;
     private javax.swing.JPanel pnlAccount;
     private javax.swing.JPanel pnlInfoData;
-    private javax.swing.JPanel pnlInfoKemananTitle;
     private javax.swing.JPanel pnlLeftBottom;
     private javax.swing.JPanel pnlMain;
-    private javax.swing.JPanel pnlManipulasiKelas;
+    private javax.swing.JPanel pnlManipulasiSpp;
     private javax.swing.JPanel pnlTitle;
     private javax.swing.JPanel pnlTitleInfo;
+    private javax.swing.JPanel pnlTitleManipulasiSpp;
     private javax.swing.JPanel pnlTop;
     private javax.swing.JPanel sidePanel;
     private javax.swing.JTable tabelData;
-    private javax.swing.JLabel val1;
-    private javax.swing.JLabel val2;
-    private javax.swing.JLabel val3;
-    private javax.swing.JLabel val4;
-    private javax.swing.JLabel val5;
-    private javax.swing.JLabel val6;
-    private javax.swing.JLabel val7;
+    private javax.swing.JLabel valDigunakan;
+    private javax.swing.JLabel valId;
+    private javax.swing.JLabel valNominal;
+    private javax.swing.JLabel valPresentase;
+    private javax.swing.JLabel valSppDibayar;
+    private javax.swing.JLabel valTahun;
+    private javax.swing.JLabel valTransaksi;
     // End of variables declaration//GEN-END:variables
 }
