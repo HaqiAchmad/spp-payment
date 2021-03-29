@@ -38,6 +38,10 @@ public class EditDataPetugas extends javax.swing.JFrame {
         this.pnlInput.setBackground(new java.awt.Color(0,0,0,1));
         this.lblLogoSmk.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts.png"), 31, 38));
     }
+
+    public EditDataPetugas() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
     private void getData(){
         this.username = acc.getDataAkun(id, "username");
@@ -114,7 +118,7 @@ public class EditDataPetugas extends javax.swing.JFrame {
         inpNama = new javax.swing.JTextField();
         inpPassword = new javax.swing.JPasswordField();
         inpKonfirmasi = new javax.swing.JPasswordField();
-        jPanel1 = new javax.swing.JPanel();
+        pnlShow = new javax.swing.JPanel();
         eyeKonfirmasi = new javax.swing.JLabel();
         eyePassword = new javax.swing.JLabel();
         btnBatal = new javax.swing.JButton();
@@ -331,7 +335,7 @@ public class EditDataPetugas extends javax.swing.JFrame {
         inpKonfirmasi.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
         inpKonfirmasi.setCaretColor(new java.awt.Color(10, 79, 223));
 
-        jPanel1.setBackground(new java.awt.Color(0, 0, 0));
+        pnlShow.setBackground(new java.awt.Color(0, 0, 0));
 
         eyeKonfirmasi.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         eyeKonfirmasi.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-login-eye-close.png"))); // NOI18N
@@ -356,16 +360,16 @@ public class EditDataPetugas extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout pnlShowLayout = new javax.swing.GroupLayout(pnlShow);
+        pnlShow.setLayout(pnlShowLayout);
+        pnlShowLayout.setHorizontalGroup(
+            pnlShowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(eyeKonfirmasi, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addComponent(eyePassword, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+        pnlShowLayout.setVerticalGroup(
+            pnlShowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlShowLayout.createSequentialGroup()
                 .addComponent(eyePassword, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(eyeKonfirmasi, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -425,7 +429,7 @@ public class EditDataPetugas extends javax.swing.JFrame {
                                     .addComponent(inpKonfirmasi, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
                                     .addComponent(inpPassword, javax.swing.GroupLayout.Alignment.LEADING))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(pnlShow, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(pnlInputLayout.createSequentialGroup()
                         .addComponent(pnlFoto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -497,7 +501,7 @@ public class EditDataPetugas extends javax.swing.JFrame {
                             .addComponent(inpTanggalLahir, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(40, 40, 40)
                         .addComponent(lineBottom, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(pnlShow, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -767,7 +771,6 @@ public class EditDataPetugas extends javax.swing.JFrame {
     private com.toedter.calendar.JDateChooser inpTanggalLahir;
     private javax.swing.JTextField inpTempatLahir;
     private javax.swing.JTextField inpUsername;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblAddFoto;
     private javax.swing.JLabel lblAlamat;
     private javax.swing.JLabel lblBgImage;
@@ -794,6 +797,7 @@ public class EditDataPetugas extends javax.swing.JFrame {
     private javax.swing.JPanel pnlFoto;
     private javax.swing.JPanel pnlInput;
     private javax.swing.JPanel pnlMain;
+    private javax.swing.JPanel pnlShow;
     private javax.swing.JLabel showFoto;
     // End of variables declaration//GEN-END:variables
 }
