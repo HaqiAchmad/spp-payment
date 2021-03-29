@@ -988,7 +988,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
 
         lblNamaAplikasiBottom.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
         lblNamaAplikasiBottom.setForeground(new java.awt.Color(16, 81, 200));
-        lblNamaAplikasiBottom.setText("Aplikasi Pembayaran SPP");
+        lblNamaAplikasiBottom.setText("Sistem Aplikasi Pembayaran SPP");
 
         lblNamaSekolahBottom.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
         lblNamaSekolahBottom.setForeground(new java.awt.Color(231, 38, 38));
