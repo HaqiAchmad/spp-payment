@@ -1,15 +1,21 @@
 package com.window.petugas;
 
 import com.database.Account;
+import com.database.Database;
+import com.database.Kelas;
+import com.database.Transaksi;
+import com.database.Validation;
+import com.media.Audio;
 import com.media.Gambar;
-import com.window.petugas.admin.EditDataPetugas;
-import com.window.petugas.admin.TambahDataPetugas;
+import com.sun.glass.events.KeyEvent;
 
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -19,7 +25,11 @@ import javax.swing.JLabel;
 public class PembayaranSpp extends javax.swing.JFrame {
     
     private final Account acc = new Account();
+    private final Kelas kls = new Kelas();
+    private final Transaksi tr = new Transaksi();
     private final String name, foto;
+    private String nisSelected = "", keyword = "", namaSiswa, gender, kelas, nominal, sppDibayar, kekuranganSpp;
+    private boolean status;
     private int x, y;
     
     public PembayaranSpp() {
@@ -43,6 +53,8 @@ public class PembayaranSpp extends javax.swing.JFrame {
         this.btnTentangApp.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnClose.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnMinimaze.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        this.btnBayar.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        this.btnHapus.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.lblPhotoProfile.setIcon(Gambar.scaleImage(new java.io.File(foto), lblPhotoProfile.getWidth(), lblPhotoProfile.getHeight()));
         this.lblSekolah.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts-circle.png"), 35, 35));     
 
@@ -87,7 +99,8 @@ public class PembayaranSpp extends javax.swing.JFrame {
         }
         
         JLabel[] lbls = new JLabel[]{
-            this.val1, this.val2, this.val3, this.val4, this.val5, this.val6, this.val7
+            this.valNis, this.valNama, this.valGender, this.valKelas, this.valNominal, 
+            this.valDibayar, this.valKekurangan, this.valNominal, this.valStatus
         };
         
         for(JLabel lbl : lbls){
@@ -122,6 +135,86 @@ public class PembayaranSpp extends javax.swing.JFrame {
             });
         }
        
+        this.updateTabel();
+        
+    }
+    
+    private void reset(){
+        this.inpCari.setText("");
+        this.inpTahunBayar.setText("");
+        this.inpJumlahBayar.setText("");
+        this.chooseBulan.setSelectedIndex(0);
+    }
+    
+    
+    private Object[][] getData(){
+        try{
+            Object[][] obj;
+            int rows = 0;
+            String sql = "SELECT nis, nama_siswa, gender, id_kelas, id_spp FROM siswa " + keyword;
+            // mendefinisikan object berdasarkan total rows dan cols yang ada didalam tabel
+            obj = new Object[acc.getJumlahData(Database.SISWA, keyword)][5];
+            // mengeksekusi query
+            acc.res = acc.stat.executeQuery(sql);
+            // mendapatkan semua data yang ada didalam tabel
+            while(acc.res.next()){
+                // menyimpan data dari tabel ke object
+                obj[rows][0] = acc.res.getString("nis");
+                obj[rows][1] = acc.res.getString("nama_siswa");
+                obj[rows][2] = acc.getGenderName(acc.res.getString("gender"));
+                obj[rows][3] = kls.getNamaKelas(acc.res.getString("id_kelas"));
+                obj[rows][4] = acc.res.getString("id_spp");
+                rows++; // rows akan bertambah 1 setiap selesai membaca 1 row pada tabel
+            }
+            return obj;
+        }catch(SQLException ex){
+            Audio.play(Audio.SOUND_ERROR);
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat mengambil data dari database\n" + ex.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+        }
+        return null;
+    }
+    
+    private void updateTabel(){
+        this.tabelData.setModel(new javax.swing.table.DefaultTableModel(
+            getData(),
+            new String [] {
+                "NIS", "Nama Siswa", "Jenis Kelamin", "Kelas", "ID SPP"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+    }
+    
+    private void showData(){
+        this.namaSiswa = acc.getDataAkun(nisSelected, "nama_siswa");
+        this.gender = acc.getGenderName(acc.getDataAkun(nisSelected, "gender"));
+        this.kelas = kls.getNamaKelas(acc.getDataAkun(nisSelected, "id_kelas"));
+        this.nominal = tr.addRp(tr.getNominalSpp(Integer.parseInt(acc.getDataAkun(nisSelected, "id_spp"))));
+        this.sppDibayar = tr.addRp(tr.sppDibayar(Integer.parseInt(nisSelected), "2020-2021"));
+        this.kekuranganSpp = tr.addRp(tr.kekuranganSpp(Integer.parseInt(nisSelected), "2020-2021"));
+        this.status = tr.isLunasByTahun(Integer.parseInt(nisSelected), "2020-2021");
+        
+        this.valNis.setText("<html><p>:&nbsp;"+nisSelected+"</p></html>");
+        this.valNama.setText("<html><p>:&nbsp;"+namaSiswa+"</p></html>");
+        this.valGender.setText("<html><p>:&nbsp;"+gender+"</p></html>");
+        this.valKelas.setText("<html><p>:&nbsp;"+kelas+"</p></html>");
+        this.valNominal.setText("<html><p>:&nbsp;"+nominal+"</p></html>");
+        this.valDibayar.setText("<html><p>:&nbsp;"+sppDibayar+"</p></html>");
+        this.valKekurangan.setText("<html><p>:&nbsp;"+kekuranganSpp+"</p></html>");
+        
+        if(status){
+            this.valStatus.setText("<html><p>:&nbsp;Lunas</p></html>");
+        }else{
+            this.valStatus.setText("<html><p>:&nbsp;Belum Lunas</p></html>");            
+        }
+       
     }
 
     @SuppressWarnings("unchecked")
@@ -154,41 +247,40 @@ public class PembayaranSpp extends javax.swing.JFrame {
         pnlInfoData = new javax.swing.JPanel();
         pnlTitleInfo = new javax.swing.JPanel();
         lblTitleInfo = new javax.swing.JLabel();
-        lblData1 = new javax.swing.JLabel();
-        lblData2 = new javax.swing.JLabel();
-        lblData4 = new javax.swing.JLabel();
-        lblData3 = new javax.swing.JLabel();
-        lblData6 = new javax.swing.JLabel();
-        lblData5 = new javax.swing.JLabel();
-        val1 = new javax.swing.JLabel();
-        val2 = new javax.swing.JLabel();
-        val3 = new javax.swing.JLabel();
-        val4 = new javax.swing.JLabel();
-        val5 = new javax.swing.JLabel();
-        val6 = new javax.swing.JLabel();
-        lblData7 = new javax.swing.JLabel();
-        val7 = new javax.swing.JLabel();
-        lblData8 = new javax.swing.JLabel();
-        val8 = new javax.swing.JLabel();
-        lblUsername = new javax.swing.JLabel();
-        inpUsername = new javax.swing.JTextField();
+        lblNis = new javax.swing.JLabel();
+        lblNamaSiswa = new javax.swing.JLabel();
+        lblKelas = new javax.swing.JLabel();
+        lblGender = new javax.swing.JLabel();
+        lblSppDibayar = new javax.swing.JLabel();
+        lblNominal = new javax.swing.JLabel();
+        valNis = new javax.swing.JLabel();
+        valNama = new javax.swing.JLabel();
+        valGender = new javax.swing.JLabel();
+        valKelas = new javax.swing.JLabel();
+        valNominal = new javax.swing.JLabel();
+        valDibayar = new javax.swing.JLabel();
+        lblKekurangan = new javax.swing.JLabel();
+        valKekurangan = new javax.swing.JLabel();
+        lblStatus = new javax.swing.JLabel();
+        valStatus = new javax.swing.JLabel();
+        lblCari = new javax.swing.JLabel();
+        inpCari = new javax.swing.JTextField();
         lineCenter = new javax.swing.JSeparator();
         lineBottom = new javax.swing.JSeparator();
         lblTotalData = new javax.swing.JLabel();
-        btnTambah = new javax.swing.JButton();
-        btnEdit = new javax.swing.JButton();
+        btnBayar = new javax.swing.JButton();
         btnHapus = new javax.swing.JButton();
         lblVersion = new javax.swing.JLabel();
         lblCopyright = new javax.swing.JLabel();
         pnlManipulasiKelas = new javax.swing.JPanel();
         pnlInfoKemananTitle = new javax.swing.JPanel();
         lblInfoKeamanan = new javax.swing.JLabel();
-        lblPassword = new javax.swing.JLabel();
-        lblKekuatan = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
-        jComboBox1 = new javax.swing.JComboBox();
-        jTextField1 = new javax.swing.JTextField();
+        lblBulanBayar = new javax.swing.JLabel();
+        lblTahunBayar = new javax.swing.JLabel();
+        lblJumlahBayar = new javax.swing.JLabel();
+        inpJumlahBayar = new javax.swing.JTextField();
+        chooseBulan = new javax.swing.JComboBox();
+        inpTahunBayar = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelData = new javax.swing.JTable();
         lblBgImage = new javax.swing.JLabel();
@@ -545,7 +637,7 @@ public class PembayaranSpp extends javax.swing.JFrame {
 
         lblDashboard.setFont(new java.awt.Font("Ebrima", 1, 21)); // NOI18N
         lblDashboard.setForeground(new java.awt.Color(22, 19, 19));
-        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-datapetugas-logo.png"))); // NOI18N
+        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/icons8_donate_35px.png"))); // NOI18N
         lblDashboard.setText("Pembayaran SPP");
         lblDashboard.setIconTextGap(6);
         pnlMain.add(lblDashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 64, 400, -1));
@@ -573,53 +665,53 @@ public class PembayaranSpp extends javax.swing.JFrame {
             .addComponent(lblTitleInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
         );
 
-        lblData1.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData1.setText("NIS");
+        lblNis.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblNis.setText("NIS");
 
-        lblData2.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData2.setText("Nama Siswa");
+        lblNamaSiswa.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblNamaSiswa.setText("Nama Siswa");
 
-        lblData4.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData4.setText("Kelas");
+        lblKelas.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblKelas.setText("Kelas");
 
-        lblData3.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData3.setText("Jenis Kelamin");
+        lblGender.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblGender.setText("Jenis Kelamin");
 
-        lblData6.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData6.setText("SPP Dibayar");
+        lblSppDibayar.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblSppDibayar.setText("SPP Dibayar");
 
-        lblData5.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData5.setText("Nominal SPP");
+        lblNominal.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblNominal.setText("Nominal SPP");
 
-        val1.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val1.setText(": 6156");
+        valNis.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valNis.setText(": 6156");
 
-        val2.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val2.setText(": Achmad Baihaqi");
+        valNama.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valNama.setText(": Achmad Baihaqi");
 
-        val3.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val3.setText(": Laki-Laki");
+        valGender.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valGender.setText(": Laki-Laki");
 
-        val4.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val4.setText(": XII RPL 1");
+        valKelas.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valKelas.setText(": XII RPL 1");
 
-        val5.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val5.setText(": Rp. 135.000.00");
+        valNominal.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valNominal.setText(": Rp. 135.000.00");
 
-        val6.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val6.setText(": Rp. 1.215.000.00");
+        valDibayar.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valDibayar.setText(": Rp. 1.215.000.00");
 
-        lblData7.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData7.setText("Kekurangan SPP");
+        lblKekurangan.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblKekurangan.setText("Kekurangan SPP");
 
-        val7.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val7.setText(": Rp. 405.000.00");
+        valKekurangan.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valKekurangan.setText(": Rp. 405.000.00");
 
-        lblData8.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblData8.setText("Status Kelunasan");
+        lblStatus.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblStatus.setText("Status Kelunasan");
 
-        val8.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        val8.setText(": Belum Lunas");
+        valStatus.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valStatus.setText(": Belum Lunas");
 
         javax.swing.GroupLayout pnlInfoDataLayout = new javax.swing.GroupLayout(pnlInfoData);
         pnlInfoData.setLayout(pnlInfoDataLayout);
@@ -630,33 +722,33 @@ public class PembayaranSpp extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData1, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblNis, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val1, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(valNis, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData2, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblNamaSiswa, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(valNama, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData4, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblKelas, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(valKelas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblData3, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblGender, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(val3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(valGender, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
                         .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(lblData6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblData5, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
-                            .addComponent(lblData7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblData8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(lblSppDibayar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblNominal, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
+                            .addComponent(lblKekurangan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(val5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(val6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(val7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(val8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(valNominal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(valDibayar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(valKekurangan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(valStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlInfoDataLayout.setVerticalGroup(
@@ -665,54 +757,54 @@ public class PembayaranSpp extends javax.swing.JFrame {
                 .addComponent(pnlTitleInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData1)
-                    .addComponent(val1))
+                    .addComponent(lblNis)
+                    .addComponent(valNis))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData2)
-                    .addComponent(val2))
+                    .addComponent(lblNamaSiswa)
+                    .addComponent(valNama))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData3)
-                    .addComponent(val3))
+                    .addComponent(lblGender)
+                    .addComponent(valGender))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData4)
-                    .addComponent(val4))
+                    .addComponent(lblKelas)
+                    .addComponent(valKelas))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData5)
-                    .addComponent(val5))
+                    .addComponent(lblNominal)
+                    .addComponent(valNominal))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData6)
-                    .addComponent(val6))
+                    .addComponent(lblSppDibayar)
+                    .addComponent(valDibayar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData7)
-                    .addComponent(val7))
+                    .addComponent(lblKekurangan)
+                    .addComponent(valKekurangan))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblData8)
-                    .addComponent(val8))
+                    .addComponent(lblStatus)
+                    .addComponent(valStatus))
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
         pnlMain.add(pnlInfoData, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 140, 510, 300));
 
-        lblUsername.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblUsername.setForeground(new java.awt.Color(237, 12, 12));
-        lblUsername.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lblUsername.setText("Cari NIS / Nama Siswa : ");
-        pnlMain.add(lblUsername, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 130, 210, 30));
+        lblCari.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblCari.setForeground(new java.awt.Color(237, 12, 12));
+        lblCari.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblCari.setText("Cari NIS / Nama Siswa : ");
+        pnlMain.add(lblCari, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 130, 210, 30));
 
-        inpUsername.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        inpUsername.addKeyListener(new java.awt.event.KeyAdapter() {
+        inpCari.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        inpCari.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
-                inpUsernameKeyTyped(evt);
+                inpCariKeyTyped(evt);
             }
         });
-        pnlMain.add(inpUsername, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 130, 220, 30));
+        pnlMain.add(inpCari, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 130, 220, 30));
 
         lineCenter.setBackground(new java.awt.Color(0, 0, 0));
         lineCenter.setForeground(new java.awt.Color(0, 0, 0));
@@ -727,51 +819,31 @@ public class PembayaranSpp extends javax.swing.JFrame {
         lblTotalData.setText("Menampilkan 20 data siswa dengan keyword = \"\"");
         pnlMain.add(lblTotalData, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 615, 440, 20));
 
-        btnTambah.setBackground(new java.awt.Color(41, 180, 50));
-        btnTambah.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        btnTambah.setForeground(new java.awt.Color(255, 255, 255));
-        btnTambah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-tambah.png"))); // NOI18N
-        btnTambah.setText("Tambah Data");
-        btnTambah.addMouseListener(new java.awt.event.MouseAdapter() {
+        btnBayar.setBackground(new java.awt.Color(34, 119, 237));
+        btnBayar.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        btnBayar.setForeground(new java.awt.Color(255, 255, 255));
+        btnBayar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-pembayaran-bayar.png"))); // NOI18N
+        btnBayar.setText("Bayar");
+        btnBayar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btnTambahMouseEntered(evt);
+                btnBayarMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnTambahMouseExited(evt);
+                btnBayarMouseExited(evt);
             }
         });
-        btnTambah.addActionListener(new java.awt.event.ActionListener() {
+        btnBayar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnTambahActionPerformed(evt);
+                btnBayarActionPerformed(evt);
             }
         });
-        pnlMain.add(btnTambah, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 660, 130, -1));
-
-        btnEdit.setBackground(new java.awt.Color(34, 119, 237));
-        btnEdit.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        btnEdit.setForeground(new java.awt.Color(255, 255, 255));
-        btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-edit.png"))); // NOI18N
-        btnEdit.setText("Edit Data");
-        btnEdit.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btnEditMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnEditMouseExited(evt);
-            }
-        });
-        btnEdit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditActionPerformed(evt);
-            }
-        });
-        pnlMain.add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 660, 110, -1));
+        pnlMain.add(btnBayar, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 660, 110, 30));
 
         btnHapus.setBackground(new java.awt.Color(220, 41, 41));
         btnHapus.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         btnHapus.setForeground(new java.awt.Color(255, 255, 255));
         btnHapus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-hapus.png"))); // NOI18N
-        btnHapus.setText("Hapus Data");
+        btnHapus.setText("Batal");
         btnHapus.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 btnHapusMouseEntered(evt);
@@ -785,7 +857,7 @@ public class PembayaranSpp extends javax.swing.JFrame {
                 btnHapusActionPerformed(evt);
             }
         });
-        pnlMain.add(btnHapus, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 660, 120, -1));
+        pnlMain.add(btnHapus, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 660, 100, 30));
 
         lblVersion.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
         lblVersion.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -820,21 +892,21 @@ public class PembayaranSpp extends javax.swing.JFrame {
             .addComponent(lblInfoKeamanan, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
         );
 
-        lblPassword.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblPassword.setText("Bulan Bayar");
+        lblBulanBayar.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblBulanBayar.setText("Bulan Bayar");
 
-        lblKekuatan.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblKekuatan.setText("Tahun Bayar");
+        lblTahunBayar.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblTahunBayar.setText("Tahun Bayar");
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        jLabel1.setText("Jumlah Bayar");
+        lblJumlahBayar.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblJumlahBayar.setText("Jumlah Bayar");
 
-        jTextField3.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        inpJumlahBayar.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
 
-        jComboBox1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Pilih Bulan", "Juli", "Agustus", "September", "Oktober", "November", "Desember", "Januari", "Februari", "Maret", "April", "Mei", "Juni" }));
+        chooseBulan.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        chooseBulan.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Pilih Bulan", "Juli", "Agustus", "September", "Oktober", "November", "Desember", "Januari", "Februari", "Maret", "April", "Mei", "Juni" }));
 
-        jTextField1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        inpTahunBayar.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
 
         javax.swing.GroupLayout pnlManipulasiKelasLayout = new javax.swing.GroupLayout(pnlManipulasiKelas);
         pnlManipulasiKelas.setLayout(pnlManipulasiKelasLayout);
@@ -844,14 +916,14 @@ public class PembayaranSpp extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlManipulasiKelasLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblKekuatan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblPassword, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE))
+                    .addComponent(lblTahunBayar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblBulanBayar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblJumlahBayar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jTextField3)
-                    .addComponent(jComboBox1, 0, 318, Short.MAX_VALUE)
-                    .addComponent(jTextField1))
+                    .addComponent(inpJumlahBayar)
+                    .addComponent(chooseBulan, 0, 318, Short.MAX_VALUE)
+                    .addComponent(inpTahunBayar))
                 .addGap(29, 29, 29))
         );
         pnlManipulasiKelasLayout.setVerticalGroup(
@@ -860,16 +932,16 @@ public class PembayaranSpp extends javax.swing.JFrame {
                 .addComponent(pnlInfoKemananTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblBulanBayar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chooseBulan, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lblKekuatan, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE)
-                    .addComponent(jTextField1))
+                    .addComponent(lblTahunBayar, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE)
+                    .addComponent(inpTahunBayar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                    .addComponent(jTextField3))
+                    .addComponent(lblJumlahBayar, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+                    .addComponent(inpJumlahBayar))
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
@@ -936,6 +1008,8 @@ public class PembayaranSpp extends javax.swing.JFrame {
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         acc.closeConnection();
+        kls.closeConnection();
+        tr.closeConnection();
     }//GEN-LAST:event_formWindowClosed
 
     private void pnlMainMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlMainMousePressed
@@ -1129,45 +1203,32 @@ public class PembayaranSpp extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_btnTentangAppActionPerformed
 
-    private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
-        java.awt.EventQueue.invokeLater(new Runnable(){
-            @Override
-            public void run(){
-                new TambahDataPetugas().setVisible(true);
-            }
-        });
-        dispose();
-    }//GEN-LAST:event_btnTambahActionPerformed
+    private void btnBayarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBayarActionPerformed
+        if(Validation.isNumber(this.inpJumlahBayar.getText()) && Validation.isNumber(this.inpTahunBayar.getText())){
+            int tahun = Integer.parseInt(this.inpTahunBayar.getText()),
+                jumlahBayar = Integer.parseInt(this.inpJumlahBayar.getText());
+                if(tr.bayarSpp(Integer.parseInt(acc.getLogin()), Integer.parseInt(nisSelected), this.chooseBulan.getSelectedItem().toString(), tahun, jumlahBayar)){
+                    Audio.play(Audio.SOUND_INFO);
+                    JOptionPane.showMessageDialog(null, "Pembayaran berhasil!", "Info", JOptionPane.INFORMATION_MESSAGE);
+                    this.showData();
+                    this.reset();
+                }else{
+                    Audio.play(Audio.SOUND_WARNING);
+                    JOptionPane.showMessageDialog(null, "Pembayaran berhasil!", "Info", JOptionPane.INFORMATION_MESSAGE);
+                }
+        }
+    }//GEN-LAST:event_btnBayarActionPerformed
 
-    private void btnTambahMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnTambahMouseEntered
-        this.btnTambah.setIcon(Gambar.getIcon("ic-data-tambah-entered.png"));
-    }//GEN-LAST:event_btnTambahMouseEntered
+    private void btnBayarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnBayarMouseEntered
+        this.btnBayar.setIcon(Gambar.getIcon("ic-pembayaran-pay-entered.png"));
+    }//GEN-LAST:event_btnBayarMouseEntered
 
-    private void btnTambahMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnTambahMouseExited
-        this.btnTambah.setIcon(Gambar.getIcon("ic-data-tambah.png"));
-    }//GEN-LAST:event_btnTambahMouseExited
-
-    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        String selected = this.tabelData.getValueAt(tabelData.getSelectedRow(), 0).toString();
-        java.awt.EventQueue.invokeLater(new Runnable(){
-            @Override
-            public void run(){
-                new EditDataPetugas(selected).setVisible(true);
-            }
-        });
-        dispose();
-    }//GEN-LAST:event_btnEditActionPerformed
-
-    private void btnEditMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditMouseEntered
-        this.btnEdit.setIcon(Gambar.getIcon("ic-data-edit-entered.png"));
-    }//GEN-LAST:event_btnEditMouseEntered
-
-    private void btnEditMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditMouseExited
-        this.btnEdit.setIcon(Gambar.getIcon("ic-data-edit.png"));
-    }//GEN-LAST:event_btnEditMouseExited
+    private void btnBayarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnBayarMouseExited
+        this.btnBayar.setIcon(Gambar.getIcon("ic-pembayaran-bayar.png"));
+    }//GEN-LAST:event_btnBayarMouseExited
 
     private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
-        
+        this.reset();
     }//GEN-LAST:event_btnHapusActionPerformed
 
     private void btnHapusMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnHapusMouseEntered
@@ -1178,16 +1239,27 @@ public class PembayaranSpp extends javax.swing.JFrame {
         this.btnHapus.setIcon(Gambar.getIcon("ic-data-hapus.png"));
     }//GEN-LAST:event_btnHapusMouseExited
 
-    private void inpUsernameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inpUsernameKeyTyped
-
-    }//GEN-LAST:event_inpUsernameKeyTyped
+    private void inpCariKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inpCariKeyTyped
+        String key = this.inpCari.getText();
+        this.keyword = "WHERE nis LIKE '%"+key+"%' OR nama_siswa LIKE '%"+key+"%'";
+        System.out.println("key = " + keyword);
+        this.lblTotalData.setText("Menampilkan "+acc.getJumlahData(Database.SISWA, keyword)+" data siswa dengan keyword = \""+key+"\"");
+        this.updateTabel();
+    }//GEN-LAST:event_inpCariKeyTyped
 
     private void tabelDataMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelDataMouseClicked
-        String foto = acc.getProfile(Integer.parseInt(this.tabelData.getValueAt(tabelData.getSelectedRow(), 0).toString()));
+        this.nisSelected = this.tabelData.getValueAt(tabelData.getSelectedRow(), 0).toString();
+        this.showData();
     }//GEN-LAST:event_tabelDataMouseClicked
 
     private void tabelDataKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tabelDataKeyPressed
-
+        if(evt.getKeyCode() == KeyEvent.VK_UP){
+            this.nisSelected = this.tabelData.getValueAt(tabelData.getSelectedRow() - 1, 0).toString();
+            this.showData();
+        }else if(evt.getKeyCode() == KeyEvent.VK_DOWN){
+            this.nisSelected = this.tabelData.getValueAt(tabelData.getSelectedRow() + 1, 0).toString();
+            this.showData();
+        }
     }//GEN-LAST:event_tabelDataKeyPressed
 
     public static void main(String args[]) {
@@ -1212,48 +1284,47 @@ public class PembayaranSpp extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBayar;
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnDashboard;
     private javax.swing.JButton btnDataKelas;
     private javax.swing.JButton btnDataPetugas;
     private javax.swing.JButton btnDataSiswa;
     private javax.swing.JButton btnDataSpp;
-    private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnHapus;
     private javax.swing.JButton btnInfoAkun;
     private javax.swing.JButton btnLaporan;
     private javax.swing.JButton btnMinimaze;
     private javax.swing.JButton btnPembayaranSpp;
-    private javax.swing.JButton btnTambah;
     private javax.swing.JButton btnTentangApp;
-    private javax.swing.JTextField inpUsername;
-    private javax.swing.JComboBox jComboBox1;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JComboBox chooseBulan;
+    private javax.swing.JTextField inpCari;
+    private javax.swing.JTextField inpJumlahBayar;
+    private javax.swing.JTextField inpTahunBayar;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField3;
     private javax.swing.JLabel lblBgImage;
+    private javax.swing.JLabel lblBulanBayar;
+    private javax.swing.JLabel lblCari;
     private javax.swing.JLabel lblCopyright;
     private javax.swing.JLabel lblDashboard;
-    private javax.swing.JLabel lblData1;
-    private javax.swing.JLabel lblData2;
-    private javax.swing.JLabel lblData3;
-    private javax.swing.JLabel lblData4;
-    private javax.swing.JLabel lblData5;
-    private javax.swing.JLabel lblData6;
-    private javax.swing.JLabel lblData7;
-    private javax.swing.JLabel lblData8;
+    private javax.swing.JLabel lblGender;
     private javax.swing.JLabel lblInfoKeamanan;
-    private javax.swing.JLabel lblKekuatan;
+    private javax.swing.JLabel lblJumlahBayar;
+    private javax.swing.JLabel lblKekurangan;
+    private javax.swing.JLabel lblKelas;
+    private javax.swing.JLabel lblNamaSiswa;
     private javax.swing.JLabel lblNamaUser;
-    private javax.swing.JLabel lblPassword;
+    private javax.swing.JLabel lblNis;
+    private javax.swing.JLabel lblNominal;
     private javax.swing.JLabel lblPhotoProfile;
     private javax.swing.JLabel lblSekolah;
+    private javax.swing.JLabel lblSppDibayar;
+    private javax.swing.JLabel lblStatus;
+    private javax.swing.JLabel lblTahunBayar;
     private javax.swing.JLabel lblTipeAkun;
     private javax.swing.JLabel lblTitleInfo;
     private javax.swing.JSeparator lblTop;
     private javax.swing.JLabel lblTotalData;
-    private javax.swing.JLabel lblUsername;
     private javax.swing.JLabel lblVersion;
     private javax.swing.JSeparator lineBottom;
     private javax.swing.JSeparator lineCenter;
@@ -1268,13 +1339,13 @@ public class PembayaranSpp extends javax.swing.JFrame {
     private javax.swing.JPanel pnlTop;
     private javax.swing.JPanel sidePanel;
     private javax.swing.JTable tabelData;
-    private javax.swing.JLabel val1;
-    private javax.swing.JLabel val2;
-    private javax.swing.JLabel val3;
-    private javax.swing.JLabel val4;
-    private javax.swing.JLabel val5;
-    private javax.swing.JLabel val6;
-    private javax.swing.JLabel val7;
-    private javax.swing.JLabel val8;
+    private javax.swing.JLabel valDibayar;
+    private javax.swing.JLabel valGender;
+    private javax.swing.JLabel valKekurangan;
+    private javax.swing.JLabel valKelas;
+    private javax.swing.JLabel valNama;
+    private javax.swing.JLabel valNis;
+    private javax.swing.JLabel valNominal;
+    private javax.swing.JLabel valStatus;
     // End of variables declaration//GEN-END:variables
 }
