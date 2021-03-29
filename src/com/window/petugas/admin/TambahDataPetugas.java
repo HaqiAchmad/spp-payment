@@ -1,7 +1,9 @@
 package com.window.petugas.admin;
 
+import com.database.Account;
 import com.media.Audio;
 import com.media.Gambar;
+import com.media.Waktu;
 import com.window.all.ConfirmCancelInput;
 import com.window.all.ConfirmClose;
 import com.window.petugas.DataPetugas;
@@ -9,6 +11,7 @@ import java.awt.Color;
 
 import java.awt.Cursor;
 import java.util.Date;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -18,6 +21,10 @@ import java.util.Date;
 public class TambahDataPetugas extends javax.swing.JFrame {
 
     int x, y;
+    private final Account acc = new Account();
+    private final Waktu waktu = new Waktu();
+    private String id, username, namaPetugas, jenisKelamin, tempatLhr, tanggalLhr, alamat,
+                   noHp, email, level, password, konfirmasi;
     
     public TambahDataPetugas() {
         initComponents();
@@ -28,6 +35,25 @@ public class TambahDataPetugas extends javax.swing.JFrame {
         this.btnTambah.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.pnlInput.setBackground(new java.awt.Color(0,0,0,1));
         this.lblLogoSmk.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts.png"), 31, 38));
+    }
+    
+    private void getInput(){
+        this.id = this.inpID.getText();
+        this.username = this.inpUsername.getText();
+        this.namaPetugas = this.inpNama.getText();
+        this.jenisKelamin = this.inpGender.getSelectedItem().toString();
+        this.tempatLhr = this.inpTempatLahir.getText();
+        this.alamat = this.inpAlamat.getText();
+        this.noHp = this.inpNoHp.getText();
+        this.email = this.inpEmail.getText();
+        this.level = this.inpLevel.getSelectedItem().toString();
+        this.password = this.inpPassword.getText();
+        
+        if(jenisKelamin.equalsIgnoreCase("Laki-Laki")){
+            jenisKelamin = "L";
+        }else{
+            jenisKelamin = "P";
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -69,7 +95,7 @@ public class TambahDataPetugas extends javax.swing.JFrame {
         inpNama = new javax.swing.JTextField();
         inpPassword = new javax.swing.JPasswordField();
         inpKonfirmasi = new javax.swing.JPasswordField();
-        jPanel1 = new javax.swing.JPanel();
+        pnlShow = new javax.swing.JPanel();
         eyeKonfirmasi = new javax.swing.JLabel();
         eyePassword = new javax.swing.JLabel();
         btnBatal = new javax.swing.JButton();
@@ -286,7 +312,7 @@ public class TambahDataPetugas extends javax.swing.JFrame {
         inpKonfirmasi.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
         inpKonfirmasi.setCaretColor(new java.awt.Color(10, 79, 223));
 
-        jPanel1.setBackground(new java.awt.Color(0, 0, 0));
+        pnlShow.setBackground(new java.awt.Color(0, 0, 0));
 
         eyeKonfirmasi.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         eyeKonfirmasi.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-login-eye-close.png"))); // NOI18N
@@ -311,16 +337,16 @@ public class TambahDataPetugas extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout pnlShowLayout = new javax.swing.GroupLayout(pnlShow);
+        pnlShow.setLayout(pnlShowLayout);
+        pnlShowLayout.setHorizontalGroup(
+            pnlShowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(eyeKonfirmasi, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addComponent(eyePassword, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+        pnlShowLayout.setVerticalGroup(
+            pnlShowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlShowLayout.createSequentialGroup()
                 .addComponent(eyePassword, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(eyeKonfirmasi, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -380,7 +406,7 @@ public class TambahDataPetugas extends javax.swing.JFrame {
                                     .addComponent(inpKonfirmasi, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
                                     .addComponent(inpPassword, javax.swing.GroupLayout.Alignment.LEADING))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(pnlShow, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(pnlInputLayout.createSequentialGroup()
                         .addComponent(pnlFoto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -452,7 +478,7 @@ public class TambahDataPetugas extends javax.swing.JFrame {
                             .addComponent(inpTanggalLahir, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(40, 40, 40)
                         .addComponent(lineBottom, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(pnlShow, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -562,7 +588,7 @@ public class TambahDataPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_pnlMainMouseDragged
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        
+        acc.closeConnection();
     }//GEN-LAST:event_formWindowClosed
 
     private void lblCloseMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblCloseMouseClicked
@@ -615,7 +641,20 @@ public class TambahDataPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_showFotoMouseExited
 
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
-        
+        this.getInput();
+        if(acc.buatAkunPetugas(Integer.parseInt(id), username, namaPetugas, jenisKelamin, noHp, email, password, level, Account.DEFAULT_FOTO)){
+            acc.setDataAkun(id, "tanggal_lahir", waktu.getDateNow());
+            JOptionPane.showMessageDialog(this, "Petugas berhasil ditambahkan!", "Info", JOptionPane.INFORMATION_MESSAGE);
+            java.awt.EventQueue.invokeLater(new Runnable(){
+                @Override
+                public void run(){
+                    new DataPetugas().setVisible(true);
+                }
+            });
+            this.dispose();
+        }else{
+            JOptionPane.showMessageDialog(this, "Gagal menambahkan petugas!", "Warning", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_btnTambahActionPerformed
 
     private void btnTambahMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnTambahMouseEntered
@@ -729,7 +768,6 @@ public class TambahDataPetugas extends javax.swing.JFrame {
     private com.toedter.calendar.JDateChooser inpTanggalLahir;
     private javax.swing.JTextField inpTempatLahir;
     private javax.swing.JTextField inpUsername;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblAddFoto;
     private javax.swing.JLabel lblAlamat;
     private javax.swing.JLabel lblBgImage;
@@ -756,6 +794,7 @@ public class TambahDataPetugas extends javax.swing.JFrame {
     private javax.swing.JPanel pnlFoto;
     private javax.swing.JPanel pnlInput;
     private javax.swing.JPanel pnlMain;
+    private javax.swing.JPanel pnlShow;
     private javax.swing.JLabel showFoto;
     // End of variables declaration//GEN-END:variables
 }
