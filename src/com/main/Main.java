@@ -1,7 +1,7 @@
 package com.main;
 
 /**
- * Class ini adala class yang pertama kali dieksekusi saat program dijalankan
+ * Class ini adalah class yang pertama kali dieksekusi saat program dijalankan
  * 
  * @author Achmad Baihaqi
  * @since 2021-03-07
@@ -13,7 +13,7 @@ public class Main {
             
             @Override
             public void run(){
-                new com.window.petugas.TentangAplikasi().setVisible(true);
+                new com.window.all.SplashWindow().setVisible(true);
             }
         });
     }
