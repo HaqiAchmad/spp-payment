@@ -248,7 +248,7 @@ public class Transaksi extends Database{
     
     public long getTotalSppDibayarKelas(String idKelas){
         long dibayar = 0L;
-        for(Object o : this.getID("WHERE id_spp = '"+idKelas+"'")){
+        for(Object o : this.getID("WHERE id_kelas = '"+idKelas+"'")){
             if(acc.getDataAkun(this.getNis(o.toString()), "id_kelas").equalsIgnoreCase(idKelas)){
                 dibayar += this.getJumlahBayar(o.toString());
             }
