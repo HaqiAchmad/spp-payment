@@ -1177,13 +1177,7 @@ public class DataPetugas extends javax.swing.JFrame {
 
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
         if(level.equalsIgnoreCase("admin")){
-            java.awt.EventQueue.invokeLater(new Runnable(){
-                @Override
-                public void run(){
-                    new TambahDataPetugas().setVisible(true);
-                }
-            });
-            dispose();
+            
         }else{
             Audio.play(Audio.SOUND_WARNING);
             JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk menambahkan sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
@@ -1201,13 +1195,7 @@ public class DataPetugas extends javax.swing.JFrame {
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         if(level.equalsIgnoreCase("admin")){
             if(tabelData.getSelectedRow() > -1){
-                java.awt.EventQueue.invokeLater(new Runnable(){
-                    @Override
-                    public void run(){
-                        new EditDataPetugas(idSelected).setVisible(true);
-                    }
-                });
-                this.dispose();
+                
             }else{
                 Audio.play(Audio.SOUND_WARNING);
                 JOptionPane.showMessageDialog(null, "Error!\nTidak ada data yang dipilih!!", "Error!", JOptionPane.ERROR_MESSAGE);
@@ -1229,9 +1217,7 @@ public class DataPetugas extends javax.swing.JFrame {
     private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
         if(level.equalsIgnoreCase("admin")){
             if(tabelData.getSelectedRow() > -1){
-                if(acc.deleteAkunById(Integer.parseInt(idSelected))){
-                    JOptionPane.showMessageDialog(null, "Data Berhasil Dihapus", "Sukes", JOptionPane.INFORMATION_MESSAGE);
-                }
+                
             }else{
                 Audio.play(Audio.SOUND_WARNING);
                 JOptionPane.showMessageDialog(null, "Error!\nTidak ada data yang dipilih!!", "Error!", JOptionPane.ERROR_MESSAGE);
