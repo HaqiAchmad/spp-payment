@@ -135,7 +135,7 @@ public class DataKelas extends javax.swing.JFrame {
         }
         
         this.updateTabel();
-//        this.showData();
+        this.showData();
     }
     
     private Object[][] getData(){
@@ -189,7 +189,7 @@ public class DataKelas extends javax.swing.JFrame {
         this.levelKelas = kls.getLevelName(idSelected);
         this.jurusan = kls.getJurusanName(idSelected);
         this.totalSiswa = "" + getJumlah.getJumlahData(Database.SISWA, "WHERE id_kelas = '"+idSelected+"'") + " Siswa";
-//        this.sppDibayar = tr.addRp(tr.getTotalSppDibayarKelas(idSelected));
+        this.sppDibayar = tr.addRp(tr.getTotalSppDibayarKelas(idSelected));
         
         this.valId.setText("<html><p>:&nbsp;"+idSelected+"</p></html>");
         this.valNama.setText("<html><p>:&nbsp;"+namaKelas+"</p></html>");
@@ -618,7 +618,7 @@ public class DataKelas extends javax.swing.JFrame {
 
         lblDashboard.setFont(new java.awt.Font("Ebrima", 1, 21)); // NOI18N
         lblDashboard.setForeground(new java.awt.Color(22, 19, 19));
-        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/icons8_class_35px.png"))); // NOI18N
+        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-datapetugas-logo.png"))); // NOI18N
         lblDashboard.setText("Data Kelas");
         lblDashboard.setIconTextGap(6);
         pnlMain.add(lblDashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 64, 400, -1));
@@ -1192,7 +1192,7 @@ public class DataKelas extends javax.swing.JFrame {
 
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
         if(level.equalsIgnoreCase("admin")){
-            JOptionPane.showMessageDialog(null, "Data berhasil ditambahkan!");
+            
         }else{
             Audio.play(Audio.SOUND_WARNING);
             JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk menambahkan sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
@@ -1210,7 +1210,7 @@ public class DataKelas extends javax.swing.JFrame {
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         if(level.equalsIgnoreCase("admin")){
             if(tabelData.getSelectedRow() > -1){
-                JOptionPane.showMessageDialog(null, "Data berhasil diedit");
+                
             }else{
                 Audio.play(Audio.SOUND_WARNING);
                 JOptionPane.showMessageDialog(null, "Error!\nTidak ada data yang dipilih!!", "Error!", JOptionPane.ERROR_MESSAGE);
