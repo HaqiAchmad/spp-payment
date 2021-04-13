@@ -181,12 +181,6 @@ public class DataSpp extends javax.swing.JFrame {
         });
     }
     
-    private void edit(){
-        this.inpId.setText(idSelected);
-        this.inpTahun.setText(tahunSpp);
-        this.inpNominal.setText(nominalSpp);
-    }
-    
     private void showData(){
         this.tahunSpp = Integer.toString(tr.getTahunSpp(Integer.parseInt(idSelected)));
         this.nominalSpp = tr.addRp(tr.getNominalSpp(Integer.parseInt(idSelected)));
@@ -202,12 +196,6 @@ public class DataSpp extends javax.swing.JFrame {
         this.valTransaksi.setText("<html><p>:&nbsp;"+transaksi+"</p></html>");
         this.valSppDibayar.setText("<html><p>:&nbsp;"+sppDibayar+"</p></html>");
         this.valPresentase.setText("<html><p>:&nbsp;"+presentase+"</p></html>");
-    }
-    
-    private void reset(){
-        this.inpId.setText("");
-        this.inpTahun.setText("");
-        this.inpNominal.setText("");
     }
 
     @SuppressWarnings("unchecked")
@@ -629,7 +617,7 @@ public class DataSpp extends javax.swing.JFrame {
 
         lblDashboard.setFont(new java.awt.Font("Ebrima", 1, 21)); // NOI18N
         lblDashboard.setForeground(new java.awt.Color(22, 19, 19));
-        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/icons8_online_payment_35px.png"))); // NOI18N
+        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-datapetugas-logo.png"))); // NOI18N
         lblDashboard.setText("Data SPP");
         lblDashboard.setIconTextGap(6);
         pnlMain.add(lblDashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 64, 400, -1));
@@ -1194,16 +1182,7 @@ public class DataSpp extends javax.swing.JFrame {
 
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
         if(level.equalsIgnoreCase("admin")){
-            int id = Integer.parseInt(inpId.getText()),
-                tahun = Integer.parseInt(inpTahun.getText()),
-                nominal = Integer.parseInt(inpNominal.getText());
-            if(tr.addDataSpp(id, tahun, nominal)){
-                JOptionPane.showMessageDialog(null, "Data SPP Berhasil Ditambahkan!", "Info!", JOptionPane.INFORMATION_MESSAGE);
-                this.updateTabel();
-                this.reset();
-            }else{
-                JOptionPane.showMessageDialog(null, "Data SPP Gagal Ditambahkan!", "Info!", JOptionPane.INFORMATION_MESSAGE);
-            }
+            
         }else{
             Audio.play(Audio.SOUND_WARNING);
             JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk menambahkan sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
@@ -1221,14 +1200,7 @@ public class DataSpp extends javax.swing.JFrame {
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         if(level.equalsIgnoreCase("admin")){
             if(tabelData.getSelectedRow() > -1){
-                this.edit();
-                if(tr.setNominalSpp(Integer.parseInt(idSelected), Integer.parseInt(inpNominal.getText())) && 
-                   tr.setTahunSpp(Integer.parseInt(idSelected), Integer.parseInt(inpTahun.getText()))
-                ){
-                    JOptionPane.showMessageDialog(null, "SPP berhasil ditambahkan", "Info!", JOptionPane.ERROR_MESSAGE);
-                }else{
-                    JOptionPane.showMessageDialog(null, "SPP gagal ditambahkan", "Info!", JOptionPane.ERROR_MESSAGE);
-                }
+                
             }else{
                 Audio.play(Audio.SOUND_WARNING);
                 JOptionPane.showMessageDialog(null, "Error!\nTidak ada data yang dipilih!!", "Error!", JOptionPane.ERROR_MESSAGE);
