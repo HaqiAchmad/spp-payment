@@ -627,7 +627,7 @@
               <Color blue="13" green="13" red="16" type="rgb"/>
             </Property>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/resources/image/icons/icons8_student_male_35px_1.png"/>
+              <Image iconType="3" name="/resources/image/icons/ic-datapetugas-logo.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Data Siswa"/>
             <Property name="iconTextGap" type="int" value="6"/>
@@ -1005,11 +1005,6 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value=": 0856-5586-4624"/>
               </Properties>
-              <Events>
-                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="valNoHpMouseClicked"/>
-                <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="valNoHpMouseEntered"/>
-                <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="valNoHpMouseExited"/>
-              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="valEmail">
               <Properties>

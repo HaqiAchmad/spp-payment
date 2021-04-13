@@ -6,21 +6,14 @@ import com.database.Kelas;
 import com.database.Transaksi;
 import com.media.Audio;
 import com.media.Gambar;
-import com.media.Internet;
 import com.media.Waktu;
-import com.window.petugas.admin.TambahDataSiswa;
-import com.window.petugas.admin.EditDataSiswa;
 import com.sun.glass.events.KeyEvent;
 
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -112,7 +105,7 @@ public class DataSiswa extends javax.swing.JFrame {
         
         JLabel[] lbls = new JLabel[]{
             this.valNis, this.valNama, this.valGender, this.valTtl, this.valKelas,
-            this.valAlamat, this.valEmail, this.valWali, this.valNominal
+            this.valAlamat, this.valNoHp, this.valEmail, this.valWali, this.valNominal
         };
         
         for(JLabel lbl : lbls){
@@ -642,7 +635,7 @@ public class DataSiswa extends javax.swing.JFrame {
 
         lblDashboard.setFont(new java.awt.Font("Ebrima", 1, 21)); // NOI18N
         lblDashboard.setForeground(new java.awt.Color(22, 19, 19));
-        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/icons8_student_male_35px_1.png"))); // NOI18N
+        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-datapetugas-logo.png"))); // NOI18N
         lblDashboard.setText("Data Siswa");
         lblDashboard.setIconTextGap(6);
         pnlMain.add(lblDashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 64, 400, -1));
@@ -741,17 +734,6 @@ public class DataSiswa extends javax.swing.JFrame {
 
         valNoHp.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
         valNoHp.setText(": 0856-5586-4624");
-        valNoHp.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                valNoHpMouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                valNoHpMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                valNoHpMouseExited(evt);
-            }
-        });
 
         valEmail.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
         valEmail.setText(": leviackerman@gmail.com");
@@ -1227,13 +1209,7 @@ public class DataSiswa extends javax.swing.JFrame {
 
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
         if(level.equalsIgnoreCase("admin")){
-            java.awt.EventQueue.invokeLater(new Runnable(){
-                @Override
-                public void run(){
-                    new TambahDataSiswa().setVisible(true);
-                }
-            });
-            this.dispose();
+            
         }else{
             Audio.play(Audio.SOUND_WARNING);
             JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk menambahkan sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
@@ -1251,13 +1227,7 @@ public class DataSiswa extends javax.swing.JFrame {
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         if(level.equalsIgnoreCase("admin")){
             if(tabelData.getSelectedRow() > -1){
-            java.awt.EventQueue.invokeLater(new Runnable(){
-                @Override
-                public void run(){
-                    new EditDataSiswa(nisSelected).setVisible(true);
-                }
-            });
-            this.dispose();
+                
             }else{
                 Audio.play(Audio.SOUND_WARNING);
                 JOptionPane.showMessageDialog(null, "Error!\nTidak ada data yang dipilih!!", "Error!", JOptionPane.ERROR_MESSAGE);
@@ -1335,30 +1305,6 @@ public class DataSiswa extends javax.swing.JFrame {
         this.lblPenampilFoto.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         this.lblPenampilFoto.setText("<html><p style=\"text-decoration:none;\">Tampilkan Foto</p></html>");
     }//GEN-LAST:event_lblPenampilFotoMouseExited
-
-    private void valNoHpMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valNoHpMouseClicked
-        Internet net = new Internet();
-        String nomor = noHp.substring(2);
-        if(net.isConnectInternet()){
-            try {
-                net.openLink("https://wa.me/62"+nomor+"");
-            } catch (IOException | URISyntaxException ex) {
-                Logger.getLogger(DataSiswa.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }else{
-            JOptionPane.showMessageDialog(null, "Tidak terhubung ke Internet!", "Error", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }//GEN-LAST:event_valNoHpMouseClicked
-
-    private void valNoHpMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valNoHpMouseEntered
-        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.valNoHp.setText("<html><p style=\"text-decoration:underline; color:rgb(15,98,230);\">:&nbsp;"+noHp+"</p></html>");
-    }//GEN-LAST:event_valNoHpMouseEntered
-
-    private void valNoHpMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valNoHpMouseExited
-        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        this.valNoHp.setText("<html><p style=\"text-decoration:none; color:rgb(0,0,0);\">:&nbsp;"+noHp+"</p></html>");
-    }//GEN-LAST:event_valNoHpMouseExited
 
     public static void main(String args[]) {
 
