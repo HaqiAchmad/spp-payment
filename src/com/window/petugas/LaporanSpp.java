@@ -55,6 +55,7 @@ public class LaporanSpp extends javax.swing.JFrame {
         this.btnClose.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnMinimaze.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnCetak.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        this.btnBatal.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnCari.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.lblPhotoProfile.setIcon(Gambar.scaleImage(new java.io.File(foto), lblPhotoProfile.getWidth(), lblPhotoProfile.getHeight()));
         this.lblSekolah.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts-circle.png"), 35, 35));     
@@ -260,6 +261,7 @@ public class LaporanSpp extends javax.swing.JFrame {
         lineBottom = new javax.swing.JSeparator();
         lblTotalData = new javax.swing.JLabel();
         btnCetak = new javax.swing.JButton();
+        btnBatal = new javax.swing.JButton();
         lblVersion = new javax.swing.JLabel();
         lblCopyright = new javax.swing.JLabel();
         pnlInfoPembayaran = new javax.swing.JPanel();
@@ -636,7 +638,7 @@ public class LaporanSpp extends javax.swing.JFrame {
 
         lblDashboard.setFont(new java.awt.Font("Ebrima", 1, 21)); // NOI18N
         lblDashboard.setForeground(new java.awt.Color(22, 19, 19));
-        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/icons8_graph_report_35px.png"))); // NOI18N
+        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-datapetugas-logo.png"))); // NOI18N
         lblDashboard.setText("Laporan SPP");
         lblDashboard.setIconTextGap(6);
         pnlMain.add(lblDashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 64, 400, -1));
@@ -812,6 +814,26 @@ public class LaporanSpp extends javax.swing.JFrame {
             }
         });
         pnlMain.add(btnCetak, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 670, 140, -1));
+
+        btnBatal.setBackground(new java.awt.Color(220, 41, 41));
+        btnBatal.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        btnBatal.setForeground(new java.awt.Color(255, 255, 255));
+        btnBatal.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-hapus.png"))); // NOI18N
+        btnBatal.setText("Batalkan");
+        btnBatal.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnBatalMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnBatalMouseExited(evt);
+            }
+        });
+        btnBatal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBatalActionPerformed(evt);
+            }
+        });
+        pnlMain.add(btnBatal, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 670, 120, -1));
 
         lblVersion.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
         lblVersion.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -989,7 +1011,6 @@ public class LaporanSpp extends javax.swing.JFrame {
         btnCari.setBackground(new java.awt.Color(34, 119, 237));
         btnCari.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         btnCari.setForeground(new java.awt.Color(255, 255, 255));
-        btnCari.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-histori-search.png"))); // NOI18N
         btnCari.setText("Cari");
         btnCari.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -1223,7 +1244,14 @@ public class LaporanSpp extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTentangAppActionPerformed
 
     private void btnCetakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCetakActionPerformed
-        JOptionPane.showMessageDialog(null, "Laporan Berhasil Dicetak!");
+        String selected = this.tabelData.getValueAt(tabelData.getSelectedRow(), 0).toString();
+        java.awt.EventQueue.invokeLater(new Runnable(){
+            @Override
+            public void run(){
+                new EditDataPetugas(selected).setVisible(true);
+            }
+        });
+        dispose();
     }//GEN-LAST:event_btnCetakActionPerformed
 
     private void btnCetakMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCetakMouseEntered
@@ -1233,6 +1261,18 @@ public class LaporanSpp extends javax.swing.JFrame {
     private void btnCetakMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCetakMouseExited
         this.btnCetak.setIcon(Gambar.getIcon("ic-data-edit.png"));
     }//GEN-LAST:event_btnCetakMouseExited
+
+    private void btnBatalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBatalActionPerformed
+        
+    }//GEN-LAST:event_btnBatalActionPerformed
+
+    private void btnBatalMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnBatalMouseEntered
+        this.btnBatal.setIcon(Gambar.getIcon("ic-data-hapus-entered.png"));
+    }//GEN-LAST:event_btnBatalMouseEntered
+
+    private void btnBatalMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnBatalMouseExited
+        this.btnBatal.setIcon(Gambar.getIcon("ic-data-hapus.png"));
+    }//GEN-LAST:event_btnBatalMouseExited
 
     private void inpNisKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inpNisKeyTyped
         
@@ -1283,6 +1323,7 @@ public class LaporanSpp extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBatal;
     private javax.swing.JButton btnCari;
     private javax.swing.JButton btnCetak;
     private javax.swing.JButton btnClose;
