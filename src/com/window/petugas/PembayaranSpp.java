@@ -4,10 +4,11 @@ import com.database.Account;
 import com.database.Database;
 import com.database.Kelas;
 import com.database.Transaksi;
-import com.database.Validation;
 import com.media.Audio;
 import com.media.Gambar;
 import com.sun.glass.events.KeyEvent;
+import com.window.petugas.admin.EditDataPetugas;
+import com.window.petugas.admin.TambahDataPetugas;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -54,6 +55,7 @@ public class PembayaranSpp extends javax.swing.JFrame {
         this.btnClose.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnMinimaze.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnBayar.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        this.btnEdit.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnHapus.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.lblPhotoProfile.setIcon(Gambar.scaleImage(new java.io.File(foto), lblPhotoProfile.getWidth(), lblPhotoProfile.getHeight()));
         this.lblSekolah.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts-circle.png"), 35, 35));     
@@ -137,13 +139,6 @@ public class PembayaranSpp extends javax.swing.JFrame {
        
         this.updateTabel();
         
-    }
-    
-    private void reset(){
-        this.inpCari.setText("");
-        this.inpTahunBayar.setText("");
-        this.inpJumlahBayar.setText("");
-        this.chooseBulan.setSelectedIndex(0);
     }
     
     
@@ -269,6 +264,7 @@ public class PembayaranSpp extends javax.swing.JFrame {
         lineBottom = new javax.swing.JSeparator();
         lblTotalData = new javax.swing.JLabel();
         btnBayar = new javax.swing.JButton();
+        btnEdit = new javax.swing.JButton();
         btnHapus = new javax.swing.JButton();
         lblVersion = new javax.swing.JLabel();
         lblCopyright = new javax.swing.JLabel();
@@ -637,7 +633,7 @@ public class PembayaranSpp extends javax.swing.JFrame {
 
         lblDashboard.setFont(new java.awt.Font("Ebrima", 1, 21)); // NOI18N
         lblDashboard.setForeground(new java.awt.Color(22, 19, 19));
-        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/icons8_donate_35px.png"))); // NOI18N
+        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-datapetugas-logo.png"))); // NOI18N
         lblDashboard.setText("Pembayaran SPP");
         lblDashboard.setIconTextGap(6);
         pnlMain.add(lblDashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 64, 400, -1));
@@ -819,11 +815,11 @@ public class PembayaranSpp extends javax.swing.JFrame {
         lblTotalData.setText("Menampilkan 20 data siswa dengan keyword = \"\"");
         pnlMain.add(lblTotalData, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 615, 440, 20));
 
-        btnBayar.setBackground(new java.awt.Color(34, 119, 237));
+        btnBayar.setBackground(new java.awt.Color(41, 180, 50));
         btnBayar.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         btnBayar.setForeground(new java.awt.Color(255, 255, 255));
-        btnBayar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-pembayaran-bayar.png"))); // NOI18N
-        btnBayar.setText("Bayar");
+        btnBayar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-tambah.png"))); // NOI18N
+        btnBayar.setText("Tambah Data");
         btnBayar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 btnBayarMouseEntered(evt);
@@ -837,13 +833,33 @@ public class PembayaranSpp extends javax.swing.JFrame {
                 btnBayarActionPerformed(evt);
             }
         });
-        pnlMain.add(btnBayar, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 660, 110, 30));
+        pnlMain.add(btnBayar, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 660, 130, -1));
+
+        btnEdit.setBackground(new java.awt.Color(34, 119, 237));
+        btnEdit.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        btnEdit.setForeground(new java.awt.Color(255, 255, 255));
+        btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-edit.png"))); // NOI18N
+        btnEdit.setText("Edit Data");
+        btnEdit.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnEditMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnEditMouseExited(evt);
+            }
+        });
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditActionPerformed(evt);
+            }
+        });
+        pnlMain.add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 660, 110, -1));
 
         btnHapus.setBackground(new java.awt.Color(220, 41, 41));
         btnHapus.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         btnHapus.setForeground(new java.awt.Color(255, 255, 255));
         btnHapus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-hapus.png"))); // NOI18N
-        btnHapus.setText("Batal");
+        btnHapus.setText("Hapus Data");
         btnHapus.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 btnHapusMouseEntered(evt);
@@ -857,7 +873,7 @@ public class PembayaranSpp extends javax.swing.JFrame {
                 btnHapusActionPerformed(evt);
             }
         });
-        pnlMain.add(btnHapus, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 660, 100, 30));
+        pnlMain.add(btnHapus, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 660, 120, -1));
 
         lblVersion.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
         lblVersion.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -1204,31 +1220,44 @@ public class PembayaranSpp extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTentangAppActionPerformed
 
     private void btnBayarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBayarActionPerformed
-        if(Validation.isNumber(this.inpJumlahBayar.getText()) && Validation.isNumber(this.inpTahunBayar.getText())){
-            int tahun = Integer.parseInt(this.inpTahunBayar.getText()),
-                jumlahBayar = Integer.parseInt(this.inpJumlahBayar.getText());
-                if(tr.bayarSpp(Integer.parseInt(acc.getLogin()), Integer.parseInt(nisSelected), this.chooseBulan.getSelectedItem().toString(), tahun, jumlahBayar)){
-                    Audio.play(Audio.SOUND_INFO);
-                    JOptionPane.showMessageDialog(null, "Pembayaran berhasil!", "Info", JOptionPane.INFORMATION_MESSAGE);
-                    this.showData();
-                    this.reset();
-                }else{
-                    Audio.play(Audio.SOUND_WARNING);
-                    JOptionPane.showMessageDialog(null, "Pembayaran berhasil!", "Info", JOptionPane.INFORMATION_MESSAGE);
-                }
-        }
+        java.awt.EventQueue.invokeLater(new Runnable(){
+            @Override
+            public void run(){
+                new TambahDataPetugas().setVisible(true);
+            }
+        });
+        dispose();
     }//GEN-LAST:event_btnBayarActionPerformed
 
     private void btnBayarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnBayarMouseEntered
-        this.btnBayar.setIcon(Gambar.getIcon("ic-pembayaran-pay-entered.png"));
+        this.btnBayar.setIcon(Gambar.getIcon("ic-data-tambah-entered.png"));
     }//GEN-LAST:event_btnBayarMouseEntered
 
     private void btnBayarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnBayarMouseExited
-        this.btnBayar.setIcon(Gambar.getIcon("ic-pembayaran-bayar.png"));
+        this.btnBayar.setIcon(Gambar.getIcon("ic-data-tambah.png"));
     }//GEN-LAST:event_btnBayarMouseExited
 
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
+        String selected = this.tabelData.getValueAt(tabelData.getSelectedRow(), 0).toString();
+        java.awt.EventQueue.invokeLater(new Runnable(){
+            @Override
+            public void run(){
+                new EditDataPetugas(selected).setVisible(true);
+            }
+        });
+        dispose();
+    }//GEN-LAST:event_btnEditActionPerformed
+
+    private void btnEditMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditMouseEntered
+        this.btnEdit.setIcon(Gambar.getIcon("ic-data-edit-entered.png"));
+    }//GEN-LAST:event_btnEditMouseEntered
+
+    private void btnEditMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditMouseExited
+        this.btnEdit.setIcon(Gambar.getIcon("ic-data-edit.png"));
+    }//GEN-LAST:event_btnEditMouseExited
+
     private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
-        this.reset();
+        
     }//GEN-LAST:event_btnHapusActionPerformed
 
     private void btnHapusMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnHapusMouseEntered
@@ -1291,6 +1320,7 @@ public class PembayaranSpp extends javax.swing.JFrame {
     private javax.swing.JButton btnDataPetugas;
     private javax.swing.JButton btnDataSiswa;
     private javax.swing.JButton btnDataSpp;
+    private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnHapus;
     private javax.swing.JButton btnInfoAkun;
     private javax.swing.JButton btnLaporan;
