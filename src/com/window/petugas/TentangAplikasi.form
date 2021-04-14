@@ -608,7 +608,7 @@
               <Color blue="13" green="13" red="16" type="rgb"/>
             </Property>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/resources/image/icons/icons8_about_35px.png"/>
+              <Image iconType="3" name="/resources/image/icons/ic-dashboard-logo.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Tentang Aplikasi"/>
             <Property name="iconTextGap" type="int" value="6"/>
@@ -678,7 +678,7 @@
                       <Font name="Dialog" size="13" style="1"/>
                     </Property>
                     <Property name="rows" type="int" value="5"/>
-                    <Property name="text" type="java.lang.String" value="Aplikasi ini digunakan untuk melakukan pembayaran SPP di &#xa;sekolah SMK Negeri 1 Kertosono.&#xa;&#xa;Tujuan dari dibuatnya aplikasi ini adalah untuk memudahkan&#xa;proses pembayaran SPP yang ada di Sekolah SMK Negeri&#xa;1 Kertosono.&#xa;&#xa;Aplikasi in dibuat oleh Achmad Baihaqi dari kelas &#xa;XII RPL 1&#xa;&#xa;Aplikasi ini dibuat pada tanggal 01 Maret 2021&#xa;"/>
+                    <Property name="text" type="java.lang.String" value="Aplikasi ini digunakan untuk melakukan pembayaran SPP di &#xa;sekolah SMK Negeri 1 Kertosono."/>
                     <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="b" green="b" red="c" type="rgb"/>
                     </Property>
@@ -802,11 +802,6 @@
                   <Image iconType="3" name="/resources/image/icons/ic-tentangapp-youtube.png"/>
                 </Property>
               </Properties>
-              <Events>
-                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblIconYTMouseClicked"/>
-                <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblIconYTMouseEntered"/>
-                <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblIconYTMouseExited"/>
-              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="lblYT">
               <Properties>
@@ -824,11 +819,6 @@
                   <Image iconType="3" name="/resources/image/icons/ic-tentangapp-instagram.png"/>
                 </Property>
               </Properties>
-              <Events>
-                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblIconIGMouseClicked"/>
-                <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblIconIGMouseEntered"/>
-                <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblIconIGMouseExited"/>
-              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="lblIG">
               <Properties>
@@ -846,11 +836,6 @@
                   <Image iconType="3" name="/resources/image/icons/ic-tentangapp-whatsapp.png"/>
                 </Property>
               </Properties>
-              <Events>
-                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblIconWAMouseClicked"/>
-                <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblIconWAMouseEntered"/>
-                <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblIconWAMouseExited"/>
-              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="lblWA">
               <Properties>

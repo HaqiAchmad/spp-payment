@@ -2,18 +2,12 @@ package com.window.petugas;
 
 import com.database.Account;
 import com.media.Gambar;
-import com.media.Internet;
 
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -581,7 +575,7 @@ public class TentangAplikasi extends javax.swing.JFrame {
 
         lblDashboard.setFont(new java.awt.Font("Ebrima", 1, 21)); // NOI18N
         lblDashboard.setForeground(new java.awt.Color(22, 19, 19));
-        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/icons8_about_35px.png"))); // NOI18N
+        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-dashboard-logo.png"))); // NOI18N
         lblDashboard.setText("Tentang Aplikasi");
         lblDashboard.setIconTextGap(6);
         pnlMain.add(lblDashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 64, 400, -1));
@@ -596,7 +590,7 @@ public class TentangAplikasi extends javax.swing.JFrame {
         txtDeskripsi.setColumns(20);
         txtDeskripsi.setFont(new java.awt.Font("Dialog", 1, 13)); // NOI18N
         txtDeskripsi.setRows(5);
-        txtDeskripsi.setText("Aplikasi ini digunakan untuk melakukan pembayaran SPP di \nsekolah SMK Negeri 1 Kertosono.\n\nTujuan dari dibuatnya aplikasi ini adalah untuk memudahkan\nproses pembayaran SPP yang ada di Sekolah SMK Negeri\n1 Kertosono.\n\nAplikasi in dibuat oleh Achmad Baihaqi dari kelas \nXII RPL 1\n\nAplikasi ini dibuat pada tanggal 01 Maret 2021\n");
+        txtDeskripsi.setText("Aplikasi ini digunakan untuk melakukan pembayaran SPP di \nsekolah SMK Negeri 1 Kertosono.");
         txtDeskripsi.setDisabledTextColor(new java.awt.Color(12, 11, 11));
         txtDeskripsi.setEnabled(false);
         jScrollPane1.setViewportView(txtDeskripsi);
@@ -639,17 +633,6 @@ public class TentangAplikasi extends javax.swing.JFrame {
 
         lblIconYT.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblIconYT.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-tentangapp-youtube.png"))); // NOI18N
-        lblIconYT.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lblIconYTMouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                lblIconYTMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                lblIconYTMouseExited(evt);
-            }
-        });
 
         lblYT.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         lblYT.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -657,17 +640,6 @@ public class TentangAplikasi extends javax.swing.JFrame {
 
         lblIconIG.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblIconIG.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-tentangapp-instagram.png"))); // NOI18N
-        lblIconIG.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lblIconIGMouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                lblIconIGMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                lblIconIGMouseExited(evt);
-            }
-        });
 
         lblIG.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         lblIG.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -675,17 +647,6 @@ public class TentangAplikasi extends javax.swing.JFrame {
 
         lblIconWA.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblIconWA.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-tentangapp-whatsapp.png"))); // NOI18N
-        lblIconWA.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lblIconWAMouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                lblIconWAMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                lblIconWAMouseExited(evt);
-            }
-        });
 
         lblWA.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         lblWA.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -1208,63 +1169,6 @@ public class TentangAplikasi extends javax.swing.JFrame {
         });
         this.dispose();
     }//GEN-LAST:event_btnTentangAppActionPerformed
-
-    private void lblIconYTMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconYTMouseEntered
-        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.lblIconYT.setIcon(Gambar.getIcon("ic-tentangapp-youtube-entered.png"));
-        this.lblYT.setForeground(new Color(246,46,46));
-    }//GEN-LAST:event_lblIconYTMouseEntered
-
-    private void lblIconYTMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconYTMouseExited
-        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        this.lblIconYT.setIcon(Gambar.getIcon("ic-tentangapp-youtube.png"));
-        this.lblYT.setForeground(new Color(0,0,0));
-    }//GEN-LAST:event_lblIconYTMouseExited
-
-    private void lblIconYTMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconYTMouseClicked
-
-    }//GEN-LAST:event_lblIconYTMouseClicked
-
-    private void lblIconIGMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconIGMouseClicked
-
-    }//GEN-LAST:event_lblIconIGMouseClicked
-
-    private void lblIconIGMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconIGMouseEntered
-        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.lblIconIG.setIcon(Gambar.getIcon("ic-tentangapp-instagram-entered.png"));
-        this.lblIG.setForeground(new Color(246,46,46));
-    }//GEN-LAST:event_lblIconIGMouseEntered
-
-    private void lblIconIGMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconIGMouseExited
-        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        this.lblIconIG.setIcon(Gambar.getIcon("ic-tentangapp-instagram.png"));
-        this.lblIG.setForeground(new Color(0,0,0));
-    }//GEN-LAST:event_lblIconIGMouseExited
-
-    private void lblIconWAMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconWAMouseClicked
-        Internet net = new Internet();
-        if(net.isConnectInternet()){
-            try {
-                net.openLink("https://wa.me/625655864624");
-            } catch (IOException | URISyntaxException ex) {
-                Logger.getLogger(DataSiswa.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }else{
-            JOptionPane.showMessageDialog(null, "Tidak terhubung ke Internet!", "Error", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }//GEN-LAST:event_lblIconWAMouseClicked
-
-    private void lblIconWAMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconWAMouseEntered
-        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.lblIconWA.setIcon(Gambar.getIcon("ic-tentangapp-whatsapp-entered.png"));
-        this.lblWA.setForeground(new Color(246,46,46));
-    }//GEN-LAST:event_lblIconWAMouseEntered
-
-    private void lblIconWAMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblIconWAMouseExited
-        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        this.lblIconWA.setIcon(Gambar.getIcon("ic-tentangapp-whatsapp.png"));
-        this.lblWA.setForeground(new Color(0,0,0));
-    }//GEN-LAST:event_lblIconWAMouseExited
 
     public static void main(String args[]) {
 
