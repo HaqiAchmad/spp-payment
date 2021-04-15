@@ -38,10 +38,6 @@ public class EditDataPetugas extends javax.swing.JFrame {
         this.pnlInput.setBackground(new java.awt.Color(0,0,0,1));
         this.lblLogoSmk.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts.png"), 31, 38));
     }
-
-    public EditDataPetugas() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
     
     private void getData(){
         this.username = acc.getDataAkun(id, "username");
