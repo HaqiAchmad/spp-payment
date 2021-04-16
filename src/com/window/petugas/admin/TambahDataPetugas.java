@@ -1,9 +1,7 @@
 package com.window.petugas.admin;
 
-import com.database.Account;
 import com.media.Audio;
 import com.media.Gambar;
-import com.media.Waktu;
 import com.window.all.ConfirmCancelInput;
 import com.window.all.ConfirmClose;
 import com.window.petugas.DataPetugas;
@@ -11,7 +9,6 @@ import java.awt.Color;
 
 import java.awt.Cursor;
 import java.util.Date;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -21,10 +18,6 @@ import javax.swing.JOptionPane;
 public class TambahDataPetugas extends javax.swing.JFrame {
 
     int x, y;
-    private final Account acc = new Account();
-    private final Waktu waktu = new Waktu();
-    private String id, username, namaPetugas, jenisKelamin, tempatLhr, tanggalLhr, alamat,
-                   noHp, email, level, password, konfirmasi;
     
     public TambahDataPetugas() {
         initComponents();
@@ -35,25 +28,6 @@ public class TambahDataPetugas extends javax.swing.JFrame {
         this.btnTambah.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.pnlInput.setBackground(new java.awt.Color(0,0,0,1));
         this.lblLogoSmk.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts.png"), 31, 38));
-    }
-    
-    private void getInput(){
-        this.id = this.inpID.getText();
-        this.username = this.inpUsername.getText();
-        this.namaPetugas = this.inpNama.getText();
-        this.jenisKelamin = this.inpGender.getSelectedItem().toString();
-        this.tempatLhr = this.inpTempatLahir.getText();
-        this.alamat = this.inpAlamat.getText();
-        this.noHp = this.inpNoHp.getText();
-        this.email = this.inpEmail.getText();
-        this.level = this.inpLevel.getSelectedItem().toString();
-        this.password = this.inpPassword.getText();
-        
-        if(jenisKelamin.equalsIgnoreCase("Laki-Laki")){
-            jenisKelamin = "L";
-        }else{
-            jenisKelamin = "P";
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -588,7 +562,7 @@ public class TambahDataPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_pnlMainMouseDragged
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        acc.closeConnection();
+        
     }//GEN-LAST:event_formWindowClosed
 
     private void lblCloseMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblCloseMouseClicked
@@ -641,20 +615,7 @@ public class TambahDataPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_showFotoMouseExited
 
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
-        this.getInput();
-        if(acc.buatAkunPetugas(Integer.parseInt(id), username, namaPetugas, jenisKelamin, noHp, email, password, level, Account.DEFAULT_FOTO)){
-            acc.setDataAkun(id, "tanggal_lahir", waktu.getDateNow());
-            JOptionPane.showMessageDialog(this, "Petugas berhasil ditambahkan!", "Info", JOptionPane.INFORMATION_MESSAGE);
-            java.awt.EventQueue.invokeLater(new Runnable(){
-                @Override
-                public void run(){
-                    new DataPetugas().setVisible(true);
-                }
-            });
-            this.dispose();
-        }else{
-            JOptionPane.showMessageDialog(this, "Gagal menambahkan petugas!", "Warning", JOptionPane.WARNING_MESSAGE);
-        }
+        
     }//GEN-LAST:event_btnTambahActionPerformed
 
     private void btnTambahMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnTambahMouseEntered
