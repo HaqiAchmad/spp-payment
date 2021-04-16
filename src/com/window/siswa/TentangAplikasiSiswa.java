@@ -482,7 +482,7 @@ public class TentangAplikasiSiswa extends javax.swing.JFrame {
 
         lblDashboard.setFont(new java.awt.Font("Ebrima", 1, 21)); // NOI18N
         lblDashboard.setForeground(new java.awt.Color(22, 19, 19));
-        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/icons8_about_35px.png"))); // NOI18N
+        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-dashboard-logo.png"))); // NOI18N
         lblDashboard.setText("Tentang Aplikasi");
         lblDashboard.setIconTextGap(6);
         pnlMain.add(lblDashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 64, 400, -1));

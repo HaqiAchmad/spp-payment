@@ -458,7 +458,7 @@
               <Color blue="13" green="13" red="16" type="rgb"/>
             </Property>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/resources/image/icons/icons8_about_35px.png"/>
+              <Image iconType="3" name="/resources/image/icons/ic-dashboard-logo.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Tentang Aplikasi"/>
             <Property name="iconTextGap" type="int" value="6"/>
