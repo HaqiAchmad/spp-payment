@@ -1,6 +1,5 @@
 package com.window.petugas.admin;
 
-import com.database.Account;
 import com.media.Audio;
 import com.media.Gambar;
 import com.window.all.ConfirmCancelInput;
@@ -9,7 +8,6 @@ import com.window.petugas.DataSiswa;
 import java.awt.Color;
 
 import java.awt.Cursor;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -19,9 +17,6 @@ import javax.swing.JOptionPane;
 public class TambahDataSiswa extends javax.swing.JFrame {
 
     int x, y;
-    private final Account acc = new Account();
-    private String nis, namaSiswa, jenisKelamin, tempatLhr, tanggalLhr, kelas, alamat,
-                   jurusan, noHp, email, level, password, konfirmasi;
     
     public TambahDataSiswa() {
         initComponents();
@@ -32,24 +27,6 @@ public class TambahDataSiswa extends javax.swing.JFrame {
         this.btnTambah.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.pnlInput.setBackground(new java.awt.Color(0,0,0,1));
         this.lblLogoSmk.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts.png"), 31, 38));
-    }
-    
-    private void getInput(){
-        this.nis = this.inpNis.getText();
-        this.namaSiswa = this.inpNamaSiswa.getText();
-        this.jenisKelamin = this.inpGender.getSelectedItem().toString();
-        this.tempatLhr = this.inpTempatLahir.getText();
-        this.alamat = this.inpAlamat.getText();
-        this.noHp = this.inpNoHp.getText();
-        this.kelas = this.inpKelas.getSelectedItem().toString();
-        this.jurusan = this.inpJurusan.getSelectedItem().toString();
-        this.email = this.inpEmail.getText();
-        
-        if(jenisKelamin.equalsIgnoreCase("Laki-Laki")){
-            jenisKelamin = "L";
-        }else{
-            jenisKelamin = "P";
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -608,13 +585,7 @@ public class TambahDataSiswa extends javax.swing.JFrame {
     }//GEN-LAST:event_lbFotoMouseExited
 
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
-        if(acc.buatAkunSiswa(4444, namaSiswa, jenisKelamin, "xii.rpl1", noHp, email, 18, Account.DEFAULT_FOTO)){
-            Audio.play(Audio.SOUND_INFO);
-            JOptionPane.showMessageDialog(null, "Siswa berhasil ditambahkan!", "Infor", JOptionPane.INFORMATION_MESSAGE);
-        }else{
-            Audio.play(Audio.SOUND_WARNING);
-            JOptionPane.showMessageDialog(null, "Ssiwa gagal ditambahkan!", "Infor", JOptionPane.INFORMATION_MESSAGE);
-        }
+        
     }//GEN-LAST:event_btnTambahActionPerformed
 
     private void btnTambahMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnTambahMouseEntered
