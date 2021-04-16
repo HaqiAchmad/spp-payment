@@ -454,7 +454,7 @@ public class HistoriPembayaranSiswa extends javax.swing.JFrame {
 
         lblDashboard.setFont(new java.awt.Font("Ebrima", 1, 21)); // NOI18N
         lblDashboard.setForeground(new java.awt.Color(22, 19, 19));
-        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/icons8_donate_30px_1.png"))); // NOI18N
+        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-datapetugas-logo.png"))); // NOI18N
         lblDashboard.setText("Histori Pembayaran");
         lblDashboard.setIconTextGap(6);
         pnlMain.add(lblDashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 64, 400, -1));
@@ -734,21 +734,7 @@ public class HistoriPembayaranSiswa extends javax.swing.JFrame {
         btnLihat.setBackground(new java.awt.Color(34, 119, 237));
         btnLihat.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         btnLihat.setForeground(new java.awt.Color(255, 255, 255));
-        btnLihat.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-histori-search.png"))); // NOI18N
         btnLihat.setText("Lihat");
-        btnLihat.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btnLihatMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnLihatMouseExited(evt);
-            }
-        });
-        btnLihat.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLihatActionPerformed(evt);
-            }
-        });
         pnlMain.add(btnLihat, new org.netbeans.lib.awtextra.AbsoluteConstraints(1170, 130, 90, 30));
 
         lblSekolahBottom.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -924,18 +910,6 @@ public class HistoriPembayaranSiswa extends javax.swing.JFrame {
     private void tabelDataKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tabelDataKeyPressed
 
     }//GEN-LAST:event_tabelDataKeyPressed
-
-    private void btnLihatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLihatActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnLihatActionPerformed
-
-    private void btnLihatMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLihatMouseEntered
-        this.btnLihat.setIcon(Gambar.getIcon("ic-histori-search-entered.png"));
-    }//GEN-LAST:event_btnLihatMouseEntered
-
-    private void btnLihatMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLihatMouseExited
-        this.btnLihat.setIcon(Gambar.getIcon("ic-histori-search.png"));
-    }//GEN-LAST:event_btnLihatMouseExited
 
     public static void main(String args[]) {
 
