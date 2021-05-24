@@ -1,6 +1,7 @@
 package com.database;
 
 import com.media.Audio;
+import com.media.Waktu;
 import javax.swing.JOptionPane;
 
 /**
@@ -39,7 +40,9 @@ public class Validation {
      *         tapi jika tidak maka akan mengembalikan nilai false.
      */
     public static boolean isNumber(String text){
-        
+        if(text == null){
+            return false;
+        }
         text = text.toLowerCase();
         // karakter yang bukan merupakan number
         String notNums = "abcdefghijklmnopqrstuvwxyz`~!@#$%^&*()_+=\\|{[]}:;'\"<>?/";
@@ -212,19 +215,39 @@ public class Validation {
     }
     
     /**
-     * - Jumlah uang minimum untuk membayara spp adalah rp. 10.000
-     * 
-     * @param bayar jumlah bayar yang akan dicek
+     * @param bulan
+     * @param tahun
      * @return 
      */
-    public static boolean isValidBayar(int bayar){
-        if(bayar >= 10000){
-            return true;
-        }else{
-            Audio.play(Audio.SOUND_WARNING);
-             JOptionPane.showMessageDialog(null, "Jumlah uang minimal untuk membayar SPP adalah Rp. 10.000!", "Pesan", JOptionPane.WARNING_MESSAGE);
-        }
-        return false;
+    public static boolean isValidPembayaran(String bulan, int tahun){
+       String tahunAjaran = "2020-2021";
+       int tahunAwal = Integer.parseInt(tahunAjaran.substring(0, tahunAjaran.indexOf("-"))),
+           tahunAkhir = Integer.parseInt(tahunAjaran.substring(tahunAjaran.indexOf("-")+1));
+       if(tahun == tahunAwal){
+           if(bulan.equalsIgnoreCase(Waktu.JULI) || bulan.equalsIgnoreCase(Waktu.AGUSTUS) || bulan.equalsIgnoreCase(Waktu.SEPTEMBER) || 
+              bulan.equalsIgnoreCase(Waktu.OKTOBER) || bulan.equalsIgnoreCase(Waktu.NOVEMBER) || bulan.equalsIgnoreCase(Waktu.DESEMBER)
+            ){
+               return true;
+           }else{
+               Audio.play(Audio.SOUND_WARNING);
+               JOptionPane.showMessageDialog(null, "Bulan Pembayaran Tidak Valid!!", "Pesan!", JOptionPane.WARNING_MESSAGE);
+               return false;
+           }
+       }else if(tahun == tahunAkhir){
+           if(bulan.equalsIgnoreCase(Waktu.JANUARI) || bulan.equalsIgnoreCase(Waktu.FEBRUARI) || bulan.equalsIgnoreCase(Waktu.MARET) || 
+              bulan.equalsIgnoreCase(Waktu.APRIL) || bulan.equalsIgnoreCase(Waktu.MEI) || bulan.equalsIgnoreCase(Waktu.JUNI)
+            ){
+               return true;
+           }else{
+               Audio.play(Audio.SOUND_WARNING);
+               JOptionPane.showMessageDialog(null, "Bulan Pembayaran Tidak Valid!!", "Pesan!", JOptionPane.WARNING_MESSAGE);
+               return false;
+           }
+       }else{
+           Audio.play(Audio.SOUND_WARNING);
+           JOptionPane.showMessageDialog(null, "Tahun Pembayaran Tidak Valid!!", "Pesan!", JOptionPane.WARNING_MESSAGE);
+           return false;
+       }
     }
     
     /**
@@ -333,23 +356,7 @@ public class Validation {
     
     
     public static void main(String[] args) {
-        System.out.println(Validation.isIdPetugas(15));
-        System.out.println(Validation.isNis(99999));
-        System.out.println(Validation.isIdKelas("r"));
-        System.out.println(Validation.isIdSpp(15));
-        System.out.println(Validation.isIdPembayaran("TR000001"));
-        System.out.println(Validation.containsNumber("1.baihaqi"));
-        System.out.println(Validation.isNamaOrang("Haqi-desu"));
-        System.out.println(Validation.isNamaKelas("X-RPL-1"));
-        System.out.println(Validation.isTahunSpp(2022));
-        System.out.println(Validation.isNominalSpp(250000));
-        System.out.println("TR013411".length());
-        System.out.println(Validation.isValidBayar(50000));
-        System.out.println(Validation.isUsername("levi"));
-        System.out.println(Validation.isPassword("12345678"));
-        System.out.println(Validation.isNamaTempat("Jombang"));
-        System.out.println(Validation.isNoHp("085655864624"));
-        System.out.println(Validation.isEmail("hakiahmad@smkn1kts.sch.id"));
+        System.out.println(Validation.isNamaTempat(""));
     }
     
 }
