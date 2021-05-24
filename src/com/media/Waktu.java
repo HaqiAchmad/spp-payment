@@ -1,5 +1,6 @@
 package com.media;
 
+import com.database.Validation;
 import java.util.Calendar;
 import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
@@ -149,6 +150,49 @@ public class Waktu {
                 "%s, %02d %s %d | %02d:%02d:%02d", 
                 this.getHari(), tanggal, this.getNamaBulan(bulan), tahun, jam, menit, detik
         );
+    }
+    
+    private int getTotalHari(int bulan){
+        switch(bulan){
+            case 1: return 31;
+            case 2: return 28;
+            case 3: return 31;
+            case 4: return 30;
+            case 5: return 31;
+            case 6: return 30;
+            case 7: return 31;
+            case 8: return 31;
+            case 9: return 30;
+            case 10: return 31;
+            case 11: return 30;
+            case 12: return 31;
+            default: return -1;
+        }
+    }
+    
+    public boolean isTanggal(String tanggal){
+        String hariStr, bulanStr, tahunStr;
+        int hariInt, bulanInt, tahunInt;
+        StringTokenizer token = new StringTokenizer(tanggal, "-");
+        
+        if(token.countTokens() >= 3){
+           tahunStr = token.nextToken();
+           bulanStr = token.nextToken();
+           hariStr = token.nextToken();
+           if(Validation.isNumber(hariStr) && Validation.isNumber(bulanStr) && Validation.isNumber(tahunStr)){
+               hariInt = Integer.parseInt(hariStr);
+               bulanInt = Integer.parseInt(bulanStr);
+               tahunInt = Integer.parseInt(tahunStr);
+               if(tahunInt >= 1 && tahunInt < 10000){
+                   if(bulanInt >= 1 && bulanInt < 13){
+                       if(hariInt >= 1 && hariInt < this.getTotalHari(bulanInt)+1){
+                           return true;
+                       }
+                   }
+               }
+           }
+        }
+        return false;
     }
     
     public static void main(String[] args) {
