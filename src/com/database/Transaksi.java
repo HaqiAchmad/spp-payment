@@ -1,9 +1,11 @@
 package com.database;
 
+import static com.database.Database.SISWA;
+import static com.database.Database.SPP;
 import com.media.Audio;
 import com.media.Waktu;
+
 import java.sql.SQLException;
-import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 /**
@@ -20,6 +22,10 @@ public class Transaksi extends Database{
     private final Account acc = new Account();
     
     private final Waktu waktu = new Waktu();
+    
+    public String addRp(long nominal){
+        return String.format("Rp. %,d.00", nominal);
+    }
     
     public boolean addDataSpp(int idSpp, int tahun, int nominal){
         String query = "INSERT INTO spp VALUES "+String.format("('%d', '%d', '%d')", idSpp, tahun, nominal);
@@ -53,21 +59,17 @@ public class Transaksi extends Database{
         return this.setData(SPP, "nominal", "id_spp", Integer.toString(idSpp), Integer.toString(nominal));
     }
     
-    public int getPresentaseLunas(int idSpp){
-        int dibayar = (int)this.getTotalSppDibayar(idSpp, "2020", "2021"),
-            lunas = (this.getNominalSpp(idSpp) * 12 * this.getJumlahData(SISWA, "WHERE id_spp = '"+idSpp+"' "));
-        return dibayar / lunas * 100;
-    }
-    
-    public Object[] getID(String keyword){
+    public String[] getIDs(){
         try{
-            ArrayList<String> id = new ArrayList<>();
-            String query = "SELECT id_pembayaran FROM pembayaran " + keyword;
+            int index = 0;
+            String query = "SELECT id_spp FROM spp";
+            String[] IDs = new String[this.getJumlahData(Database.SPP)];
             res = stat.executeQuery(query);
             while(res.next()){
-                id.add(res.getString("id_pembayaran"));
+                IDs[index] = res.getString("id_spp");
+                index++;
             }
-            return id.toArray();
+            return IDs;
         }catch(SQLException ex){
             Audio.play(Audio.SOUND_ERROR);
             JOptionPane.showMessageDialog(null, "Terjadi kesalahan : " + ex.getMessage(), "Warning", JOptionPane.WARNING_MESSAGE);
@@ -75,17 +77,36 @@ public class Transaksi extends Database{
         return null;
     }
     
-    public Object[] getID(){
-        return this.getID("");
+    public int getPenggunaSpp(int idSpp){
+        try{
+            String query = "SELECT COUNT(id_spp) AS pengguna FROM siswa WHERE id_spp = " + idSpp,
+                   buffer;
+            res = stat.executeQuery(query);
+            if(res.next()){
+                buffer = res.getString("pengguna");
+                if(Validation.isNumber(buffer)){
+                    return Integer.parseInt(buffer);
+                }
+            }
+        }catch(SQLException ex){
+            Audio.play(Audio.SOUND_ERROR);
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan : " + ex.getMessage(), "Warning", JOptionPane.WARNING_MESSAGE);
+        }
+        return 0;
     }
     
-    public String getLastID(){
-        Object[] all_id = this.getID();
-        if(all_id.length < 1){
-            return "TR000000";
-        }else{
-            return all_id[all_id.length-1].toString();
+    private String getLastID(){
+        try{
+            String query = "SELECT * FROM pembayaran ORDER BY id_pembayaran DESC LIMIT 0,1";
+            res = stat.executeQuery(query);
+            if(res.next()){
+                return res.getString("id_pembayaran");
+            }
+        }catch(SQLException ex){
+            Audio.play(Audio.SOUND_ERROR);
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan : " + ex.getMessage(), "Warning", JOptionPane.WARNING_MESSAGE);
         }
+        return null;
     }
     
     public String createID(){
@@ -96,83 +117,66 @@ public class Transaksi extends Database{
         return null;
     }
     
-    public boolean bayarSpp(int idPetugas, int nis, String bulan, int tahun, int nominal){
-        if(!this.isLunasByBulan(nis, bulan, tahun)){
-            int kekurangan = this.kekuranganSpp(nis, bulan, tahun);
-            if(nominal <= kekurangan){
-                String query = "INSERT INTO pembayaran VALUES " + 
-                        String.format("('%s', '%d', '%d', '%s', '%d', '%d' , '%s', '%s')", 
-                                createID(), idPetugas, nis, bulan, tahun, nominal, waktu.getDateNow(), acc.getDataAkun(Integer.toString(nis), "id_spp"));
-                return this.addData(query);
+    public boolean bayarSpp(int idPetugas, int nis, String bulan, int tahun, int nominal){  
+        
+        if(Validation.isValidPembayaran(bulan, tahun)){
+            if(!this.isLunasByBulan(nis, bulan, tahun)){
+                int kekurangan = this.kekuranganSppSiswa(nis, bulan, tahun);
+                if(nominal >= 0){
+                    if(nominal <= kekurangan){
+                        String query = "INSERT INTO pembayaran VALUES " + 
+                                String.format("('%s', '%d', '%d', '%s', '%d', '%d' , '%s', '%s')", 
+                                        createID(), idPetugas, nis, bulan, tahun, nominal, waktu.getDateNow(), acc.getDataAkun(Integer.toString(nis), "id_spp"));
+                        return this.addData(query);
+                    }else{
+                        Audio.play(Audio.SOUND_WARNING);
+                        JOptionPane.showMessageDialog(null, "Uang Anda kelebihan!", "Pesan!", JOptionPane.WARNING_MESSAGE);
+                        return false;
+                    }                    
+                }else{
+                    Audio.play(Audio.SOUND_WARNING);
+                    JOptionPane.showMessageDialog(null, "Uang Anda Harus Lebih Dari Rp. 0.00 Untuk Mebayar SPP!", "Pesan!", JOptionPane.WARNING_MESSAGE);
+                    return false;                    
+                }
             }else{
                 Audio.play(Audio.SOUND_WARNING);
-                JOptionPane.showMessageDialog(null, "Uang Anda kelebihan!", "Pesan!", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(null, "SPP siswa ini sudah lunas!", "Pesan!", JOptionPane.WARNING_MESSAGE);
+                return true;
+            }
+            
+        }else{
+            JOptionPane.showMessageDialog(null, "Pembayaran Dibatalkan!", "Pesan!", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+    }
+    
+    public boolean batalkanPembayaran(int nis, String bulan, int tahun){
+        try{
+            String query = String.format(
+                    "DELETE FROM pembayaran WHERE nis = %d AND bln_bayar = '%s' AND thn_bayar = %d", nis, bulan, tahun
+            );
+            int result = stat.executeUpdate(query);
+            if(result > 0){
+                return true;
+            }else{
+                Audio.play(Audio.SOUND_WARNING);
+                JOptionPane.showMessageDialog(null, "Gagal Membatalkan Pembayaran!", "Pesan!", JOptionPane.WARNING_MESSAGE);
                 return false;
             }
-        }else{
-            Audio.play(Audio.SOUND_WARNING);
-            JOptionPane.showMessageDialog(null, "SPP siswa ini sudah lunas!", "Pesan!", JOptionPane.WARNING_MESSAGE);
-            return true;
-        }
-    }
-    
-    public boolean hapusTransaksi(String idPembayaran){
-        return this.deleteData(PEMBAYARAN, "id_pembayaran", idPembayaran);
-    }
-    
-    public int sppDibayar(int nis, String bulan, int tahun){
-        try{
-            int dibayar = 0;
-            String query = "SELECT jml_bayar FROM pembayaran " + String.format("WHERE nis = '%d' AND bln_bayar = '%s' AND thn_bayar = '%d'", nis, bulan, tahun),
-                   buffer;
-            res = stat.executeQuery(query);
-            while(res.next()){
-                buffer = res.getString("jml_bayar");
-                if(!buffer.equalsIgnoreCase("null") && Validation.isNumber(buffer)){
-                    dibayar += Integer.parseInt(buffer);
-                }
-            }
-            return dibayar;
         }catch(SQLException ex){
             Audio.play(Audio.SOUND_ERROR);
-            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat mengambil data dari database\n" + ex.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan : " + ex.getMessage(), "Warning", JOptionPane.WARNING_MESSAGE);
         }
-        return 0;
-    }
-    
-    public int sppDibayar(int nis, String tahun){
-        int tahunAwl = Integer.parseInt(tahun.substring(0, tahun.indexOf("-"))), 
-            tahunAkr = Integer.parseInt(tahun.substring(tahun.indexOf("-")+1));
-        int dibayar = 
-                sppDibayar(nis, Waktu.JANUARI, tahunAkr) + sppDibayar(nis, Waktu.FEBRUARI, tahunAkr) + sppDibayar(nis, Waktu.MARET, tahunAkr) + 
-                sppDibayar(nis, Waktu.APRIL, tahunAkr) + sppDibayar(nis, Waktu.MEI, tahunAkr) + sppDibayar(nis, Waktu.JUNI, tahunAkr) + 
-                sppDibayar(nis, Waktu.JULI, tahunAwl) + sppDibayar(nis, Waktu.AGUSTUS, tahunAwl) + sppDibayar(nis, Waktu.SEPTEMBER, tahunAwl) +
-                sppDibayar(nis, Waktu.OKTOBER, tahunAwl) + sppDibayar(nis, Waktu.NOVEMBER, tahunAwl) + sppDibayar(nis, Waktu.DESEMBER, tahunAwl);
-        return dibayar;
-    }
-    
-    public int kekuranganSpp(int nis, String bulan, int tahun){
-        return this.getNominalSpp(Integer.parseInt(acc.getDataAkun(Integer.toString(nis), "id_spp"))) - this.sppDibayar(nis, bulan, tahun);
-    }
-    
-    public int kekuranganSpp(int nis, String tahun){
-        int tahunAwl = Integer.parseInt(tahun.substring(0, tahun.indexOf("-"))), 
-            tahunAkr = Integer.parseInt(tahun.substring(tahun.indexOf("-")+1));
-        int kekurangan = 
-                kekuranganSpp(nis, Waktu.JANUARI, tahunAkr) + kekuranganSpp(nis, Waktu.FEBRUARI, tahunAkr) + kekuranganSpp(nis, Waktu.MARET, tahunAkr) + 
-                kekuranganSpp(nis, Waktu.APRIL, tahunAkr) + kekuranganSpp(nis, Waktu.MEI, tahunAkr) + kekuranganSpp(nis, Waktu.JUNI, tahunAkr) + 
-                kekuranganSpp(nis, Waktu.JULI, tahunAwl) + kekuranganSpp(nis, Waktu.AGUSTUS, tahunAwl) + kekuranganSpp(nis, Waktu.SEPTEMBER, tahunAwl) +
-                kekuranganSpp(nis, Waktu.OKTOBER, tahunAwl) + kekuranganSpp(nis, Waktu.NOVEMBER, tahunAwl) + kekuranganSpp(nis, Waktu.DESEMBER, tahunAwl);
-        return kekurangan;
+        return false;
     }
     
     public boolean isLunasByBulan(int nis, String bulan, int tahun){
-        return this.sppDibayar(nis, bulan, tahun) >= this.getNominalSpp(Integer.parseInt(acc.getDataAkun(Integer.toString(nis), "id_spp")));
+        return this.totalSppDibayarSiswa(nis, bulan, tahun) >= this.getNominalSpp(Integer.parseInt(acc.getDataAkun(Integer.toString(nis), "id_spp")));
     }
     
-    public boolean isLunasByTahun(int nis, String tahun){
-        int tahunAwl = Integer.parseInt(tahun.substring(0, tahun.indexOf("-"))), 
-            tahunAkr = Integer.parseInt(tahun.substring(tahun.indexOf("-")+1));
+    public boolean isLunasByTahun(int nis, String tahunPelajaran){
+        int tahunAwl = Integer.parseInt(tahunPelajaran.substring(0, tahunPelajaran.indexOf("-"))), 
+            tahunAkr = Integer.parseInt(tahunPelajaran.substring(tahunPelajaran.indexOf("-")+1));
         
         return isLunasByBulan(nis, Waktu.JANUARI, tahunAkr) && isLunasByBulan(nis, Waktu.MEI, tahunAkr) && isLunasByBulan(nis, Waktu.SEPTEMBER, tahunAwl) &&
                isLunasByBulan(nis, Waktu.FEBRUARI, tahunAkr) && isLunasByBulan(nis, Waktu.JUNI, tahunAkr) && isLunasByBulan(nis, Waktu.OKTOBER, tahunAwl) &&
@@ -180,80 +184,139 @@ public class Transaksi extends Database{
                isLunasByBulan(nis, Waktu.APRIL, tahunAkr) && isLunasByBulan(nis, Waktu.AGUSTUS, tahunAwl) && isLunasByBulan(nis, Waktu.DESEMBER, tahunAwl);
     }
     
-    public String getIdPetugas(String idPembayaran){
-        return this.getData(PEMBAYARAN, "id_petugas", "WHERE id_pembayaran = '"+idPembayaran+"'");
-    }
-    
-    public String getNis(String idPembayaran){
-        return this.getData(PEMBAYARAN, "nis", "WHERE id_pembayaran = '"+idPembayaran+"'");
-    }
-    
-    public String getBulanBayar(String idPembayaran){
-        return this.getData(PEMBAYARAN, "bln_bayar", "WHERE id_pembayaran = '"+idPembayaran+"'");
-    }
-    
-    public String getTahunBayar(String idPembayaran){
-        return this.getData(PEMBAYARAN, "thn_bayar", "WHERE id_pembayaran = '"+idPembayaran+"'");
-    }
-    
-    public int getJumlahBayar(String idPembayaran){
-        return Integer.parseInt(this.getData(PEMBAYARAN, "jml_bayar", "WHERE id_pembayaran = '"+idPembayaran+"'"));
-    }
-    
-    public int getJumlahBayar(int nis, String bulan, int tahun){
-        int res = Integer.parseInt(this.getData(PEMBAYARAN, "jml_bayar", "WHERE nis = '"+nis+"' AND bln_bayar = '"+bulan+"' AND thn_bayar = '"+tahun+"'"));
-        if(Validation.isNumber(""+res)){
-            return res;
-        }else{
-            return 0;
-        }
-    }
-    
-    public String getTanggalBayar(String idPembayaran){
-        return this.getData(PEMBAYARAN, "tgl_bayar", "WHERE id_pembayaran = '"+idPembayaran+"'");
-    }
-    
-    public int getIdSpp(String idPembayaran){
-        return Integer.parseInt(this.getData(PEMBAYARAN, "id_spp", "WHERE id_pembayaran = '"+idPembayaran+"'"));
-    }
-    
-    public String addRp(long nominal){
-        return String.format("Rp. %,d.00", nominal);
-    }
-    
-    public long getTotalSppDibayar(){
-        long dibayar = 0L;
-        Object[] tr = this.getID();
-        for(Object o : tr){
-            dibayar += this.getJumlahBayar(o.toString());
-        }
-        return dibayar;
-    }
-    
-    public long getTotalSppDibayar(int id){
-        long dibayar = 0L;
-        for(Object o : this.getID("WHERE id_spp = '"+id+"'")){
-            dibayar += this.getJumlahBayar(o.toString());
-        }
-        return dibayar;
-    }
-    
-    public long getTotalSppDibayar(int id, String thnAwal, String thnAkhir){
-        long dibayar = 0L;
-        for(Object o : this.getID("WHERE id_spp = '"+id+"' AND thn_bayar = '"+thnAwal+"' OR thn_bayar = '"+thnAkhir+"'")){
-            dibayar += this.getJumlahBayar(o.toString());
-        }
-        return dibayar;
-    }
-    
-    public long getTotalSppDibayarKelas(String idKelas){
-        long dibayar = 0L;
-        for(Object o : this.getID("WHERE id_kelas = '"+idKelas+"'")){
-            if(acc.getDataAkun(this.getNis(o.toString()), "id_kelas").equalsIgnoreCase(idKelas)){
-                dibayar += this.getJumlahBayar(o.toString());
+    public int totalTransaksi(int idSpp){
+        try{
+            String query = "SELECT COUNT(id_spp) AS TOTAL "+
+                           "FROM pembayaran WHERE id_spp = " + idSpp,
+                   buffer;
+            res = stat.executeQuery(query);
+            if(res.next()){
+                buffer = res.getString("TOTAL");
+                if(Validation.isNumber(buffer)){
+                    return Integer.parseInt(buffer);
+                }
             }
+        }catch(SQLException ex){
+            Audio.play(Audio.SOUND_ERROR);
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan : " + ex.getMessage(), "Warning", JOptionPane.WARNING_MESSAGE);
         }
+        return 0;
+    }
+    
+    public long totalSppDibayar(){
+        try{
+             String query = "SELECT SUM(jml_bayar) AS TOTAL \n" +
+                            "FROM pembayaran";
+             res = stat.executeQuery(query);
+             if(res.next()){
+                 return res.getLong("TOTAL");
+             }
+        }catch(SQLException ex){
+            Audio.play(Audio.SOUND_ERROR);
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan : " + ex.getMessage(), "Warning", JOptionPane.WARNING_MESSAGE);
+        }
+        return 0;
+    }
+    
+    public long totalSppDibayar(int idSpp){
+        try{
+             String query = "SELECT SUM(t.jml_bayar) AS TOTAL \n" +
+                            "FROM pembayaran AS t \n" +
+                            "INNER JOIN spp AS s ON (t.id_spp = s.id_spp)\n" +
+                            "WHERE t.id_spp = " + idSpp,
+                    buffer;
+             res = stat.executeQuery(query);
+             if(res.next()){
+                 buffer = res.getString("TOTAL");
+                 if(Validation.isNumber(buffer)){
+                     return Long.parseLong(buffer);
+                 }
+             }
+        }catch(SQLException ex){
+            Audio.play(Audio.SOUND_ERROR);
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan : " + ex.getMessage(), "Warning", JOptionPane.WARNING_MESSAGE);
+        }
+        return 0;
+    }
+    
+    public int totalSppDibayarKelas(String idKelas, String bulan, int tahun){
+        try{
+            String  buffer,
+                    query =  "SELECT \n" +
+                            "k.nama_kelas AS NAMA_KELAS, \n" +
+                            "SUM(t.jml_bayar) AS TOTAL_SPP\n" +
+                            "FROM pembayaran AS t \n" +
+                            "INNER JOIN siswa AS s ON(s.nis = t.nis)\n" +
+                            "INNER JOIN kelas AS k ON(s.id_kelas = k.id_kelas)\n" +
+                            String.format("WHERE k.id_kelas = '%s' AND t.thn_bayar = %d AND t.bln_bayar = '%s';", idKelas, tahun, bulan);
+            res = stat.executeQuery(query);
+            if(res.next()){
+                buffer = res.getString("TOTAL_SPP");
+                if(Validation.isNumber(buffer)){
+                    return Integer.parseInt(buffer);
+                }
+            }
+        }catch(SQLException ex){
+            Audio.play(Audio.SOUND_ERROR);
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan : " + ex.getMessage(), "Warning", JOptionPane.WARNING_MESSAGE);
+        }
+        return 0;
+    }
+    
+    public int totalSppDibayarKelas(String idKelas, String tahunPelajaran){
+        int tahunAwl = Integer.parseInt(tahunPelajaran.substring(0, tahunPelajaran.indexOf("-"))), 
+            tahunAkr = Integer.parseInt(tahunPelajaran.substring(tahunPelajaran.indexOf("-")+1));
+        int dibayar = 
+                this.totalSppDibayarKelas(idKelas, Waktu.JANUARI, tahunAkr) + this.totalSppDibayarKelas(idKelas, Waktu.FEBRUARI, tahunAkr) + this.totalSppDibayarKelas(idKelas, Waktu.MARET, tahunAkr) + 
+                this.totalSppDibayarKelas(idKelas, Waktu.APRIL, tahunAkr) + this.totalSppDibayarKelas(idKelas, Waktu.MEI, tahunAkr) + this.totalSppDibayarKelas(idKelas, Waktu.JUNI, tahunAkr) + 
+                this.totalSppDibayarKelas(idKelas, Waktu.JULI, tahunAwl) + this.totalSppDibayarKelas(idKelas, Waktu.AGUSTUS, tahunAwl) + this.totalSppDibayarKelas(idKelas, Waktu.SEPTEMBER, tahunAwl) + 
+                this.totalSppDibayarKelas(idKelas, Waktu.OKTOBER, tahunAwl) + this.totalSppDibayarKelas(idKelas, Waktu.NOVEMBER, tahunAwl) + this.totalSppDibayarKelas(idKelas, Waktu.DESEMBER, tahunAwl);
         return dibayar;
+    }
+    
+    public int totalSppDibayarSiswa(int nis, String bulan, int tahun){
+        try{
+            String query = "SELECT SUM(jml_bayar) AS dibayar FROM pembayaran " + 
+                   String.format("WHERE nis = %d AND bln_bayar = '%s' AND thn_bayar = %d", nis, bulan, tahun),
+                   buffer;
+            res = stat.executeQuery(query);
+            if(res.next()){
+                buffer = res.getString("dibayar");
+                if(Validation.isNumber(buffer)){
+                    return Integer.parseInt(buffer);
+                }
+            }
+        }catch(SQLException ex){
+            Audio.play(Audio.SOUND_ERROR);
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat mengambil data dari database\n" + ex.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+        }
+        return 0;
+    }
+    
+    public int totalSppDibayarSiswa(int nis, String tahunPelajaran){
+        int tahunAwl = Integer.parseInt(tahunPelajaran.substring(0, tahunPelajaran.indexOf("-"))), 
+            tahunAkr = Integer.parseInt(tahunPelajaran.substring(tahunPelajaran.indexOf("-")+1));
+        int dibayar = 
+                this.totalSppDibayarSiswa(nis, Waktu.JANUARI, tahunAkr) + this.totalSppDibayarSiswa(nis, Waktu.FEBRUARI, tahunAkr) + this.totalSppDibayarSiswa(nis, Waktu.MARET, tahunAkr) + 
+                this.totalSppDibayarSiswa(nis, Waktu.APRIL, tahunAkr) + this.totalSppDibayarSiswa(nis, Waktu.MEI, tahunAkr) + this.totalSppDibayarSiswa(nis, Waktu.JUNI, tahunAkr) + 
+                this.totalSppDibayarSiswa(nis, Waktu.JULI, tahunAwl) + this.totalSppDibayarSiswa(nis, Waktu.AGUSTUS, tahunAwl) + this.totalSppDibayarSiswa(nis, Waktu.SEPTEMBER, tahunAwl) +
+                this.totalSppDibayarSiswa(nis, Waktu.OKTOBER, tahunAwl) + this.totalSppDibayarSiswa(nis, Waktu.NOVEMBER, tahunAwl) + this.totalSppDibayarSiswa(nis, Waktu.DESEMBER, tahunAwl);
+        return dibayar;
+    }
+    
+    public int kekuranganSppSiswa(int nis, String bulan, int tahun){
+        return this.getNominalSpp(Integer.parseInt(acc.getDataAkun(Integer.toString(nis), "id_spp"))) - this.totalSppDibayarSiswa(nis, bulan, tahun);
+    }
+    
+    public int kekuranganSppSiswa(int nis, String tahunPelajaran){
+        int tahunAwl = Integer.parseInt(tahunPelajaran.substring(0, tahunPelajaran.indexOf("-"))), 
+            tahunAkr = Integer.parseInt(tahunPelajaran.substring(tahunPelajaran.indexOf("-")+1));
+        int kekurangan = 
+                this.kekuranganSppSiswa(nis, Waktu.JANUARI, tahunAkr) + this.kekuranganSppSiswa(nis, Waktu.FEBRUARI, tahunAkr) + this.kekuranganSppSiswa(nis, Waktu.MARET, tahunAkr) + 
+                this.kekuranganSppSiswa(nis, Waktu.APRIL, tahunAkr) + this.kekuranganSppSiswa(nis, Waktu.MEI, tahunAkr) + this.kekuranganSppSiswa(nis, Waktu.JUNI, tahunAkr) + 
+                this.kekuranganSppSiswa(nis, Waktu.JULI, tahunAwl) + this.kekuranganSppSiswa(nis, Waktu.AGUSTUS, tahunAwl) + this.kekuranganSppSiswa(nis, Waktu.SEPTEMBER, tahunAwl) +
+                this.kekuranganSppSiswa(nis, Waktu.OKTOBER, tahunAwl) + this.kekuranganSppSiswa(nis, Waktu.NOVEMBER, tahunAwl) + this.kekuranganSppSiswa(nis, Waktu.DESEMBER, tahunAwl);
+        return kekurangan;
     }
     
     @Override
@@ -279,60 +342,9 @@ public class Transaksi extends Database{
         }
     }
     
-    private String[] nis(){
-        try{
-            int row = 0;
-            String[] nis = new String[this.getJumlahData(SISWA)];
-            String q = "SELECT * FROM siswa;";
-            res = stat.executeQuery(q);
-            while(res.next()){
-                nis[row] = res.getString("nis");
-                row++;
-            }
-            return nis;
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-    
-    public int randID(){
-        java.util.Random rand = new java.util.Random();
-        int r = rand.nextInt(20);
-        while(true){
-            if(r >= 11 && r <= 20){
-                return r;
-            }else{
-                r = rand.nextInt(20);
-            }
-        }
-    }
-    
     public static void main(String[] args) {
-        int nis = 6156, tahun = 2017, uang = 120000;
-        String bulan = Waktu.JANUARI;
-        Kelas kls = new Kelas();
         Transaksi tr = new Transaksi();
-        
-        System.out.println(tr.getLastID());
-        
-//        for(String o : tr.nis()){
-//            if(kls.getLevelKelas(tr.acc.getDataAkun(o, "id_kelas")).equalsIgnoreCase("XIII")){
-//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.JULI, tahun, uang);
-//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.AGUSTUS, tahun, uang);
-//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.SEPTEMBER, tahun, uang);
-//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.OKTOBER, tahun, uang);
-//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.NOVEMBER, tahun, uang);
-//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.DESEMBER, tahun, uang);
-//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.JANUARI, tahun+1, uang);
-//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.FEBRUARI, tahun+1, uang);
-//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.MARET, tahun+1, uang);
-//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.APRIL, tahun+1, uang);
-//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.MEI, tahun+1, uang);
-//                tr.bayarSpp(tr.randID(), Integer.parseInt(o), Waktu.JUNI, tahun+1, uang);
-//            }
-//        }
-        
+        System.out.println(tr.bayarSpp(12, 6156, Waktu.APRIL, 2021, 500));
     }
     
 }
