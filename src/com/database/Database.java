@@ -46,7 +46,7 @@ public class Database {
      * Attribute yang digunakan untuk menhubungkan Aplikasi ke <B>Database MySQL</B>
      */
     private static final String DRIVER = "com.mysql.jdbc.Driver",
-                                DB_NAME = "baihaqi_app_pembayaranspp",
+                                DB_NAME = "spp_payment",
                                 URL = "jdbc:mysql://localhost/" + DB_NAME,
                                 USER = "root",
                                 PASS = "";
