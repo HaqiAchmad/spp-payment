@@ -79,4 +79,10 @@ public class Audio {
         }
     }
     
+    public static void main(String[] args) {
+        
+        Audio.play("lemon.mp3");
+        
+    }
+    
 }
