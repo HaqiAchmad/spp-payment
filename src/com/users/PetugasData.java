@@ -1,6 +1,7 @@
 package com.users;
 
 /**
+ * Field-field yang ada didalam tabel petugas pada <b>Database</b>.
  *
  * @author Achmad Baihaqi
  * @since 2021-06-14
