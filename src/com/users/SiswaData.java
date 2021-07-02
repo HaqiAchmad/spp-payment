@@ -1,7 +1,8 @@
 package com.users;
 
 /**
- *
+ * Field-field yang ada didalam tabel siswa pada <b>Database</b>.
+ * 
  * @author Achmad Baihaqi
  * @since 2021-06-14
  */
