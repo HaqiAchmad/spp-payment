@@ -28,7 +28,7 @@ public final class Log {
     /**
      * Direktori dari file yang dibuat untuk menyimpan data log aplikasi.
      */
-    private static final String logFile = new Storage().getLogDirectory() + "Log.txt";
+    private static final String logFile = new Storage().getLogDir() + "Log.txt";
     
     /**
      * Untuk menyimpan data jumlah dari log yang sedang disimpan di {@code StringBuilder}.
