@@ -170,7 +170,6 @@ public class FileManager {
      * @throws FileNotFoundException jika file yang dinputkan tidak ditemukan.
      */
     public InputStream fileToBlob(File file) throws FileNotFoundException{
-        Log.addLog("Menkonversi file " + file + " ke dalam bentuk biner.");
         // mengkonversi file kedalam bentuk byte stream
         return new FileInputStream(file);
     }
@@ -251,7 +250,7 @@ public class FileManager {
                 return selected.getAbsolutePath();
             }else{
                 Audio.play(Audio.SOUND_WARNING);
-                JOptionPane.showMessageDialog(null, "Ukuran dari file lebih besar dari " + this.getSizeFileOfBytes(limitSize), "Warning", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Ukuran dari file lebih besar dari " + this.getSizeOfBytes(limitSize), "Warning", JOptionPane.WARNING_MESSAGE);
             }
         }
         // jika user tidak jadi memilih sebuah file
@@ -275,7 +274,7 @@ public class FileManager {
      * diinputkan oleh user adalah sebuah file atau tidak. Jika yang diinputkan oleh user 
      * bukanlah sebuah file maka method akan mengembalikan nilai <strong>null</strong>.
      * <br><br>
-     * <b>Example : </b> 'C:\Users\Baihaqi\Desktop\aplikasi.exe' maka hasil outputnya adalah '<i>aplikasi.exe</i>'.
+     * <b>Example : </b> 'C:\Users\Baihaqi\Desktop\aplikasi.exe' maka hasil outputnya adalah '<i>aplikasi</i>'.
      * 
      * @param file file yang ingin didapatkan namanya.
      * @return nama dari file yang diinputkan.
@@ -329,6 +328,53 @@ public class FileManager {
     }
 
     /**
+     * Method ini digunakan untuk menghitung berapa jumlah bytes yang ada didalam folder. Tujuan dibuatnya method ini 
+     * adalah untuk menhitung ukuran dari sebuah folder. Method hanya akan menhitung jumlah bytes pada folder yang diinputkan 
+     * jika folder yang diinputkan memiliki child folder maka bytes dari child folder tidak akan dihitung.
+     * <br><br>
+     * Petama-tama method akan memdapatkan semua direktori dari file yang ada didalam folder yang diinputkan dengan mengunakan 
+     * method {@code getListFile()} dan outputnya akan disimpan pada array {@code Object}. Setelah direktori didapatkan maka 
+     * selanjutnya method akan membaca semua data yang ada didalam array {@code Object} yang berupa direktori dari file.
+     * <br><br>
+     * Saat membaca data yang ada didalam array {@code Object} method akan menghitung satu-persatu jumlah bytes pada setiap direktori
+     * file dengan menggunakan method {@code length()} pada class {@code File}. Hal ini akan terus-menerus dilakukan sampai tidak 
+     * ada lagi data yang ada di dalam array {@code Object}.
+     * 
+     * @param folder folder yang akan dihitung jumlah bytes-nya.
+     * @return jumlah bytes dari folder.
+     */
+    public double getFolderBytes(String folder){
+        try{
+            double bytes = 0;
+            // mendapatkan direktori dari file yang ada didalam folder
+            Object[] files = this.getListFile(folder);
+           
+            // menghitung bytes dari setiap file
+            for(Object file : files){
+                bytes += new File(file.toString()).length();
+            }
+            
+            return bytes;
+        }catch(IOException ex){
+            Message.showException(this, ex, true);
+        }
+        return -1;
+    }
+    
+    /**
+     * Method ini digunakan untuk mendapatkan ukuran dari sebuah folder yang diinputkan. 
+     * Sebelum menghitung ukuran dari folder method akan mendapatakan jumlah bytes yang ada didalam 
+     * dari folder dengan menggunakan method {@code getFolderBytes()}. Setelah jumlah bytes sudah 
+     * didapatkan maka selanjutnya method akan menghitung size dari folder.
+     * 
+     * @param folder folder yang akan dihitung sizenya.
+     * @return ukuran/size dari folder yang diinputkan.
+     */
+    public String getSizeFolder(String folder){
+        return this.getSizeOfBytes(this.getFolderBytes(folder));
+    }
+    
+    /**
      * Method ini digunakan untuk mendapatkan ukuran dari sebuah file yang diinputkan.
      * Method akan mendapatkan ukuran/size dari file menggunakan method {@code getSizeFile(double bytes)}.
      * Method {@code getSizeFile(double bytes} memerlukan sebuah input bytes dari file. Bytes dari 
@@ -338,7 +384,7 @@ public class FileManager {
      * @return ukuran/size dari file yang dinputkan.
      */
     public String getSizeFile(String file) {
-        return this.getSizeFileOfBytes(new File(file).length());
+        return this.getSizeOfBytes(new File(file).length());
     }
     
     /**
@@ -358,7 +404,7 @@ public class FileManager {
             bytes += new File(filename.toString()).length();
         }
         
-        return this.getSizeFileOfBytes(bytes);
+        return this.getSizeOfBytes(bytes);
     }
     
     /**
@@ -382,7 +428,7 @@ public class FileManager {
      * @param bytes byte dari file yang akan dihitung satuanya.
      * @return satuan ukuran dari file yang diinputkan.
      */
-    private String getSizeFileOfBytes(double bytes){
+    public String getSizeOfBytes(double bytes){
         if (bytes > 0 && bytes < 1024) {
             return String.format("%.2f bytes", bytes);
         } else if (bytes >= 1_024 && bytes < 1_048_576) {
