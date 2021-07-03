@@ -1,6 +1,8 @@
 package com.manage;
 
+import com.data.app.Application;
 import com.media.Audio;
+import com.manage.Waktu;
 import javax.swing.JOptionPane;
 
 /**
@@ -150,7 +152,7 @@ public class Validation {
      * @return 
      */
     public static boolean isNamaOrang(String nama){
-        if(nama.length() >= 5 && nama.length() <= 50){
+        if(nama.length() >= 6 && nama.length() <= 50){
             if(!containsNumber(nama)){
                 return true;
             }else{
@@ -244,7 +246,7 @@ public class Validation {
      * @return 
      */
     public static boolean isValidPembayaran(String bulan, int tahun){
-       String tahunAjaran = "2020-2021";
+       String tahunAjaran = Application.getTahunAjaran();
        int tahunAwal = Integer.parseInt(tahunAjaran.substring(0, tahunAjaran.indexOf("-"))),
            tahunAkhir = Integer.parseInt(tahunAjaran.substring(tahunAjaran.indexOf("-")+1));
        if(tahun == tahunAwal){
@@ -364,7 +366,12 @@ public class Validation {
      */
     public static boolean isNoHp(String noHp){
         if(noHp.length() >= 10 && noHp.length() <= 15){
-           return true;
+            if(noHp.startsWith("08")){
+                return true;
+            }else{
+                Audio.play(Audio.SOUND_WARNING);
+                JOptionPane.showMessageDialog(null, "Nomor HP tidak valid!\nContoh Nomor HP yang valid : 085655864624", "Pesan", JOptionPane.WARNING_MESSAGE);
+            }
         }else{
             Audio.play(Audio.SOUND_WARNING);
             JOptionPane.showMessageDialog(null, "Panjang dari Nomor Hp harus diantara 10-15 karakter!", "Pesan", JOptionPane.WARNING_MESSAGE);
