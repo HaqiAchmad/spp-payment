@@ -1,7 +1,6 @@
 package com.window.petugas;
 
-import com.media.Gambar;
-import java.io.File;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -9,18 +8,14 @@ import java.io.File;
  * @since 2021-03-25
  */
 public class PenampilFotoPetugas extends javax.swing.JDialog {
-
-    private final String foto;
     
-    public PenampilFotoPetugas(java.awt.Frame parent, boolean modal, String foto) {
+    public PenampilFotoPetugas(java.awt.Frame parent, boolean modal, ImageIcon foto) {
         super(parent, modal);
-        this.foto = foto;
         initComponents();
         
         this.setLocationRelativeTo(null);
-        this.setTitle(foto.substring(foto.lastIndexOf("\\")+1));
         this.lblFoto.setText("");
-        this.lblFoto.setIcon(Gambar.scaleImage(new File(foto), pnlMain.getWidth(), pnlMain.getHeight()));
+        this.lblFoto.setIcon(foto);
     }
 
     @SuppressWarnings("unchecked")
@@ -31,6 +26,7 @@ public class PenampilFotoPetugas extends javax.swing.JDialog {
         lblFoto = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Penampil Foto Petugas");
         setResizable(false);
 
         pnlMain.setBackground(new java.awt.Color(0, 0, 0));
@@ -65,7 +61,6 @@ public class PenampilFotoPetugas extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-
     public static void main(String args[]) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -81,7 +76,7 @@ public class PenampilFotoPetugas extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                PenampilFotoPetugas dialog = new PenampilFotoPetugas(new javax.swing.JFrame(), true, "null");
+                PenampilFotoPetugas dialog = new PenampilFotoPetugas(new javax.swing.JFrame(), true, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
