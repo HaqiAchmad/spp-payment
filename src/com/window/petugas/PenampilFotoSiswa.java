@@ -1,7 +1,7 @@
 package com.window.petugas;
 
-import com.media.Gambar;
-import java.io.File;
+
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -9,18 +9,14 @@ import java.io.File;
  * @since 2021-03-25
  */
 public class PenampilFotoSiswa extends javax.swing.JDialog {
-
-    private final String foto;
     
-    public PenampilFotoSiswa(java.awt.Frame parent, boolean modal, String foto) {
+    public PenampilFotoSiswa(java.awt.Frame parent, boolean modal, ImageIcon foto) {
         super(parent, modal);
-        this.foto = foto;
         initComponents();
         
         this.setLocationRelativeTo(null);
-        this.setTitle(foto.substring(foto.lastIndexOf("\\")+1));
         this.lblFoto.setText("");
-        this.lblFoto.setIcon(Gambar.scaleImage(new File(foto), pnlMain.getWidth(), pnlMain.getHeight()));
+        this.lblFoto.setIcon(foto);
     }
 
     @SuppressWarnings("unchecked")
@@ -31,6 +27,7 @@ public class PenampilFotoSiswa extends javax.swing.JDialog {
         lblFoto = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Penampil Foto Siswa");
         setResizable(false);
 
         pnlMain.setBackground(new java.awt.Color(0, 0, 0));
@@ -81,7 +78,7 @@ public class PenampilFotoSiswa extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                PenampilFotoSiswa dialog = new PenampilFotoSiswa(new javax.swing.JFrame(), true, "null");
+                PenampilFotoSiswa dialog = new PenampilFotoSiswa(new javax.swing.JFrame(), true, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
