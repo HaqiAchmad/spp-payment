@@ -1,7 +1,9 @@
 package com.data.app;
 
 import com.data.db.Database;
-import com.data.db.Database;
+import com.data.db.DatabaseTables;
+import com.manage.Message;
+import java.sql.SQLException;
 
 /**
  *
@@ -22,12 +24,23 @@ public class Kelas extends Database{
         return this.addData(query);
     }
     
-    public Object[][] getDataKelas(String kondisi){
+    public String[] getIDs(){
+        try{
+            int index = 0;
+            // menginisialisasi array seseuai dengan jumlah data pada tabel kelas yg ada didalam database
+            String[] IDs = new String[super.getJumlahData(Database.KELAS)];
+            // mengeksekusi query untuk mendapatkan data id kelas
+            res = stat.executeQuery("SELECT id_kelas FROM kelas");
+            // mendapatkan data id spp
+            while(res.next()){
+                IDs[index] = res.getString("id_kelas");
+                index++;
+            }
+            return IDs;
+        }catch(SQLException ex){
+            Message.showException(this, "Terjadi kesalahan\n" + ex.getMessage(), ex, true);
+        }
         return null;
-    }
-    
-    public Object[][] getDataKelas(){
-        return this.getDataKelas("");
     }
     
     public String getNamaKelas(String id){
@@ -93,6 +106,26 @@ public class Kelas extends Database{
     
     public boolean deleteKelas(String id){
         return this.deleteData(KELAS, "id_kelas", id);
+    }
+    
+    /**
+     * Method ini digunakan untuk mendapatkan total kelas yang terdaftar di <b>Database</b> aplikasi. Method akan mendapatkan 
+     * data total kelas dengan melalui method {@code getJumlahData()} yang ada didalam class {@code Database}.
+     * 
+     * @return total kelas pada aplikasi.
+     */
+    public int getTotalKelas(){
+        return super.getJumlahData(DatabaseTables.KELAS.name());
+    }
+    
+    /**
+     * Method ini digunakan untuk mendapatkan total siswa yang ada didalam kelas.
+     * 
+     * @param idKelas
+     * @return 
+     */
+    public int getTotalSiswa(String idKelas){
+        return super.getJumlahData(DatabaseTables.SISWA.name(), "WHERE id_kelas = '" + idKelas + "'");
     }
     
 }
