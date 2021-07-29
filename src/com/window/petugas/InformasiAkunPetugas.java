@@ -1,17 +1,19 @@
 package com.window.petugas;
 
-import com.database.Account;
-import com.database.Database;
+import com.data.app.Application;
+import com.data.app.Log;
+import com.manage.Message;
+import com.manage.Text;
 import com.media.Audio;
 import com.media.Gambar;
-import com.media.Waktu;
+import com.users.UserPhotoSize;
+import com.users.Users;
 import com.window.all.ConfirmLogout;
 
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -20,10 +22,10 @@ import javax.swing.JOptionPane;
  */
 public class InformasiAkunPetugas extends javax.swing.JFrame {
     
-    private final Waktu waktu = new Waktu();
-    private final Account acc = new Account();
-    private final String userLogin, id, username, name, gender, tempat_lahir, tanggal_lahir, 
-                         alamat, no_hp, email, password, level, foto, transaksi;
+    private final Users.LevelPetugas petugas = Users.levelPetugas();
+    private final Text txt = new Text();
+    
+    private final String currentLogin, name, gender, tmpLahir, tglLahir, alamat, no_hp, email, password, passStrength, level, transaksi;
     private int x, y;
     
     public InformasiAkunPetugas() {
@@ -33,37 +35,45 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         this.setIconImage(Gambar.getWindowIcon());
         
         // mendapatkan data dari user
-        userLogin = acc.getLogin();
-        id = acc.getDataAkun(userLogin, "id_petugas");
-        username = acc.getDataAkun(userLogin, "username");
-        name = acc.getDataAkun(userLogin, "nama_petugas");
-        gender = acc.getDataAkun(userLogin, "gender");
-        tempat_lahir = acc.getDataAkun(userLogin, "tempat_lahir");
-        tanggal_lahir = acc.getDataAkun(userLogin, "tanggal_lahir");
-        alamat = acc.getDataAkun(userLogin, "alamat");
-        no_hp = acc.getDataAkun(userLogin, "no_hp");
-        email = acc.getDataAkun(userLogin, "email");
-        password = acc.getDataAkun(userLogin, "password");
-        level = acc.getDataAkun(userLogin, "level");
-        foto = acc.getProfile(userLogin);
-        transaksi = Integer.toString(acc.getJumlahData(Database.PEMBAYARAN, "WHERE id_petugas = '"+id+"'"));
+        currentLogin = petugas.getCurrentLogin();
+        name = txt.toCapitalize(petugas.getNama());
+        gender = txt.getGenderName(petugas.getGender());
+        tmpLahir = txt.toCapitalize(petugas.getTempatLahir());
+        tglLahir = txt.toDateCase(petugas.getTanggalLahir());
+        alamat = txt.toCapitalize(petugas.getAlamat());
+        no_hp = txt.toTelephoneCase(petugas.getNoHp());
+        email = petugas.getEmail().toLowerCase();
+        password = txt.toPasswordCase(petugas.getPassword());
+        passStrength = petugas.getPasswordStrength(password);
+        level = petugas.getLevel().name();
+        transaksi = txt.addDelim(petugas.getTotalTransaksi());
         
-        // menampilkan data dari usre
+        // menampilkan data-data aplikasi
+        this.lblSekolah.setIcon(Gambar.getTopIcon());
+        this.lblSekolahBottom.setIcon(Gambar.getBottomIcon());
+        this.lblSekolah.setText(Application.getCompany() + " | " + Application.getNama());
+        this.lblNamaSekolahBottom.setText(Application.getCompany());
+        this.lblNamaAplikasiBottom.setText(Application.getNama());
+        
+        // menampilkan data dari user
         this.lblNamaUser.setText("<html><p>"+name+"</p></html>");
-        this.valIdPetugas.setText("<html><p>:&nbsp;"+id+"</p></html>");
-        this.valUsername.setText("<html><p>:&nbsp;"+username+"</p></html>");
+        this.valIdUser.setText("<html><p>:&nbsp;"+currentLogin+"</p></html>");
+        this.valIdPetugas.setText("<html><p>:&nbsp;"+currentLogin+"</p></html>");
         this.valNama.setText("<html><p>:&nbsp;"+name+"</p></html>");
-        this.valGender.setText("<html><p>:&nbsp;"+acc.getGenderName(gender)+"</p></html>");
-        this.valTempatLahir.setText("<html><p>:&nbsp;"+tempat_lahir+"</p></html>");
-        this.valTanggalLahir.setText("<html><p>:&nbsp;"+waktu.getTanggal(tanggal_lahir)+"</p></html>");
+        this.valGender.setText("<html><p>:&nbsp;"+gender+"</p></html>");
+        this.valTempatLahir.setText("<html><p>:&nbsp;"+tmpLahir+"</p></html>");
+        this.valTanggalLahir.setText("<html><p>:&nbsp;"+tglLahir+"</p></html>");
         this.valAlamat.setText("<html><p>:&nbsp;"+alamat+"</p></html>");
         this.valNoHp.setText("<html><p>:&nbsp;"+no_hp+"</p></html>");
         this.valEmail.setText("<html><p>:&nbsp;"+email+"</p></html>");
-        this.valPassword.setText("<html><p>:&nbsp;"+setHiddenPass(password)+"</p></html>");
-        this.valKekuatan.setText("<html><p>:&nbsp;"+acc.getKekuatanPassword(password)+"</p></html>");
+        this.valPassword.setText("<html><p>:&nbsp;"+password+"</p></html>");
+        this.valKekuatan.setText("<html><p>:&nbsp;"+passStrength+"</p></html>");
         this.valLevel.setText("<html><p>:&nbsp;"+level+"</p></html>");
         this.valTransaksi.setText("<html><p>:&nbsp;"+transaksi+" Transaksi Dilakukan</p></html>");
+        this.lblPhotoProfile.setIcon(petugas.getPhotoProfile());
+        this.lblInfoFoto.setIcon(petugas.getPhoto(UserPhotoSize.INFO_AKUN_PETUGAS));
         
+        // mengatur ui dari button
         this.btnEdit.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnLogout.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnDashboard.setUI(new javax.swing.plaf.basic.BasicButtonUI());
@@ -77,11 +87,7 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         this.btnTentangApp.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnClose.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnMinimaze.setUI(new javax.swing.plaf.basic.BasicButtonUI());
-        this.lblInfoFoto.setIcon(Gambar.scaleImage(new java.io.File(foto), lblPhotoProfile.getWidth(), lblPhotoProfile.getHeight()));
-        this.lblPhotoProfile.setIcon(Gambar.scaleImage(new java.io.File(foto), lblPhotoProfile.getWidth(), lblPhotoProfile.getHeight()));
-        this.lblLogoSekolah.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts.png"), 35, 43));
-        this.lblSekolah.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts-circle.png"), 35, 35));     
-
+        
         this.btnInfoAkun.setBackground(new Color(85,101,114));
         JButton[] btns = new JButton[]{
             this.btnDashboard, this.btnDataPetugas, this.btnDataSiswa, this.btnDataKelas, 
@@ -119,15 +125,6 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         }
        
     }
-
-    private String setHiddenPass(String pass){
-        int index = pass.length();
-        String buffer = "";
-        for(int i = 0; i < index; i++){
-            buffer += "•";
-        }
-        return buffer;
-    }
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -156,18 +153,18 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         lblSekolah = new javax.swing.JLabel();
         lblDashboard = new javax.swing.JLabel();
         pnlInfoUtama = new javax.swing.JPanel();
-        lblIdPetugas = new javax.swing.JLabel();
-        lblUsername = new javax.swing.JLabel();
+        lblIdUser = new javax.swing.JLabel();
         lblEmail = new javax.swing.JLabel();
         lblNoHP = new javax.swing.JLabel();
         lblLevel = new javax.swing.JLabel();
-        valIdPetugas = new javax.swing.JLabel();
-        valUsername = new javax.swing.JLabel();
+        valIdUser = new javax.swing.JLabel();
         valNoHp = new javax.swing.JLabel();
         valEmail = new javax.swing.JLabel();
         valLevel = new javax.swing.JLabel();
         pnlInfoUtamaTitle = new javax.swing.JPanel();
         lblInfoUtama = new javax.swing.JLabel();
+        lblIdPetugas = new javax.swing.JLabel();
+        valIdPetugas = new javax.swing.JLabel();
         lineTop = new javax.swing.JSeparator();
         pnlInfoKeamanan = new javax.swing.JPanel();
         pnlInfoKemananTitle = new javax.swing.JPanel();
@@ -195,9 +192,9 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         valTransaksi = new javax.swing.JLabel();
         lblAlamat = new javax.swing.JLabel();
         valAlamat = new javax.swing.JLabel();
-        lblLogoSekolah = new javax.swing.JLabel();
+        lblSekolahBottom = new javax.swing.JLabel();
         lblNamaSekolahBottom = new javax.swing.JLabel();
-        lblNamaApp = new javax.swing.JLabel();
+        lblNamaAplikasiBottom = new javax.swing.JLabel();
         lblBgImage = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -205,6 +202,9 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
+            }
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
             }
         });
 
@@ -523,7 +523,7 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
 
         lblSekolah.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         lblSekolah.setForeground(new java.awt.Color(255, 255, 255));
-        lblSekolah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-nav-logosekolah.png"))); // NOI18N
+        lblSekolah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/logo-smkn1kts-circle_35x35.png"))); // NOI18N
         lblSekolah.setText("SMK Negeri 1 Kertosono | Aplikasi Pembayaran SPP");
         lblSekolah.setIconTextGap(13);
 
@@ -555,50 +555,39 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         pnlInfoUtama.setBackground(new java.awt.Color(252, 249, 249));
         pnlInfoUtama.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(26, 121, 173), 2));
 
-        lblIdPetugas.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblIdPetugas.setText("ID Petugas");
-
-        lblUsername.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblUsername.setText("Username");
+        lblIdUser.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblIdUser.setForeground(new java.awt.Color(0, 0, 0));
+        lblIdUser.setText("ID User");
 
         lblEmail.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblEmail.setForeground(new java.awt.Color(0, 0, 0));
         lblEmail.setText("Email");
 
         lblNoHP.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblNoHP.setForeground(new java.awt.Color(0, 0, 0));
         lblNoHP.setText("Nomor HP");
 
         lblLevel.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblLevel.setForeground(new java.awt.Color(0, 0, 0));
         lblLevel.setText("Level Akun");
 
-        valIdPetugas.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        valIdPetugas.setText(": 12");
-        valIdPetugas.addMouseListener(new java.awt.event.MouseAdapter() {
+        valIdUser.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        valIdUser.setForeground(new java.awt.Color(0, 0, 0));
+        valIdUser.setText(": 12");
+        valIdUser.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                valIdPetugasMouseClicked(evt);
+                valIdUserMouseClicked(evt);
             }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                valIdPetugasMouseEntered(evt);
+                valIdUserMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                valIdPetugasMouseExited(evt);
-            }
-        });
-
-        valUsername.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        valUsername.setText(": baihaqi");
-        valUsername.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                valUsernameMouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                valUsernameMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                valUsernameMouseExited(evt);
+                valIdUserMouseExited(evt);
             }
         });
 
         valNoHp.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        valNoHp.setForeground(new java.awt.Color(0, 0, 0));
         valNoHp.setText(": 0856-5586-4624");
         valNoHp.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -613,6 +602,7 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         });
 
         valEmail.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        valEmail.setForeground(new java.awt.Color(0, 0, 0));
         valEmail.setText(": hakiahmad756@gmail.com");
         valEmail.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -627,6 +617,7 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         });
 
         valLevel.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        valLevel.setForeground(new java.awt.Color(0, 0, 0));
         valLevel.setText(": Admin");
         valLevel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -659,6 +650,25 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
             .addComponent(lblInfoUtama, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
         );
 
+        lblIdPetugas.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblIdPetugas.setForeground(new java.awt.Color(0, 0, 0));
+        lblIdPetugas.setText("ID Petugas");
+
+        valIdPetugas.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        valIdPetugas.setForeground(new java.awt.Color(0, 0, 0));
+        valIdPetugas.setText(": 12");
+        valIdPetugas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                valIdPetugasMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                valIdPetugasMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                valIdPetugasMouseExited(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlInfoUtamaLayout = new javax.swing.GroupLayout(pnlInfoUtama);
         pnlInfoUtama.setLayout(pnlInfoUtamaLayout);
         pnlInfoUtamaLayout.setHorizontalGroup(
@@ -668,16 +678,16 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
                 .addGroup(pnlInfoUtamaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(lblEmail, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblNoHP, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblUsername, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblIdPetugas, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblLevel, javax.swing.GroupLayout.DEFAULT_SIZE, 101, Short.MAX_VALUE))
+                    .addComponent(lblIdUser, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblLevel, javax.swing.GroupLayout.DEFAULT_SIZE, 101, Short.MAX_VALUE)
+                    .addComponent(lblIdPetugas, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoUtamaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(valUsername, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(valIdPetugas, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(valIdUser, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(valLevel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(valEmail, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
-                    .addComponent(valNoHp, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(valEmail, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
+                    .addComponent(valNoHp, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(valIdPetugas, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
             .addComponent(pnlInfoUtamaTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -687,12 +697,12 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
                 .addComponent(pnlInfoUtamaTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoUtamaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lblIdPetugas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(valIdPetugas, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblIdUser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(valIdUser, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoUtamaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(valUsername, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblIdPetugas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(valIdPetugas, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoUtamaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblNoHP, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -705,7 +715,7 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
                 .addGroup(pnlInfoUtamaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(lblLevel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(valLevel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addGap(50, 50, 50))
         );
 
         pnlMain.add(pnlInfoUtama, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 150, 430, 230));
@@ -736,12 +746,15 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         );
 
         lblPassword.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblPassword.setForeground(new java.awt.Color(0, 0, 0));
         lblPassword.setText("Password");
 
         lblKekuatan.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblKekuatan.setForeground(new java.awt.Color(0, 0, 0));
         lblKekuatan.setText("Kekuatan");
 
         valPassword.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        valPassword.setForeground(new java.awt.Color(0, 0, 0));
         valPassword.setText(": •••");
         valPassword.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -756,6 +769,7 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         });
 
         valKekuatan.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        valKekuatan.setForeground(new java.awt.Color(0, 0, 0));
         valKekuatan.setText(": Sangat Rendah");
         valKekuatan.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -809,8 +823,8 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         pnlMain.add(lineBottom, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 560, 900, 10));
 
         btnLogout.setBackground(new java.awt.Color(235, 29, 29));
-        btnLogout.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         btnLogout.setForeground(new java.awt.Color(255, 255, 255));
+        btnLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-app-logout.png"))); // NOI18N
         btnLogout.setText("Logout");
         btnLogout.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -825,11 +839,11 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
                 btnLogoutActionPerformed(evt);
             }
         });
-        pnlMain.add(btnLogout, new org.netbeans.lib.awtextra.AbsoluteConstraints(1080, 590, 80, 30));
+        pnlMain.add(btnLogout, new org.netbeans.lib.awtextra.AbsoluteConstraints(1060, 590, 100, 30));
 
         btnEdit.setBackground(new java.awt.Color(27, 186, 47));
-        btnEdit.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         btnEdit.setForeground(new java.awt.Color(255, 255, 255));
+        btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-manipulasi-editakun.png"))); // NOI18N
         btnEdit.setText("Edit Akun");
         btnEdit.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -844,7 +858,7 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
                 btnEditActionPerformed(evt);
             }
         });
-        pnlMain.add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 590, -1, 30));
+        pnlMain.add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(943, 590, 110, 30));
 
         pnlInfoPribadi.setBackground(new java.awt.Color(255, 255, 255));
         pnlInfoPribadi.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(5, 170, 57), 2));
@@ -871,9 +885,11 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         lblInfoFoto.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         lblNama.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblNama.setForeground(new java.awt.Color(0, 0, 0));
         lblNama.setText("Nama");
 
         valNama.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        valNama.setForeground(new java.awt.Color(0, 0, 0));
         valNama.setText(": Achmad Baihaqi");
         valNama.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -888,9 +904,11 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         });
 
         lblGender.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblGender.setForeground(new java.awt.Color(0, 0, 0));
         lblGender.setText("Jenis Kelamin");
 
         valGender.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        valGender.setForeground(new java.awt.Color(0, 0, 0));
         valGender.setText(": Laki-Laki");
         valGender.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -905,9 +923,11 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         });
 
         lblTanggalLhr.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblTanggalLhr.setForeground(new java.awt.Color(0, 0, 0));
         lblTanggalLhr.setText("Tanggal Lahir");
 
         valTanggalLahir.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        valTanggalLahir.setForeground(new java.awt.Color(0, 0, 0));
         valTanggalLahir.setText(": 04 Agustus 2003");
         valTanggalLahir.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -922,9 +942,11 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         });
 
         lblTempatLhr.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblTempatLhr.setForeground(new java.awt.Color(0, 0, 0));
         lblTempatLhr.setText("Tempat Lahir");
 
         valTempatLahir.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        valTempatLahir.setForeground(new java.awt.Color(0, 0, 0));
         valTempatLahir.setText(": Jombang");
         valTempatLahir.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -939,9 +961,11 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         });
 
         lblTransaksi.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblTransaksi.setForeground(new java.awt.Color(0, 0, 0));
         lblTransaksi.setText("Total Transaksi");
 
         valTransaksi.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        valTransaksi.setForeground(new java.awt.Color(0, 0, 0));
         valTransaksi.setText(": 156 Transaksi Dilakukan");
         valTransaksi.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -956,9 +980,11 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         });
 
         lblAlamat.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblAlamat.setForeground(new java.awt.Color(0, 0, 0));
         lblAlamat.setText("Alamat");
 
         valAlamat.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        valAlamat.setForeground(new java.awt.Color(0, 0, 0));
         valAlamat.setText(": Jombang, Jawa Timur");
         valAlamat.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -1044,20 +1070,20 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
 
         pnlMain.add(pnlInfoPribadi, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 150, 440, 380));
 
-        lblLogoSekolah.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblLogoSekolah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-dashboard-logo-dark.png"))); // NOI18N
-        lblLogoSekolah.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        pnlMain.add(lblLogoSekolah, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 570, 50, 60));
+        lblSekolahBottom.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblSekolahBottom.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/logo-smkn1kts_30x37.png"))); // NOI18N
+        lblSekolahBottom.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        pnlMain.add(lblSekolahBottom, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 570, 50, 60));
 
         lblNamaSekolahBottom.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         lblNamaSekolahBottom.setForeground(new java.awt.Color(12, 64, 245));
         lblNamaSekolahBottom.setText("SMK Negeri 1 Kertosono");
         pnlMain.add(lblNamaSekolahBottom, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 580, 230, -1));
 
-        lblNamaApp.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblNamaApp.setForeground(new java.awt.Color(231, 38, 38));
-        lblNamaApp.setText("Sistem Aplikasi Pembayaran SPP");
-        pnlMain.add(lblNamaApp, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 600, 260, 20));
+        lblNamaAplikasiBottom.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lblNamaAplikasiBottom.setForeground(new java.awt.Color(231, 38, 38));
+        lblNamaAplikasiBottom.setText("Sistem Aplikasi Pembayaran SPP");
+        pnlMain.add(lblNamaAplikasiBottom, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 600, 260, 20));
 
         lblBgImage.setBackground(new java.awt.Color(41, 52, 71));
         pnlMain.add(lblBgImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1200, 650));
@@ -1077,7 +1103,8 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        acc.closeConnection();
+        petugas.closeConnection();
+        Log.addLog("Menutup Window " + getClass().getName());
     }//GEN-LAST:event_formWindowClosed
 
     private void pnlMainMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlMainMousePressed
@@ -1092,7 +1119,7 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_pnlMainMouseDragged
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        System.exit(0);
+        Application.closeApplication();
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnCloseMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCloseMouseEntered
@@ -1229,7 +1256,7 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
 
     private void btnLaporanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLaporanActionPerformed
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        LaporanSpp laporanSpp = new LaporanSpp();
+        LaporanPembayaran laporanSpp = new LaporanPembayaran();
         java.awt.EventQueue.invokeLater(new Runnable(){
             @Override
             public void run(){
@@ -1254,68 +1281,47 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTentangAppActionPerformed
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        
+        Audio.play(Audio.SOUND_INFO);
+        new EditAkunPetugas(this, true, this.petugas.getCurrentLogin()).setVisible(true);
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnEditMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditMouseEntered
-        
+        this.btnEdit.setIcon(Gambar.getIcon("ic-manipulasi-editakun-entered.png"));
     }//GEN-LAST:event_btnEditMouseEntered
 
     private void btnEditMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditMouseExited
-        
+        this.btnEdit.setIcon(Gambar.getIcon("ic-manipulasi-editakun.png"));
     }//GEN-LAST:event_btnEditMouseExited
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
-        java.awt.EventQueue.invokeLater(new Runnable(){
-            @Override
-            public void run(){
-                new ConfirmLogout(ConfirmLogout.PETUGAS).setVisible(true);
-            }
-        });
-        dispose();
+        Audio.play(Audio.SOUND_WARNING);
+        new ConfirmLogout(this, true).setVisible(true);
     }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void btnLogoutMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLogoutMouseEntered
-        
+        this.btnLogout.setIcon(Gambar.getIcon("ic-app-logout-entered.png"));
     }//GEN-LAST:event_btnLogoutMouseEntered
 
     private void btnLogoutMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLogoutMouseExited
-        
+        this.btnLogout.setIcon(Gambar.getIcon("ic-app-logout.png"));
     }//GEN-LAST:event_btnLogoutMouseExited
 
-    private void valIdPetugasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valIdPetugasMouseClicked
-        Audio.play(Audio.SOUND_INFO);
-        JOptionPane.showMessageDialog(null, "ID Petugas : " + id, "Informasi!", JOptionPane.INFORMATION_MESSAGE);
-    }//GEN-LAST:event_valIdPetugasMouseClicked
+    private void valIdUserMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valIdUserMouseClicked
+        Message.showInformation(this, "ID User : " + currentLogin);
+    }//GEN-LAST:event_valIdUserMouseClicked
 
-    private void valIdPetugasMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valIdPetugasMouseEntered
+    private void valIdUserMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valIdUserMouseEntered
         this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.valIdPetugas.setText("<html><p style=\" color:rgb(15,98,230)\">:&nbsp;"+id+"</p></html>");
-    }//GEN-LAST:event_valIdPetugasMouseEntered
+        this.valIdUser.setText("<html><p style=\" color:rgb(15,98,230)\">:&nbsp;"+currentLogin+"</p></html>");
+    }//GEN-LAST:event_valIdUserMouseEntered
 
-    private void valIdPetugasMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valIdPetugasMouseExited
+    private void valIdUserMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valIdUserMouseExited
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        this.valIdPetugas.setText("<html><p style=\" color:rgb(0,0,0)\">:&nbsp;"+id+"</p></html>");
-    }//GEN-LAST:event_valIdPetugasMouseExited
-
-    private void valUsernameMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valUsernameMouseClicked
-        Audio.play(Audio.SOUND_INFO);
-        JOptionPane.showMessageDialog(null, "Username : " + username, "Informasi!", JOptionPane.INFORMATION_MESSAGE);
-    }//GEN-LAST:event_valUsernameMouseClicked
-
-    private void valUsernameMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valUsernameMouseEntered
-        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.valUsername.setText("<html><p style=\" color:rgb(15,98,230)\">:&nbsp;"+username+"</p></html>");
-    }//GEN-LAST:event_valUsernameMouseEntered
-
-    private void valUsernameMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valUsernameMouseExited
-        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        this.valUsername.setText("<html><p style=\" color:rgb(0,0,0)\">:&nbsp;"+username+"</p></html>");
-    }//GEN-LAST:event_valUsernameMouseExited
+        this.valIdUser.setText("<html><p style=\" color:rgb(0,0,0)\">:&nbsp;"+currentLogin+"</p></html>");
+    }//GEN-LAST:event_valIdUserMouseExited
 
     private void valNoHpMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valNoHpMouseClicked
-        Audio.play(Audio.SOUND_INFO);
-        JOptionPane.showMessageDialog(null, "Nomor HP : " + no_hp, "Informasi!", JOptionPane.INFORMATION_MESSAGE);
+        Message.showInformation(this, "Nomor HP : " + no_hp);
     }//GEN-LAST:event_valNoHpMouseClicked
 
     private void valNoHpMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valNoHpMouseEntered
@@ -1329,8 +1335,7 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_valNoHpMouseExited
 
     private void valEmailMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valEmailMouseClicked
-        Audio.play(Audio.SOUND_INFO);
-        JOptionPane.showMessageDialog(null, "Email : " + email, "Informasi!", JOptionPane.INFORMATION_MESSAGE);
+        Message.showInformation(this, "Email : " + email);
     }//GEN-LAST:event_valEmailMouseClicked
 
     private void valEmailMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valEmailMouseEntered
@@ -1344,8 +1349,7 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_valEmailMouseExited
 
     private void valLevelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valLevelMouseClicked
-        Audio.play(Audio.SOUND_INFO);
-        JOptionPane.showMessageDialog(null, "Level Akun : " + level, "Informasi!", JOptionPane.INFORMATION_MESSAGE);
+        Message.showInformation(this, "Level Akun : " + level);
     }//GEN-LAST:event_valLevelMouseClicked
 
     private void valLevelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valLevelMouseEntered
@@ -1359,38 +1363,35 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_valLevelMouseExited
 
     private void valPasswordMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valPasswordMouseClicked
-        Audio.play(Audio.SOUND_INFO);
-        JOptionPane.showMessageDialog(null, "Password : " + this.setHiddenPass(password), "Informasi!", JOptionPane.INFORMATION_MESSAGE);
+        Message.showInformation(this, "Password : " + password);
     }//GEN-LAST:event_valPasswordMouseClicked
 
     private void valPasswordMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valPasswordMouseEntered
         this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.valPassword.setText("<html><p style=\" color:rgb(246,46,46)\">:&nbsp;"+this.setHiddenPass(password)+"</p></html>");
+        this.valPassword.setText("<html><p style=\" color:rgb(246,46,46)\">:&nbsp;"+password+"</p></html>");
     }//GEN-LAST:event_valPasswordMouseEntered
 
     private void valPasswordMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valPasswordMouseExited
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        this.valPassword.setText("<html><p style=\" color:rgb(0,0,0)\">:&nbsp;"+this.setHiddenPass(password)+"</p></html>");
+        this.valPassword.setText("<html><p style=\" color:rgb(0,0,0)\">:&nbsp;"+password+"</p></html>");
     }//GEN-LAST:event_valPasswordMouseExited
 
     private void valKekuatanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valKekuatanMouseClicked
-        Audio.play(Audio.SOUND_INFO);
-        JOptionPane.showMessageDialog(null, "Kekuatan : " + acc.getKekuatanPassword(password), "Informasi!", JOptionPane.INFORMATION_MESSAGE);
+        Message.showInformation(this, "Kekuatan : " + passStrength);
     }//GEN-LAST:event_valKekuatanMouseClicked
 
     private void valKekuatanMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valKekuatanMouseEntered
         this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.valKekuatan.setText("<html><p style=\" color:rgb(246,46,46)\">:&nbsp;"+acc.getKekuatanPassword(password)+"</p></html>");
+        this.valKekuatan.setText("<html><p style=\" color:rgb(246,46,46)\">:&nbsp;"+passStrength+"</p></html>");
     }//GEN-LAST:event_valKekuatanMouseEntered
 
     private void valKekuatanMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valKekuatanMouseExited
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        this.valKekuatan.setText("<html><p style=\" color:rgb(0,0,0)\">:&nbsp;"+acc.getKekuatanPassword(password)+"</p></html>");
+        this.valKekuatan.setText("<html><p style=\" color:rgb(0,0,0)\">:&nbsp;"+passStrength+"</p></html>");
     }//GEN-LAST:event_valKekuatanMouseExited
 
     private void valNamaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valNamaMouseClicked
-        Audio.play(Audio.SOUND_INFO);
-        JOptionPane.showMessageDialog(null, "Nama : " + name, "Informasi!", JOptionPane.INFORMATION_MESSAGE);
+        Message.showInformation(this, "Nama : " + name);
     }//GEN-LAST:event_valNamaMouseClicked
 
     private void valNamaMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valNamaMouseEntered
@@ -1404,53 +1405,49 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_valNamaMouseExited
 
     private void valGenderMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valGenderMouseClicked
-        Audio.play(Audio.SOUND_INFO);
-        JOptionPane.showMessageDialog(null, "Nama : " + acc.getGenderName(gender), "Informasi!", JOptionPane.INFORMATION_MESSAGE);
+        Message.showInformation(this, "Jenis Kelamin : " + gender);
     }//GEN-LAST:event_valGenderMouseClicked
 
     private void valGenderMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valGenderMouseEntered
         this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.valGender.setText("<html><p style=\" color:rgb(5,170,57)\">:&nbsp;"+acc.getGenderName(gender)+"</p></html>");
+        this.valGender.setText("<html><p style=\" color:rgb(5,170,57)\">:&nbsp;"+gender+"</p></html>");
     }//GEN-LAST:event_valGenderMouseEntered
 
     private void valGenderMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valGenderMouseExited
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        this.valGender.setText("<html><p style=\" color:rgb(0,0,0)\">:&nbsp;"+acc.getGenderName(gender)+"</p></html>");
+        this.valGender.setText("<html><p style=\" color:rgb(0,0,0)\">:&nbsp;"+gender+"</p></html>");
     }//GEN-LAST:event_valGenderMouseExited
 
     private void valTempatLahirMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valTempatLahirMouseClicked
-        Audio.play(Audio.SOUND_INFO);
-        JOptionPane.showMessageDialog(null, "Tempat Lahir : " + tempat_lahir, "Informasi!", JOptionPane.INFORMATION_MESSAGE);
+        Message.showInformation(this, "Tempat Lahir : " + tmpLahir);
     }//GEN-LAST:event_valTempatLahirMouseClicked
 
     private void valTempatLahirMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valTempatLahirMouseEntered
         this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.valTempatLahir.setText("<html><p style=\" color:rgb(5,170,57)\">:&nbsp;"+tempat_lahir+"</p></html>");
+        this.valTempatLahir.setText("<html><p style=\" color:rgb(5,170,57)\">:&nbsp;"+tmpLahir+"</p></html>");
     }//GEN-LAST:event_valTempatLahirMouseEntered
 
     private void valTempatLahirMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valTempatLahirMouseExited
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        this.valTempatLahir.setText("<html><p style=\" color:rgb(0,0,0)\">:&nbsp;"+tempat_lahir+"</p></html>");
+        this.valTempatLahir.setText("<html><p style=\" color:rgb(0,0,0)\">:&nbsp;"+tmpLahir+"</p></html>");
     }//GEN-LAST:event_valTempatLahirMouseExited
 
     private void valTanggalLahirMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valTanggalLahirMouseClicked
-        Audio.play(Audio.SOUND_INFO);
-        JOptionPane.showMessageDialog(null, "Tanggal lahir : " + waktu.getTanggal(tanggal_lahir), "Informasi!", JOptionPane.INFORMATION_MESSAGE);
+       Message.showInformation(this, "Tanggal lahir : " + tglLahir);
     }//GEN-LAST:event_valTanggalLahirMouseClicked
 
     private void valTanggalLahirMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valTanggalLahirMouseEntered
         this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.valTanggalLahir.setText("<html><p style=\" color:rgb(5,170,57)\">:&nbsp;"+waktu.getTanggal(tanggal_lahir)+"</p></html>");
+        this.valTanggalLahir.setText("<html><p style=\" color:rgb(5,170,57)\">:&nbsp;"+tglLahir+"</p></html>");
     }//GEN-LAST:event_valTanggalLahirMouseEntered
 
     private void valTanggalLahirMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valTanggalLahirMouseExited
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        this.valTanggalLahir.setText("<html><p style=\" color:rgb(0,0,0)\">:&nbsp;"+waktu.getTanggal(tanggal_lahir)+"</p></html>");
+        this.valTanggalLahir.setText("<html><p style=\" color:rgb(0,0,0)\">:&nbsp;"+tglLahir+"</p></html>");
     }//GEN-LAST:event_valTanggalLahirMouseExited
 
     private void valTransaksiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valTransaksiMouseClicked
-        Audio.play(Audio.SOUND_INFO);
-        JOptionPane.showMessageDialog(null, "Total Transaksi : " + transaksi + " Transaksi Dilakukan", "Informasi!", JOptionPane.INFORMATION_MESSAGE);
+        Message.showInformation(this, "Total Transaksi : " + transaksi + " Transaksi Dilakukan");
     }//GEN-LAST:event_valTransaksiMouseClicked
 
     private void valTransaksiMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valTransaksiMouseEntered
@@ -1464,8 +1461,7 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_valTransaksiMouseExited
 
     private void valAlamatMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valAlamatMouseClicked
-        Audio.play(Audio.SOUND_INFO);
-        JOptionPane.showMessageDialog(null, "Alamat : " + alamat, "Informasi!", JOptionPane.INFORMATION_MESSAGE);
+        Message.showInformation(this, "Alamat : " + alamat);
     }//GEN-LAST:event_valAlamatMouseClicked
 
     private void valAlamatMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valAlamatMouseEntered
@@ -1477,6 +1473,24 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         this.valAlamat.setText("<html><p style=\" color:rgb(0,0,0)\">:&nbsp;"+alamat+"</p></html>");
     }//GEN-LAST:event_valAlamatMouseExited
+
+    private void valIdPetugasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valIdPetugasMouseClicked
+        Message.showInformation(this, "ID Petugas : " + currentLogin);
+    }//GEN-LAST:event_valIdPetugasMouseClicked
+
+    private void valIdPetugasMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valIdPetugasMouseEntered
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        this.valIdPetugas.setText("<html><p style=\" color:rgb(15,98,230)\">:&nbsp;"+currentLogin+"</p></html>");
+    }//GEN-LAST:event_valIdPetugasMouseEntered
+
+    private void valIdPetugasMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valIdPetugasMouseExited
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        this.valIdPetugas.setText("<html><p style=\" color:rgb(0,0,0)\">:&nbsp;"+currentLogin+"</p></html>");
+    }//GEN-LAST:event_valIdPetugasMouseExited
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        Log.addLog("Membuka Window " + getClass().getName());
+    }//GEN-LAST:event_formWindowOpened
 
     public static void main(String args[]) {
 
@@ -1519,26 +1533,26 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
     private javax.swing.JLabel lblEmail;
     private javax.swing.JLabel lblGender;
     private javax.swing.JLabel lblIdPetugas;
+    private javax.swing.JLabel lblIdUser;
     private javax.swing.JLabel lblInfoFoto;
     private javax.swing.JLabel lblInfoKeamanan;
     private javax.swing.JLabel lblInfoPribadi;
     private javax.swing.JLabel lblInfoUtama;
     private javax.swing.JLabel lblKekuatan;
     private javax.swing.JLabel lblLevel;
-    private javax.swing.JLabel lblLogoSekolah;
     private javax.swing.JLabel lblNama;
-    private javax.swing.JLabel lblNamaApp;
+    private javax.swing.JLabel lblNamaAplikasiBottom;
     private javax.swing.JLabel lblNamaSekolahBottom;
     private javax.swing.JLabel lblNamaUser;
     private javax.swing.JLabel lblNoHP;
     private javax.swing.JLabel lblPassword;
     private javax.swing.JLabel lblPhotoProfile;
     private javax.swing.JLabel lblSekolah;
+    private javax.swing.JLabel lblSekolahBottom;
     private javax.swing.JLabel lblTanggalLhr;
     private javax.swing.JLabel lblTempatLhr;
     private javax.swing.JLabel lblTipeAkun;
     private javax.swing.JLabel lblTransaksi;
-    private javax.swing.JLabel lblUsername;
     private javax.swing.JSeparator lineBottom;
     private javax.swing.JSeparator lineTop;
     private javax.swing.JPanel pnlAccount;
@@ -1557,6 +1571,7 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
     private javax.swing.JLabel valEmail;
     private javax.swing.JLabel valGender;
     private javax.swing.JLabel valIdPetugas;
+    private javax.swing.JLabel valIdUser;
     private javax.swing.JLabel valKekuatan;
     private javax.swing.JLabel valLevel;
     private javax.swing.JLabel valNama;
@@ -1565,6 +1580,5 @@ public class InformasiAkunPetugas extends javax.swing.JFrame {
     private javax.swing.JLabel valTanggalLahir;
     private javax.swing.JLabel valTempatLahir;
     private javax.swing.JLabel valTransaksi;
-    private javax.swing.JLabel valUsername;
     // End of variables declaration//GEN-END:variables
 }
