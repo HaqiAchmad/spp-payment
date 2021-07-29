@@ -9,7 +9,7 @@ import com.window.petugas.DataSiswa;
 import com.window.petugas.DataSpp;
 import com.window.petugas.DataSpp;
 import com.window.petugas.PembayaranSpp;
-import com.window.petugas.LaporanSpp;
+import com.window.petugas.LaporanPembayaran;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -660,7 +660,7 @@ public class WindowKosong extends javax.swing.JFrame {
 
     private void btnLaporanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLaporanActionPerformed
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        LaporanSpp laporanSpp = new LaporanSpp();
+        LaporanPembayaran laporanSpp = new LaporanPembayaran();
         java.awt.EventQueue.invokeLater(new Runnable(){
             @Override
             public void run(){
