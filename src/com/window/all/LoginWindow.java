@@ -1,24 +1,27 @@
 package com.window.all;
 
-import com.window.petugas.DashboardPetugas;
-import com.window.siswa.DashboardSiswa;
-import com.database.Account;
-import com.media.Audio;
+import com.data.app.Application;
+import com.data.app.Log;
+import com.error.AuthenticationException;
+import com.manage.Message;
 import com.media.Gambar;
+import com.users.Users;
 
 import java.awt.Color;
-import javax.swing.JOptionPane;
+import java.awt.Cursor;
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
- * Digunakan untuk login bagi admin dan petugas
+ * Digunakan untuk login bagi admin, petugas dan siswa.
  * 
  * @author Achmad Baihaqi
  * @since 2020-11-22
  */
 public class LoginWindow extends javax.swing.JFrame {
 
-    private final Account acc = new Account();
-    private String user, password;
+    private final Users user = new Users();
+    private String idUser, password;
     private int x, y;
     
     public LoginWindow() {
@@ -28,7 +31,6 @@ public class LoginWindow extends javax.swing.JFrame {
         this.setIconImage(Gambar.getWindowIcon());
         this.lblKembali.setVisible(false);
         this.btnLogin.setUI(new javax.swing.plaf.basic.BasicButtonUI());
-        this.lblLogoSmk.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts.png"), 145, 185));
     }
 
     @SuppressWarnings("unchecked")
@@ -60,6 +62,9 @@ public class LoginWindow extends javax.swing.JFrame {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
         });
 
         pnlMain.setBackground(new java.awt.Color(21, 20, 20));
@@ -78,7 +83,7 @@ public class LoginWindow extends javax.swing.JFrame {
         pnlLeft.setBackground(new java.awt.Color(33, 33, 37));
 
         lblLogoSmk.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblLogoSmk.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-school.png"))); // NOI18N
+        lblLogoSmk.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-login-logosmkn1kts.png"))); // NOI18N
         lblLogoSmk.setToolTipText("");
         lblLogoSmk.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
@@ -86,6 +91,7 @@ public class LoginWindow extends javax.swing.JFrame {
         lblSekolah.setForeground(new java.awt.Color(255, 255, 255));
         lblSekolah.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblSekolah.setText("SMK Negeri 1 Kertosono");
+        lblSekolah.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         javax.swing.GroupLayout pnlLeftLayout = new javax.swing.GroupLayout(pnlLeft);
         pnlLeft.setLayout(pnlLeftLayout);
@@ -99,8 +105,8 @@ public class LoginWindow extends javax.swing.JFrame {
             .addGroup(pnlLeftLayout.createSequentialGroup()
                 .addComponent(lblLogoSmk, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblSekolah, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(64, Short.MAX_VALUE))
+                .addComponent(lblSekolah, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         pnlMain.add(pnlLeft, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 380));
@@ -165,7 +171,7 @@ public class LoginWindow extends javax.swing.JFrame {
         lblUsername.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         lblUsername.setForeground(new java.awt.Color(255, 255, 255));
         lblUsername.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblUsername.setText("NIS / Username");
+        lblUsername.setText("ID Petugas / NIS");
         pnlMain.add(lblUsername, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 110, 384, 23));
 
         lblKembali.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -254,11 +260,13 @@ public class LoginWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_pnlMainMouseDragged
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        acc.closeConnection();
+        Log.addLog("Menutup Window " + getClass().getName());
+        user.closeConnection();
     }//GEN-LAST:event_formWindowClosed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        acc.closeConnection();
+        Log.addLog("Menutup Window " + getClass().getName());
+        user.closeConnection();
     }//GEN-LAST:event_formWindowClosing
 
     private void lblEyeMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblEyeMouseExited
@@ -298,49 +306,67 @@ public class LoginWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_lblCloseMouseEntered
 
     private void lblCloseMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblCloseMouseClicked
-        System.exit(0);
+        Application.closeApplication();
     }//GEN-LAST:event_lblCloseMouseClicked
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        user = this.inpUsername.getText();
-        password = this.inpPassword.getText();
-        boolean login;
-        if(acc.isExistAkun(user)){
-            if(acc.isAdmin(user) || acc.isPetugas(user)){
-                login = acc.loginAsPetugas(user, password);
-                if(login){
+        try {
+            // mendapatkan input
+            idUser = this.inpUsername.getText();
+            password = this.inpPassword.getText();
+            // melakukan login
+            boolean login = user.login(idUser, password);
+            this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            
+            // jika login berhasil
+            if(login){
+                // jika user login dengan level akun admin atau petugas
+                if(user.isAdmin() || user.isPetugas()){
+                    // membuka window DashboardPetugas
                     java.awt.EventQueue.invokeLater(new Runnable(){
+                        
                         @Override
                         public void run(){
-                            new DashboardPetugas().setVisible(true);
+                            new com.window.petugas.DashboardPetugas().setVisible(true);
                         }
                     });
+                    
+                    // menutup window LoginWindow
+                    this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    dispose();
+                }
+                // jika user login dengan level akun siswa
+                else if(user.isSiswa()){
+                    // membuka window DashboardSiswa
+                    java.awt.EventQueue.invokeLater(new Runnable(){
+                        
+                        @Override
+                        public void run(){
+                            new com.window.siswa.DashboardSiswa().setVisible(true);
+                        }
+                    });
+                    
+                    // menutup window LoginWindow
+                    this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                     dispose();
                 }else{
-                    this.inpUsername.setText("");
-                    this.inpPassword.setText("");
+                    Message.showWarning(this, "Level akun Anda tidak valid!", true);
                 }
             }else{
-                login = acc.loginAsSiswa(Integer.parseInt(user), password);
-                if(login){
-                    java.awt.EventQueue.invokeLater(new Runnable(){
-                        @Override
-                        public void run(){
-                            new DashboardSiswa().setVisible(true);
-                        }
-                    });
-                    dispose();
-                }else{
-                    this.inpUsername.setText("");
-                    this.inpPassword.setText("");
-                }
+                this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                // mereset textfield jika login gagal
+                this.inpUsername.setText("");
+                this.inpPassword.setText("");
             }
-        }else{
+        } catch (IOException | AuthenticationException | SQLException ex) {
+            // mereset textfield jika terjadi error
             this.inpUsername.setText("");
             this.inpPassword.setText("");
-            Audio.play(Audio.SOUND_ERROR);
-            JOptionPane.showMessageDialog(null, "'"+user+"' NIS / Username tersbut tidak dapat ditemukan!", "Error!", JOptionPane.WARNING_MESSAGE);
+            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            // menampilkan pesan error
+            Message.showException(this, ex, true);
         }
+
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void btnLoginMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLoginMouseExited
@@ -362,6 +388,10 @@ public class LoginWindow extends javax.swing.JFrame {
     private void lblKembaliMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblKembaliMouseClicked
 
     }//GEN-LAST:event_lblKembaliMouseClicked
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        Log.addLog("Membuka Window " + getClass().getName());
+    }//GEN-LAST:event_formWindowOpened
 
     public static void main(String args[]) {
         
