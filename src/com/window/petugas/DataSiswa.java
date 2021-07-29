@@ -1,22 +1,30 @@
 package com.window.petugas;
 
-import com.database.Account;
-import com.database.Database;
-import com.database.Kelas;
-import com.database.Transaksi;
+import com.data.app.Application;
+import com.data.db.Database;
+import com.data.app.Kelas;
+import com.data.app.Log;
+import com.data.app.Transaksi;
 import com.media.Audio;
 import com.media.Gambar;
-import com.media.Waktu;
+import com.manage.Internet;
+import com.manage.Message;
+import com.manage.Text;
+import com.window.admin.TambahDataSiswa;
+import com.window.admin.EditDataSiswa;
 import com.sun.glass.events.KeyEvent;
+import com.users.UserPhotoSize;
+import com.users.Users;
+import com.window.admin.HapusData;
 
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
-import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -25,26 +33,36 @@ import javax.swing.JOptionPane;
  */
 public class DataSiswa extends javax.swing.JFrame {
     
-    private final Account acc = new Account();
+    private final Users.LevelPetugas petugas = Users.levelPetugas();
+    private final Users.LevelSiswa siswa = Users.levelSiswa();
     private final Kelas kls = new Kelas();
     private final Transaksi tr = new Transaksi();
-    private final Waktu waktu = new Waktu();
-    private final String name, foto, level;
-    private String nisSelected = "", keyword = "", namaSiswa, gender, tempatLahir, 
-                   tanggalLahir, ttl, kelas, alamat, noHp, email, nominal, namaWali, fotoSiswa;
+    private final Text txt = new Text();
+    
+    private final String name;
+    private String nisSelected = "", keyword = "", namaSiswa, gender, ttl, kelas, alamat, noHp, email, nominal, namaWali;
     private int x, y;
     
     public DataSiswa() {
         initComponents();
-        
-        nisSelected = "6156";
-        name = acc.getDataAkun(acc.getLogin(), "nama_petugas");
-        foto = acc.getProfile(acc.getLogin());
-        level = acc.getDataAkun(acc.getLogin(), "level");
-        
         this.setLocationRelativeTo(null);
         this.setIconImage(Gambar.getWindowIcon());
+        
+        nisSelected = "6156";
+        
+        // menampilkan data-data aplikasi
+        this.lblSekolah.setIcon(Gambar.getTopIcon());
+        this.lblSekolah.setText(Application.getCompany() + " | " + Application.getNama());
+        this.lblVersion.setText("Versi " + Application.getVersi());
+        this.lblCopyright.setText(Application.getRightReserved());
+        
+        // mendapatkan dan menampilkan data petugas
+        name = txt.toCapitalize(petugas.getNama());
         this.lblNamaUser.setText("<html><p>"+name+"</p></html>");
+        this.lblTotalData.setText("Menampilkan "+txt.addDelim(siswa.getTotalSiswa())+" data siswa.");
+        this.lblPhotoProfile.setIcon(petugas.getPhotoProfile());
+        
+        // mengatur ui pada button
         this.btnDashboard.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnInfoAkun.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnDataPetugas.setUI(new javax.swing.plaf.basic.BasicButtonUI());
@@ -59,9 +77,6 @@ public class DataSiswa extends javax.swing.JFrame {
         this.btnTambah.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnEdit.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnHapus.setUI(new javax.swing.plaf.basic.BasicButtonUI());
-        this.lblPhotoProfile.setIcon(Gambar.scaleImage(new File(foto), lblPhotoProfile.getWidth(), lblPhotoProfile.getHeight()));
-        this.lblSekolah.setIcon(Gambar.scaleImage(new File("src\\resources\\image\\icons\\logo-smkn1kts-circle.png"), 35, 35));     
-        this.lblTotalData.setText("Menampilkan "+acc.getJumlahData(Database.SISWA)+" data siswa.");
         
         this.tabelData.setRowHeight(29);
         this.tabelData.getTableHeader().setBackground(new java.awt.Color(255,255,255));
@@ -105,7 +120,7 @@ public class DataSiswa extends javax.swing.JFrame {
         
         JLabel[] lbls = new JLabel[]{
             this.valNis, this.valNama, this.valGender, this.valTtl, this.valKelas,
-            this.valAlamat, this.valNoHp, this.valEmail, this.valWali, this.valNominal
+            this.valAlamat, this.valEmail, this.valWali, this.valNominal
         };
         
         for(JLabel lbl : lbls){
@@ -151,22 +166,21 @@ public class DataSiswa extends javax.swing.JFrame {
             int rows = 0;
             String sql = "SELECT nis, nama_siswa, gender, id_kelas FROM siswa " + keyword;
             // mendefinisikan object berdasarkan total rows dan cols yang ada didalam tabel
-            obj = new Object[acc.getJumlahData(Database.SISWA, keyword)][4];
+            obj = new Object[siswa.getJumlahData(Database.SISWA, keyword)][4];
             // mengeksekusi query
-            acc.res = acc.stat.executeQuery(sql);
+            siswa.res = siswa.stat.executeQuery(sql);
             // mendapatkan semua data yang ada didalam tabel
-            while(acc.res.next()){
+            while(siswa.res.next()){
                 // menyimpan data dari tabel ke object
-                obj[rows][0] = acc.res.getString("nis");
-                obj[rows][1] = acc.res.getString("nama_siswa");
-                obj[rows][2] = acc.getGenderName(acc.res.getString("gender"));
-                obj[rows][3] = kls.getNamaKelas(acc.res.getString("id_kelas"));
+                obj[rows][0] = siswa.res.getString("nis");
+                obj[rows][1] = siswa.res.getString("nama_siswa");
+                obj[rows][2] = txt.getGenderName(siswa.res.getString("gender"));
+                obj[rows][3] = kls.getNamaKelas(siswa.res.getString("id_kelas"));
                 rows++; // rows akan bertambah 1 setiap selesai membaca 1 row pada tabel
             }
             return obj;
         }catch(SQLException ex){
-            Audio.play(Audio.SOUND_ERROR);
-            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat mengambil data dari database\n" + ex.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+            Message.showException(this, "Terjadi kesalahan saat mengambil data dari database\n" + ex.getMessage(), ex, true);
         }
         return null;
     }
@@ -190,30 +204,30 @@ public class DataSiswa extends javax.swing.JFrame {
     }
     
     private void showData(){
-        this.namaSiswa = acc.getDataAkun(nisSelected, "nama_siswa");
-        this.gender = acc.getGenderName(acc.getDataAkun(nisSelected, "gender"));
-        this.tempatLahir = acc.getDataAkun(nisSelected, "tempat_lhr");
-        this.tanggalLahir = waktu.getTanggal(acc.getDataAkun(nisSelected, "tanggal_lhr"));
-        this.ttl = tempatLahir + ", " + tanggalLahir;
-        this.kelas = kls.getNamaKelas(acc.getDataAkun(nisSelected, "id_kelas"));
-        this.alamat = acc.getDataAkun(nisSelected, "alamat");
-        this.noHp = acc.getDataAkun(nisSelected, "no_hp");
-        this.email = acc.getDataAkun(nisSelected, "email");
-        this.namaWali = acc.getDataAkun(nisSelected, "nama_wali");
-        this.nominal = tr.addRp(tr.getNominalSpp(Integer.parseInt(acc.getDataAkun(nisSelected, "id_spp"))));
-        this.fotoSiswa = acc.getProfile(Integer.parseInt(nisSelected));
         
+        // mendapatkan data-data dari siswa
+        this.namaSiswa = txt.toCapitalize(siswa.getNama(nisSelected));
+        this.gender = txt.getGenderName(siswa.getGender(nisSelected));
+        this.ttl = txt.toDateOfBirthCase(siswa.getTempatLahir(nisSelected), siswa.getTanggalLahir(nisSelected));
+        this.kelas = kls.getNamaKelas(siswa.getIdKelas(nisSelected));
+        this.alamat = txt.toCapitalize(siswa.getAlamat(nisSelected));
+        this.noHp = txt.toTelephoneCase(siswa.getNoHp(nisSelected));
+        this.email = siswa.getEmail(nisSelected).toLowerCase();
+        this.namaWali = siswa.getNamaWali(nisSelected);
+        this.nominal = txt.toMoneyCase(Integer.toString(tr.getNominalSpp(Integer.parseInt(siswa.getIdSpp(nisSelected)))));
+        
+        // menampilkan data siswa
         this.valNis.setText("<html><p>:&nbsp;"+nisSelected+"</p></html>");
         this.valNama.setText("<html><p>:&nbsp;"+namaSiswa+"</p></html>");
         this.valGender.setText("<html><p>:&nbsp;"+gender+"</p></html>");
         this.valTtl.setText("<html><p>:&nbsp;"+ttl+"</p></html>");
         this.valKelas.setText("<html><p>:&nbsp;"+kelas+"</p></html>");
         this.valAlamat.setText("<html><p>:&nbsp;"+alamat+"</p></html>");
-        this.valNoHp.setText("<html><p>:&nbsp;"+noHp+"</p></html>");
+        this.valNoHp.setText("<html><p style=\"text-decoration:underline; color:rgb(0,0,0);\">:&nbsp;"+noHp+"</p></html>");
         this.valEmail.setText("<html><p>:&nbsp;"+email+"</p></html>");
         this.valWali.setText("<html><p>:&nbsp;"+namaWali+"</p></html>");
         this.valNominal.setText("<html><p>:&nbsp;"+nominal+"</p></html>");
-        this.lblShowFoto.setIcon(Gambar.scaleImage(new File(fotoSiswa), lblShowFoto.getWidth(), lblShowFoto.getHeight()));
+        this.lblShowFoto.setIcon(siswa.getPhoto(nisSelected, UserPhotoSize.DATA_SISWA));
     }
 
     @SuppressWarnings("unchecked")
@@ -288,6 +302,9 @@ public class DataSiswa extends javax.swing.JFrame {
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
+            }
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
             }
         });
 
@@ -606,7 +623,7 @@ public class DataSiswa extends javax.swing.JFrame {
 
         lblSekolah.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         lblSekolah.setForeground(new java.awt.Color(255, 255, 255));
-        lblSekolah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-nav-logosekolah.png"))); // NOI18N
+        lblSekolah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/logo-smkn1kts-circle_35x35.png"))); // NOI18N
         lblSekolah.setText("SMK Negeri 1 Kertosono | Aplikasi Pembayaran SPP");
         lblSekolah.setIconTextGap(13);
 
@@ -635,7 +652,7 @@ public class DataSiswa extends javax.swing.JFrame {
 
         lblDashboard.setFont(new java.awt.Font("Ebrima", 1, 21)); // NOI18N
         lblDashboard.setForeground(new java.awt.Color(22, 19, 19));
-        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-datapetugas-logo.png"))); // NOI18N
+        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-window-datasiswa-logo.png"))); // NOI18N
         lblDashboard.setText("Data Siswa");
         lblDashboard.setIconTextGap(6);
         pnlMain.add(lblDashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 64, 400, -1));
@@ -666,11 +683,12 @@ public class DataSiswa extends javax.swing.JFrame {
         lblShowFoto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblShowFoto.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        lblFoto.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        lblFoto.setForeground(new java.awt.Color(0, 0, 0));
         lblFoto.setText("Foto Siswa");
         lblFoto.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
         lblPenampilFoto.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
+        lblPenampilFoto.setForeground(new java.awt.Color(0, 0, 0));
         lblPenampilFoto.setText("Tampilkan Foto");
         lblPenampilFoto.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -685,63 +703,94 @@ public class DataSiswa extends javax.swing.JFrame {
         });
 
         lblNis.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblNis.setForeground(new java.awt.Color(0, 0, 0));
         lblNis.setText("NIS");
 
         lblNama.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblNama.setForeground(new java.awt.Color(0, 0, 0));
         lblNama.setText("Nama Siswa");
 
         lblTtl.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblTtl.setForeground(new java.awt.Color(0, 0, 0));
         lblTtl.setText("TTL ");
 
         lblGender.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblGender.setForeground(new java.awt.Color(0, 0, 0));
         lblGender.setText("Jenis Kelamin");
 
         lblEmail.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblEmail.setForeground(new java.awt.Color(0, 0, 0));
         lblEmail.setText("Email");
 
         lblNoHp.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblNoHp.setForeground(new java.awt.Color(0, 0, 0));
         lblNoHp.setText("Nomor HP");
 
         lblAlamat.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblAlamat.setForeground(new java.awt.Color(0, 0, 0));
         lblAlamat.setText("Alamat");
 
         lblKelas.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblKelas.setForeground(new java.awt.Color(0, 0, 0));
         lblKelas.setText("Kelas");
 
         lblWali.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblWali.setForeground(new java.awt.Color(0, 0, 0));
         lblWali.setText("Nama Wali");
 
         lblNominal.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblNominal.setForeground(new java.awt.Color(0, 0, 0));
         lblNominal.setText("Nominal SPP");
 
         valNis.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valNis.setForeground(new java.awt.Color(0, 0, 0));
         valNis.setText(": 6156");
 
         valNama.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valNama.setForeground(new java.awt.Color(0, 0, 0));
         valNama.setText(": Achmad Baihaqi");
 
         valGender.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valGender.setForeground(new java.awt.Color(0, 0, 0));
         valGender.setText(": Laki-Laki");
 
         valTtl.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valTtl.setForeground(new java.awt.Color(0, 0, 0));
         valTtl.setText(": Jombang, 04 Agustus 2003");
 
         valKelas.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valKelas.setForeground(new java.awt.Color(0, 0, 0));
         valKelas.setText(": XII RPL 1");
 
         valAlamat.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valAlamat.setForeground(new java.awt.Color(0, 0, 0));
         valAlamat.setText(": Jawa Timur, Indonesia");
 
         valNoHp.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valNoHp.setForeground(new java.awt.Color(0, 0, 0));
         valNoHp.setText(": 0856-5586-4624");
+        valNoHp.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                valNoHpMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                valNoHpMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                valNoHpMouseExited(evt);
+            }
+        });
 
         valEmail.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valEmail.setForeground(new java.awt.Color(0, 0, 0));
         valEmail.setText(": leviackerman@gmail.com");
 
         valWali.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valWali.setForeground(new java.awt.Color(0, 0, 0));
         valWali.setText(": Manusia");
 
         valNominal.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valNominal.setForeground(new java.awt.Color(0, 0, 0));
         valNominal.setText(": Rp. 135.000.00");
 
         javax.swing.GroupLayout pnlInfoDataLayout = new javax.swing.GroupLayout(pnlInfoData);
@@ -863,6 +912,7 @@ public class DataSiswa extends javax.swing.JFrame {
         pnlMain.add(lblCari, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 130, 210, 30));
 
         tabelData.setFont(new java.awt.Font("Ebrima", 1, 13)); // NOI18N
+        tabelData.setForeground(new java.awt.Color(0, 0, 0));
         tabelData.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {"6156", "Achmad Baihaqi", "Laki-Laki", "XII RPL 1"},
@@ -899,6 +949,7 @@ public class DataSiswa extends javax.swing.JFrame {
         pnlMain.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 170, 440, 440));
 
         inpCari.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        inpCari.setForeground(new java.awt.Color(0, 0, 0));
         inpCari.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 inpCariKeyTyped(evt);
@@ -916,11 +967,11 @@ public class DataSiswa extends javax.swing.JFrame {
         pnlMain.add(lineBottom, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 640, 1010, 10));
 
         lblTotalData.setFont(new java.awt.Font("Dialog", 1, 11)); // NOI18N
+        lblTotalData.setForeground(new java.awt.Color(0, 0, 0));
         lblTotalData.setText("Menampilkan 20 data siswa dengan keyword = \"\"");
         pnlMain.add(lblTotalData, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 615, 440, 20));
 
         btnTambah.setBackground(new java.awt.Color(41, 180, 50));
-        btnTambah.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         btnTambah.setForeground(new java.awt.Color(255, 255, 255));
         btnTambah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-tambah.png"))); // NOI18N
         btnTambah.setText("Tambah Data");
@@ -940,7 +991,6 @@ public class DataSiswa extends javax.swing.JFrame {
         pnlMain.add(btnTambah, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 660, 130, -1));
 
         btnEdit.setBackground(new java.awt.Color(34, 119, 237));
-        btnEdit.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         btnEdit.setForeground(new java.awt.Color(255, 255, 255));
         btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-edit.png"))); // NOI18N
         btnEdit.setText("Edit Data");
@@ -960,7 +1010,6 @@ public class DataSiswa extends javax.swing.JFrame {
         pnlMain.add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 660, 110, -1));
 
         btnHapus.setBackground(new java.awt.Color(220, 41, 41));
-        btnHapus.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         btnHapus.setForeground(new java.awt.Color(255, 255, 255));
         btnHapus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-hapus.png"))); // NOI18N
         btnHapus.setText("Hapus Data");
@@ -980,11 +1029,13 @@ public class DataSiswa extends javax.swing.JFrame {
         pnlMain.add(btnHapus, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 660, 120, -1));
 
         lblVersion.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
+        lblVersion.setForeground(new java.awt.Color(0, 0, 0));
         lblVersion.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblVersion.setText("Version 1.0.0");
         pnlMain.add(lblVersion, new org.netbeans.lib.awtextra.AbsoluteConstraints(900, 660, 370, -1));
 
         lblCopyright.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
+        lblCopyright.setForeground(new java.awt.Color(0, 0, 0));
         lblCopyright.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblCopyright.setText("Copyright © 2021. Achmad Baihaqi. All Rights Reserved.");
         pnlMain.add(lblCopyright, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 680, 390, -1));
@@ -1011,9 +1062,11 @@ public class DataSiswa extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        acc.closeConnection();
+        petugas.closeConnection();
+        siswa.closeConnection();
         kls.closeConnection();
         tr.closeConnection();
+        Log.addLog("Menutup Window " + getClass().getName());
     }//GEN-LAST:event_formWindowClosed
 
     private void pnlMainMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlMainMousePressed
@@ -1028,7 +1081,7 @@ public class DataSiswa extends javax.swing.JFrame {
     }//GEN-LAST:event_pnlMainMouseDragged
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        System.exit(0);
+        Application.closeApplication();
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnCloseMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCloseMouseEntered
@@ -1183,7 +1236,7 @@ public class DataSiswa extends javax.swing.JFrame {
 
     private void btnLaporanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLaporanActionPerformed
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        LaporanSpp laporanSpp = new LaporanSpp();
+        LaporanPembayaran laporanSpp = new LaporanPembayaran();
         java.awt.EventQueue.invokeLater(new Runnable(){
             @Override
             public void run(){
@@ -1208,11 +1261,11 @@ public class DataSiswa extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTentangAppActionPerformed
 
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
-        if(level.equalsIgnoreCase("admin")){
-            
+        if(petugas.isAdmin()){
+            Audio.play(Audio.SOUND_INFO);
+            new TambahDataSiswa(this, true).setVisible(true);
         }else{
-            Audio.play(Audio.SOUND_WARNING);
-            JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk menambahkan sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
+            Message.showWarning(this, "Access Denied!\nPetugas tidak diperbolehkan untuk menambahkan sebuah data!", true);
         }
     }//GEN-LAST:event_btnTambahActionPerformed
 
@@ -1225,16 +1278,16 @@ public class DataSiswa extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTambahMouseExited
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        if(level.equalsIgnoreCase("admin")){
+        if(petugas.isAdmin()){
             if(tabelData.getSelectedRow() > -1){
-                
+                // membuka window edit data
+                Audio.play(Audio.SOUND_INFO);
+                new EditDataSiswa(this, true, this.nisSelected).setVisible(true);
             }else{
-                Audio.play(Audio.SOUND_WARNING);
-                JOptionPane.showMessageDialog(null, "Error!\nTidak ada data yang dipilih!!", "Error!", JOptionPane.ERROR_MESSAGE);
+                Message.showWarning(this, "Tidak ada data yang dipilih!!", true);
             }
         }else{
-            Audio.play(Audio.SOUND_WARNING);
-            JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk mengedit sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
+            Message.showWarning(this, "Access Denied!\nPetugas tidak diperbolehkan untuk mengedit sebuah data!", true);
         }
     }//GEN-LAST:event_btnEditActionPerformed
 
@@ -1247,16 +1300,15 @@ public class DataSiswa extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEditMouseExited
 
     private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
-        if(level.equalsIgnoreCase("admin")){
+        if(petugas.isAdmin()){
             if(tabelData.getSelectedRow() > -1){
-                
+                Audio.play(Audio.SOUND_INFO);
+                new HapusData(this, true, HapusData.DATA_SISWA, this.nisSelected).setVisible(true);
             }else{
-                Audio.play(Audio.SOUND_WARNING);
-                JOptionPane.showMessageDialog(null, "Error!\nTidak ada data yang dipilih!!", "Error!", JOptionPane.ERROR_MESSAGE);
+                Message.showWarning(this, "Tidak ada data yang dipilih!!", true);
             }
         }else{
-            Audio.play(Audio.SOUND_WARNING);
-            JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk menghapus sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
+            Message.showWarning(this, "Access Denied!\nPetugas tidak diperbolehkan untuk mengedit sebuah data!", true);
         }
     }//GEN-LAST:event_btnHapusActionPerformed
 
@@ -1271,12 +1323,12 @@ public class DataSiswa extends javax.swing.JFrame {
     private void inpCariKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inpCariKeyTyped
         String key = this.inpCari.getText();
         this.keyword = "WHERE nis LIKE '%"+key+"%' OR nama_siswa LIKE '%"+key+"%'";
-        System.out.println("key = " + keyword);
-        this.lblTotalData.setText("Menampilkan "+acc.getJumlahData(Database.SISWA, keyword)+" data siswa dengan keyword = \""+key+"\"");
+        this.lblTotalData.setText("Menampilkan "+siswa.getJumlahData(Database.SISWA, keyword)+" data siswa dengan keyword = \""+key+"\"");
         this.updateTabel();
     }//GEN-LAST:event_inpCariKeyTyped
 
     private void tabelDataKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tabelDataKeyPressed
+        this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         if(evt.getKeyCode() == KeyEvent.VK_UP){
             this.nisSelected = this.tabelData.getValueAt(tabelData.getSelectedRow() - 1, 0).toString();
             this.showData();
@@ -1284,27 +1336,62 @@ public class DataSiswa extends javax.swing.JFrame {
             this.nisSelected = this.tabelData.getValueAt(tabelData.getSelectedRow() + 1, 0).toString();
             this.showData();
         }
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }//GEN-LAST:event_tabelDataKeyPressed
 
     private void tabelDataMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelDataMouseClicked
+        this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        // menampilkan data siswa
         this.nisSelected = this.tabelData.getValueAt(tabelData.getSelectedRow(), 0).toString();
         this.showData();
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }//GEN-LAST:event_tabelDataMouseClicked
 
     private void lblPenampilFotoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblPenampilFotoMouseClicked
+        this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         Audio.play(Audio.SOUND_INFO);
-        new PenampilFotoSiswa(this, true, fotoSiswa).setVisible(true);
+        new PenampilFotoSiswa(this, true, siswa.getPhoto(nisSelected, UserPhotoSize.SHOW_FOTO_SISWA)).setVisible(true);
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }//GEN-LAST:event_lblPenampilFotoMouseClicked
 
     private void lblPenampilFotoMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblPenampilFotoMouseEntered
         this.lblPenampilFoto.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.lblPenampilFoto.setText("<html><p style=\"text-decoration:underline;\">Tampilkan Foto</p></html>");
+        this.lblPenampilFoto.setText("<html><p style=\"text-decoration:underline; color:rgb(0,0,255);\">Tampilkan Foto</p></html>");
     }//GEN-LAST:event_lblPenampilFotoMouseEntered
 
     private void lblPenampilFotoMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblPenampilFotoMouseExited
         this.lblPenampilFoto.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        this.lblPenampilFoto.setText("<html><p style=\"text-decoration:none;\">Tampilkan Foto</p></html>");
+        this.lblPenampilFoto.setText("<html><p style=\"text-decoration:none; color:rgb(0,0,0);\">Tampilkan Foto</p></html>");
     }//GEN-LAST:event_lblPenampilFotoMouseExited
+
+    private void valNoHpMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valNoHpMouseClicked
+        Internet net = new Internet();
+        String nomor = noHp.substring(1).replaceAll(" ", "").replaceAll("-", "");
+        if(net.isConnectInternet()){
+            try {
+                net.openLink("https://wa.me/"+nomor);
+            } catch (IOException | URISyntaxException ex) {
+                Message.showException(this, ex, true);
+            }
+        }else{
+            Message.showWarning(this, "Tidak terhubung ke Internet!", true);
+        }
+    }//GEN-LAST:event_valNoHpMouseClicked
+
+    private void valNoHpMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valNoHpMouseEntered
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        this.valNoHp.setText("<html><p style=\"text-decoration:underline; color:rgb(15,98,230);\">:&nbsp;"+noHp+"</p></html>");
+    }//GEN-LAST:event_valNoHpMouseEntered
+
+    private void valNoHpMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valNoHpMouseExited
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        this.valNoHp.setText("<html><p style=\"text-decoration:underline; color:rgb(0,0,0);\">:&nbsp;"+noHp+"</p></html>");
+//        this.valNoHp.setText("<html><p style=\"text-decoration:none; color:rgb(0,0,0);\">:&nbsp;"+noHp+"</p></html>");
+    }//GEN-LAST:event_valNoHpMouseExited
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        Log.addLog("Membuka Window " + getClass().getName());
+    }//GEN-LAST:event_formWindowOpened
 
     public static void main(String args[]) {
 
