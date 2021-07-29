@@ -1,12 +1,19 @@
 package com.window.petugas;
 
-import com.database.Account;
-import com.database.Database;
-import com.database.Kelas;
-import com.database.Transaksi;
+import com.data.app.Application;
+import com.data.db.Database;
+import com.data.app.Kelas;
+import com.data.app.Log;
+import com.data.app.Transaksi;
+import com.manage.Message;
+import com.manage.Text;
 import com.media.Audio;
 import com.media.Gambar;
 import com.sun.glass.events.KeyEvent;
+import com.users.Users;
+import com.window.admin.EditDataKelas;
+import com.window.admin.HapusData;
+import com.window.admin.TambahDataKelas;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -14,7 +21,6 @@ import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -23,24 +29,35 @@ import javax.swing.JOptionPane;
  */
 public class DataKelas extends javax.swing.JFrame {
     
-    private final Account acc = new Account(), getJumlah = new Account();
+    private final Users.LevelPetugas petugas = Users.levelPetugas();
     private final Kelas kls = new Kelas();
     private final Transaksi tr = new Transaksi();
-    private final String name, foto, level;
+    private final Text txt = new Text();
+    
+    private final String name;
     private String idSelected = "", keyword = "", namaKelas, levelKelas, jurusan, totalSiswa, sppDibayar;
     private int x, y;
     
     public DataKelas() {
         initComponents();
-        
-        idSelected = "xii.rpl1";
-        name = acc.getDataAkun(acc.getLogin(), "nama_petugas");
-        foto = acc.getProfile(acc.getLogin());
-        level = acc.getDataAkun(acc.getLogin(), "level");
-        
         this.setLocationRelativeTo(null);
         this.setIconImage(Gambar.getWindowIcon());
+        
+        idSelected = "xii.rpl1";
+        
+        // menampilkan data-data aplikasi
+        this.lblSekolah.setIcon(Gambar.getTopIcon());
+        this.lblSekolah.setText(Application.getCompany() + " | " + Application.getNama());
+        this.lblVersion.setText("Versi " + Application.getVersi());
+        this.lblCopyright.setText(Application.getRightReserved());
+        this.lblPhotoProfile.setIcon(petugas.getPhotoProfile());
+        
+        // mendapatkan dan menampilkan data dari petugas
+        name = txt.toCapitalize(petugas.getNama());        
         this.lblNamaUser.setText("<html><p>"+name+"</p></html>");
+        this.lblTotalData.setText("Menampilkan "+kls.getTotalKelas()+" data kelas.");
+        
+        // mengatur ui dari button
         this.btnDashboard.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnInfoAkun.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnDataPetugas.setUI(new javax.swing.plaf.basic.BasicButtonUI());
@@ -55,8 +72,7 @@ public class DataKelas extends javax.swing.JFrame {
         this.btnTambah.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnEdit.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnHapus.setUI(new javax.swing.plaf.basic.BasicButtonUI());
-        this.lblPhotoProfile.setIcon(Gambar.scaleImage(new java.io.File(foto), lblPhotoProfile.getWidth(), lblPhotoProfile.getHeight()));
-        this.lblSekolah.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts-circle.png"), 35, 35));     
+        this.btnDaftarSiswa.setUI(new javax.swing.plaf.basic.BasicButtonUI());
 
         this.tabelData.setRowHeight(29);
         this.tabelData.getTableHeader().setBackground(new java.awt.Color(255,255,255));
@@ -99,7 +115,8 @@ public class DataKelas extends javax.swing.JFrame {
         }
         
         JLabel[] lbls = new JLabel[]{
-            this.valId, this.valNama, this.valLevel, this.valJurusan, this.valTotalSiswa, this.valSppDibayar
+            this.valId, this.valNama, this.valLevel, this.valJurusan, this.valTotalSiswa, this.valSiswaLunas, 
+            this.valSiswaBelumLunas, this.valPresentase, this.valSppDibayar, this.valWaliKelas, this.valKetuaKelas
         };
         
         for(JLabel lbl : lbls){
@@ -123,7 +140,7 @@ public class DataKelas extends javax.swing.JFrame {
                 @Override
                 public void mouseEntered(MouseEvent e) {
                     setCursor(new Cursor(Cursor.HAND_CURSOR));
-                    lbl.setForeground(new Color(5,170,57));
+                    lbl.setForeground(new Color(15,98,230));
                 }
 
                 @Override
@@ -144,24 +161,22 @@ public class DataKelas extends javax.swing.JFrame {
             int rows = 0;
             String sql = "SELECT id_kelas, nama_kelas, jurusan FROM kelas " + keyword, id;
             // mendefinisikan object berdasarkan total rows dan cols yang ada didalam tabel
-            obj = new Object[acc.getJumlahData(Database.KELAS, keyword)][4];
+            obj = new Object[petugas.getJumlahData(Database.KELAS, keyword)][4];
             // mengeksekusi query
-            acc.res = acc.stat.executeQuery(sql);
+            petugas.res = petugas.stat.executeQuery(sql);
             // mendapatkan semua data yang ada didalam tabel
-            while(acc.res.next()){
+            while(petugas.res.next()){
                 // menyimpan data dari tabel ke object
-                id = acc.res.getString("id_kelas");
+                id = petugas.res.getString("id_kelas");
                 obj[rows][0] = id;
-                obj[rows][1] = acc.res.getString("nama_kelas");
-                obj[rows][2] = acc.res.getString("jurusan");
-                obj[rows][3] = getJumlah.getJumlahData(Database.SISWA, "WHERE id_kelas = '" + id + "'") + " Siswa";
-                System.out.println(rows);
+                obj[rows][1] = petugas.res.getString("nama_kelas");
+                obj[rows][2] = petugas.res.getString("jurusan");
+                obj[rows][3] = kls.getJumlahData(Database.SISWA, "WHERE id_kelas = '" + id + "'") + " Siswa";
                 rows++; // rows akan bertambah 1 setiap selesai membaca 1 row pada tabel
             }
             return obj;
         }catch(SQLException ex){
-            Audio.play(Audio.SOUND_ERROR);
-            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat mengambil data dari database\n" + ex.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+            Message.showException(this, "Terjadi kesalahan saat mengambil data dari database\n", ex, true);
         }
         return null;
     }
@@ -170,7 +185,7 @@ public class DataKelas extends javax.swing.JFrame {
         this.tabelData.setModel(new javax.swing.table.DefaultTableModel(
             getData(),
             new String [] {
-                "ID Kelsa", "Nama Kelas", "Jurusan", "Total Siswa"
+                "ID Kelas", "Nama Kelas", "Jurusan", "Total Siswa"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -187,9 +202,9 @@ public class DataKelas extends javax.swing.JFrame {
     private void showData(){
         this.namaKelas = kls.getNamaKelas(idSelected).replaceAll("-", " ");
         this.levelKelas = kls.getLevelName(idSelected);
-        this.jurusan = kls.getJurusanName(idSelected);
-        this.totalSiswa = "" + getJumlah.getJumlahData(Database.SISWA, "WHERE id_kelas = '"+idSelected+"'") + " Siswa";
-        this.sppDibayar = tr.addRp(tr.getTotalSppDibayarKelas(idSelected));
+        this.jurusan = kls.getJurusanName(idSelected); 
+        this.totalSiswa = ""+kls.getTotalSiswa(idSelected) + " Siswa";
+        this.sppDibayar = tr.addRp(tr.getTotalSppDibayarByKelas(idSelected, Application.getTahunAjaran()));
         
         this.valId.setText("<html><p>:&nbsp;"+idSelected+"</p></html>");
         this.valNama.setText("<html><p>:&nbsp;"+namaKelas+"</p></html>");
@@ -233,14 +248,26 @@ public class DataKelas extends javax.swing.JFrame {
         lblNama = new javax.swing.JLabel();
         lblJurusankelas = new javax.swing.JLabel();
         lblLevelKelas = new javax.swing.JLabel();
-        lblSppDibayar = new javax.swing.JLabel();
+        lblSiswaLunas = new javax.swing.JLabel();
         lblTotalSiswa = new javax.swing.JLabel();
         valId = new javax.swing.JLabel();
         valNama = new javax.swing.JLabel();
         valLevel = new javax.swing.JLabel();
         valJurusan = new javax.swing.JLabel();
         valTotalSiswa = new javax.swing.JLabel();
+        valSiswaLunas = new javax.swing.JLabel();
+        lblSiswaBelumLunas = new javax.swing.JLabel();
+        valSiswaBelumLunas = new javax.swing.JLabel();
+        lblPresentase = new javax.swing.JLabel();
+        valPresentase = new javax.swing.JLabel();
+        lblSppDibayar = new javax.swing.JLabel();
         valSppDibayar = new javax.swing.JLabel();
+        lblWaliKelas = new javax.swing.JLabel();
+        valWaliKelas = new javax.swing.JLabel();
+        lblKetuaKelas = new javax.swing.JLabel();
+        valKetuaKelas = new javax.swing.JLabel();
+        lineInfo = new javax.swing.JSeparator();
+        btnDaftarSiswa = new javax.swing.JButton();
         lblCari = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelData = new javax.swing.JTable();
@@ -253,17 +280,6 @@ public class DataKelas extends javax.swing.JFrame {
         btnHapus = new javax.swing.JButton();
         lblVersion = new javax.swing.JLabel();
         lblCopyright = new javax.swing.JLabel();
-        pnlManipulasiKelas = new javax.swing.JPanel();
-        pnlInfoKemananTitle = new javax.swing.JPanel();
-        lblInfoKeamanan = new javax.swing.JLabel();
-        lblIdKelas = new javax.swing.JLabel();
-        lblNamaKelas = new javax.swing.JLabel();
-        inpID = new javax.swing.JTextField();
-        inpNamaKelas = new javax.swing.JTextField();
-        inpLevel = new javax.swing.JComboBox();
-        inpJurusan = new javax.swing.JComboBox();
-        lblLevel = new javax.swing.JLabel();
-        lblJurusan = new javax.swing.JLabel();
         lblBgImage = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -271,6 +287,9 @@ public class DataKelas extends javax.swing.JFrame {
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
+            }
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
             }
         });
 
@@ -589,7 +608,7 @@ public class DataKelas extends javax.swing.JFrame {
 
         lblSekolah.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         lblSekolah.setForeground(new java.awt.Color(255, 255, 255));
-        lblSekolah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-nav-logosekolah.png"))); // NOI18N
+        lblSekolah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/logo-smkn1kts-circle_35x35.png"))); // NOI18N
         lblSekolah.setText("SMK Negeri 1 Kertosono | Aplikasi Pembayaran SPP");
         lblSekolah.setIconTextGap(13);
 
@@ -618,15 +637,15 @@ public class DataKelas extends javax.swing.JFrame {
 
         lblDashboard.setFont(new java.awt.Font("Ebrima", 1, 21)); // NOI18N
         lblDashboard.setForeground(new java.awt.Color(22, 19, 19));
-        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-datapetugas-logo.png"))); // NOI18N
+        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-window-datakelas-logo.png"))); // NOI18N
         lblDashboard.setText("Data Kelas");
         lblDashboard.setIconTextGap(6);
         pnlMain.add(lblDashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 64, 400, -1));
 
         pnlInfoData.setBackground(new java.awt.Color(255, 255, 255));
-        pnlInfoData.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(5, 170, 57), 2));
+        pnlInfoData.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(15, 98, 230), 2));
 
-        pnlTitleInfo.setBackground(new java.awt.Color(5, 170, 57));
+        pnlTitleInfo.setBackground(new java.awt.Color(15, 98, 230));
         pnlTitleInfo.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
         lblTitleInfo.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
@@ -647,40 +666,113 @@ public class DataKelas extends javax.swing.JFrame {
         );
 
         lblID.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblID.setForeground(new java.awt.Color(0, 0, 0));
         lblID.setText("ID Kelas");
 
         lblNama.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblNama.setForeground(new java.awt.Color(0, 0, 0));
         lblNama.setText("Nama Kelas");
 
         lblJurusankelas.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblJurusankelas.setForeground(new java.awt.Color(0, 0, 0));
         lblJurusankelas.setText("Jurusan ");
 
         lblLevelKelas.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblLevelKelas.setForeground(new java.awt.Color(0, 0, 0));
         lblLevelKelas.setText("Level Kelas");
 
-        lblSppDibayar.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblSppDibayar.setText("Total SPP Dibayar");
+        lblSiswaLunas.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblSiswaLunas.setForeground(new java.awt.Color(0, 0, 0));
+        lblSiswaLunas.setText("Siswa Lunas");
 
         lblTotalSiswa.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblTotalSiswa.setForeground(new java.awt.Color(0, 0, 0));
         lblTotalSiswa.setText("Total Siswa");
 
         valId.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valId.setForeground(new java.awt.Color(0, 0, 0));
         valId.setText(": xii.rpl1");
 
         valNama.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valNama.setForeground(new java.awt.Color(0, 0, 0));
         valNama.setText(": XII RPL 1");
 
         valLevel.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valLevel.setForeground(new java.awt.Color(0, 0, 0));
         valLevel.setText(": XII (dua belas)");
 
         valJurusan.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valJurusan.setForeground(new java.awt.Color(0, 0, 0));
         valJurusan.setText(": Rekayasa Perangkat Lunak");
 
         valTotalSiswa.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valTotalSiswa.setForeground(new java.awt.Color(0, 0, 0));
         valTotalSiswa.setText(": 35 Siswa");
 
+        valSiswaLunas.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valSiswaLunas.setForeground(new java.awt.Color(0, 0, 0));
+        valSiswaLunas.setText(": 15 Siswa");
+
+        lblSiswaBelumLunas.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblSiswaBelumLunas.setForeground(new java.awt.Color(0, 0, 0));
+        lblSiswaBelumLunas.setText("Siswa Belum Lunas");
+
+        valSiswaBelumLunas.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valSiswaBelumLunas.setForeground(new java.awt.Color(0, 0, 0));
+        valSiswaBelumLunas.setText(": 20 Siswa");
+
+        lblPresentase.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblPresentase.setForeground(new java.awt.Color(0, 0, 0));
+        lblPresentase.setText("Presentase Lunas");
+
+        valPresentase.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valPresentase.setForeground(new java.awt.Color(0, 0, 0));
+        valPresentase.setText(": 40%");
+
+        lblSppDibayar.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblSppDibayar.setForeground(new java.awt.Color(0, 0, 0));
+        lblSppDibayar.setText("Total SPP DIbayar");
+
         valSppDibayar.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valSppDibayar.setForeground(new java.awt.Color(0, 0, 0));
         valSppDibayar.setText(": Rp. 7.970.000.00");
+
+        lblWaliKelas.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblWaliKelas.setForeground(new java.awt.Color(0, 0, 0));
+        lblWaliKelas.setText("Wali Kelas");
+
+        valWaliKelas.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valWaliKelas.setForeground(new java.awt.Color(0, 0, 0));
+        valWaliKelas.setText(": Manusai K0bd");
+
+        lblKetuaKelas.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblKetuaKelas.setForeground(new java.awt.Color(0, 0, 0));
+        lblKetuaKelas.setText("Ketua Kelas");
+
+        valKetuaKelas.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valKetuaKelas.setForeground(new java.awt.Color(0, 0, 0));
+        valKetuaKelas.setText(": Achmad Baihaqi");
+
+        lineInfo.setBackground(new java.awt.Color(15, 98, 230));
+        lineInfo.setForeground(new java.awt.Color(15, 98, 230));
+
+        btnDaftarSiswa.setBackground(new java.awt.Color(231, 77, 40));
+        btnDaftarSiswa.setForeground(new java.awt.Color(255, 255, 255));
+        btnDaftarSiswa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-daftarpengguna.png"))); // NOI18N
+        btnDaftarSiswa.setText("Daftar Siswa");
+        btnDaftarSiswa.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnDaftarSiswaMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnDaftarSiswaMouseExited(evt);
+            }
+        });
+        btnDaftarSiswa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDaftarSiswaActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlInfoDataLayout = new javax.swing.GroupLayout(pnlInfoData);
         pnlInfoData.setLayout(pnlInfoDataLayout);
@@ -708,12 +800,32 @@ public class DataKelas extends javax.swing.JFrame {
                         .addComponent(valLevel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
                         .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(lblSppDibayar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblTotalSiswa, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE))
+                            .addComponent(lblSiswaLunas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblTotalSiswa, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
+                            .addComponent(lblSppDibayar, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
+                            .addComponent(lblWaliKelas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblKetuaKelas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(valTotalSiswa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(valSppDibayar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(valSiswaLunas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(valSppDibayar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(valWaliKelas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(valKetuaKelas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(pnlInfoDataLayout.createSequentialGroup()
+                        .addComponent(lblSiswaBelumLunas, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(valSiswaBelumLunas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(pnlInfoDataLayout.createSequentialGroup()
+                        .addComponent(lblPresentase, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(valPresentase, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(24, Short.MAX_VALUE))
+            .addGroup(pnlInfoDataLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lineInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 475, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnDaftarSiswa, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlInfoDataLayout.setVerticalGroup(
@@ -742,12 +854,36 @@ public class DataKelas extends javax.swing.JFrame {
                     .addComponent(valTotalSiswa))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblSiswaLunas)
+                    .addComponent(valSiswaLunas))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblSiswaBelumLunas)
+                    .addComponent(valSiswaBelumLunas))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblPresentase)
+                    .addComponent(valPresentase))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblSppDibayar)
                     .addComponent(valSppDibayar))
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblWaliKelas)
+                    .addComponent(valWaliKelas))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblKetuaKelas)
+                    .addComponent(valKetuaKelas))
+                .addGap(18, 18, 18)
+                .addComponent(lineInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnDaftarSiswa)
+                .addContainerGap(10, Short.MAX_VALUE))
         );
 
-        pnlMain.add(pnlInfoData, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 140, 510, 250));
+        pnlMain.add(pnlInfoData, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 140, 510, 470));
 
         lblCari.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         lblCari.setForeground(new java.awt.Color(237, 12, 12));
@@ -756,6 +892,7 @@ public class DataKelas extends javax.swing.JFrame {
         pnlMain.add(lblCari, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 130, 210, 30));
 
         tabelData.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
+        tabelData.setForeground(new java.awt.Color(0, 0, 0));
         tabelData.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {"x.rpl1", "X RPL 1", "RPL", "35 Siswa"},
@@ -792,6 +929,7 @@ public class DataKelas extends javax.swing.JFrame {
         pnlMain.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 170, 440, 440));
 
         inpCari.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        inpCari.setForeground(new java.awt.Color(0, 0, 0));
         inpCari.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 inpCariKeyTyped(evt);
@@ -809,11 +947,11 @@ public class DataKelas extends javax.swing.JFrame {
         pnlMain.add(lineBottom, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 640, 1010, 10));
 
         lblTotalData.setFont(new java.awt.Font("Dialog", 1, 11)); // NOI18N
+        lblTotalData.setForeground(new java.awt.Color(0, 0, 0));
         lblTotalData.setText("Menampilkan 20 data kelas dengan keyword = \"\"");
         pnlMain.add(lblTotalData, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 615, 440, 20));
 
         btnTambah.setBackground(new java.awt.Color(41, 180, 50));
-        btnTambah.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         btnTambah.setForeground(new java.awt.Color(255, 255, 255));
         btnTambah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-tambah.png"))); // NOI18N
         btnTambah.setText("Tambah Data");
@@ -833,7 +971,6 @@ public class DataKelas extends javax.swing.JFrame {
         pnlMain.add(btnTambah, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 660, 130, -1));
 
         btnEdit.setBackground(new java.awt.Color(34, 119, 237));
-        btnEdit.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         btnEdit.setForeground(new java.awt.Color(255, 255, 255));
         btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-edit.png"))); // NOI18N
         btnEdit.setText("Edit Data");
@@ -853,7 +990,6 @@ public class DataKelas extends javax.swing.JFrame {
         pnlMain.add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 660, 110, -1));
 
         btnHapus.setBackground(new java.awt.Color(220, 41, 41));
-        btnHapus.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         btnHapus.setForeground(new java.awt.Color(255, 255, 255));
         btnHapus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-hapus.png"))); // NOI18N
         btnHapus.setText("Hapus Data");
@@ -873,104 +1009,16 @@ public class DataKelas extends javax.swing.JFrame {
         pnlMain.add(btnHapus, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 660, 120, -1));
 
         lblVersion.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
+        lblVersion.setForeground(new java.awt.Color(0, 0, 0));
         lblVersion.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblVersion.setText("Version 1.0.0");
         pnlMain.add(lblVersion, new org.netbeans.lib.awtextra.AbsoluteConstraints(900, 660, 370, -1));
 
         lblCopyright.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
+        lblCopyright.setForeground(new java.awt.Color(0, 0, 0));
         lblCopyright.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblCopyright.setText("Copyright © 2021. Achmad Baihaqi. All Rights Reserved.");
         pnlMain.add(lblCopyright, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 680, 390, -1));
-
-        pnlManipulasiKelas.setBackground(new java.awt.Color(255, 255, 255));
-        pnlManipulasiKelas.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(15, 98, 230), 2));
-
-        pnlInfoKemananTitle.setBackground(new java.awt.Color(15, 98, 230));
-        pnlInfoKemananTitle.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-
-        lblInfoKeamanan.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
-        lblInfoKeamanan.setForeground(new java.awt.Color(255, 255, 255));
-        lblInfoKeamanan.setText("Tambah / Edit Kelas");
-
-        javax.swing.GroupLayout pnlInfoKemananTitleLayout = new javax.swing.GroupLayout(pnlInfoKemananTitle);
-        pnlInfoKemananTitle.setLayout(pnlInfoKemananTitleLayout);
-        pnlInfoKemananTitleLayout.setHorizontalGroup(
-            pnlInfoKemananTitleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlInfoKemananTitleLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblInfoKeamanan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        pnlInfoKemananTitleLayout.setVerticalGroup(
-            pnlInfoKemananTitleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(lblInfoKeamanan, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-        );
-
-        lblIdKelas.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblIdKelas.setText("ID Kelas");
-
-        lblNamaKelas.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblNamaKelas.setText("Nama Kelas");
-
-        inpID.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-
-        inpNamaKelas.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-
-        inpLevel.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        inpLevel.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "X (sepuluh)", "XI (sebelas)", "XII (dua belas)", "XIII (tiga belas)" }));
-
-        inpJurusan.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        inpJurusan.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Teknik Pemesinan", "Teknik Instalasi Tenaga Listrik", "Teknik Otomasi Industri", "Tata Boga", "Tata Busana", "Rekayasa Perangkat Lunak" }));
-
-        lblLevel.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblLevel.setText("Level Kelas");
-
-        lblJurusan.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblJurusan.setText("Jurusan");
-
-        javax.swing.GroupLayout pnlManipulasiKelasLayout = new javax.swing.GroupLayout(pnlManipulasiKelas);
-        pnlManipulasiKelas.setLayout(pnlManipulasiKelasLayout);
-        pnlManipulasiKelasLayout.setHorizontalGroup(
-            pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlInfoKemananTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlManipulasiKelasLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblNamaKelas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblIdKelas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblLevel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
-                    .addComponent(lblJurusan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(inpID)
-                    .addComponent(inpNamaKelas)
-                    .addComponent(inpLevel, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(inpJurusan, 0, 318, Short.MAX_VALUE))
-                .addGap(29, 29, 29))
-        );
-        pnlManipulasiKelasLayout.setVerticalGroup(
-            pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlManipulasiKelasLayout.createSequentialGroup()
-                .addComponent(pnlInfoKemananTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblIdKelas, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(inpID, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblNamaKelas, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(inpNamaKelas, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lblLevel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(inpLevel, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlManipulasiKelasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(inpJurusan, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
-                    .addComponent(lblJurusan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(20, Short.MAX_VALUE))
-        );
-
-        pnlMain.add(pnlManipulasiKelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 410, 510, 210));
 
         lblBgImage.setBackground(new java.awt.Color(41, 52, 71));
         pnlMain.add(lblBgImage, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1310, 710));
@@ -994,9 +1042,10 @@ public class DataKelas extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        acc.closeConnection();
-        getJumlah.closeConnection();
+        tr.closeConnection();
+        petugas.closeConnection();
         kls.closeConnection();
+        Log.addLog("Menutup Window " + getClass().getName());
     }//GEN-LAST:event_formWindowClosed
 
     private void pnlMainMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlMainMousePressed
@@ -1011,7 +1060,7 @@ public class DataKelas extends javax.swing.JFrame {
     }//GEN-LAST:event_pnlMainMouseDragged
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        System.exit(0);
+        Application.closeApplication();
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnCloseMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCloseMouseEntered
@@ -1166,7 +1215,7 @@ public class DataKelas extends javax.swing.JFrame {
 
     private void btnLaporanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLaporanActionPerformed
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        LaporanSpp laporanSpp = new LaporanSpp();
+        LaporanPembayaran laporanSpp = new LaporanPembayaran();
         java.awt.EventQueue.invokeLater(new Runnable(){
             @Override
             public void run(){
@@ -1191,11 +1240,11 @@ public class DataKelas extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTentangAppActionPerformed
 
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
-        if(level.equalsIgnoreCase("admin")){
-            
+        if(petugas.isAdmin()){
+            Audio.play(Audio.SOUND_INFO);
+            new TambahDataKelas(this, true).setVisible(true);
         }else{
-            Audio.play(Audio.SOUND_WARNING);
-            JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk menambahkan sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
+            Message.showWarning(this, "Access Denied!\nPetugas tidak diperbolehkan untuk menambahkan sebuah data!", true);
         }
     }//GEN-LAST:event_btnTambahActionPerformed
 
@@ -1208,16 +1257,15 @@ public class DataKelas extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTambahMouseExited
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        if(level.equalsIgnoreCase("admin")){
+        if(petugas.isAdmin()){
             if(tabelData.getSelectedRow() > -1){
-                
+                Audio.play(Audio.SOUND_INFO);
+                new EditDataKelas(this, true, this.idSelected).setVisible(true);
             }else{
-                Audio.play(Audio.SOUND_WARNING);
-                JOptionPane.showMessageDialog(null, "Error!\nTidak ada data yang dipilih!!", "Error!", JOptionPane.ERROR_MESSAGE);
+                Message.showWarning(this, "Tidak ada data yang dipilih!!", true);
             }
         }else{
-            Audio.play(Audio.SOUND_WARNING);
-            JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk mengedit sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
+            Message.showWarning(this, "Access Denied!\nPetugas tidak diperbolehkan untuk mengedit sebuah data!", true);
         }
     }//GEN-LAST:event_btnEditActionPerformed
 
@@ -1230,16 +1278,15 @@ public class DataKelas extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEditMouseExited
 
     private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
-        if(level.equalsIgnoreCase("admin")){
+        if(petugas.isAdmin()){
             if(tabelData.getSelectedRow() > -1){
-                
+                Audio.play(Audio.SOUND_INFO);
+                new HapusData(this, true, HapusData.DATA_KELAS, this.idSelected).setVisible(true);
             }else{
-                Audio.play(Audio.SOUND_WARNING);
-                JOptionPane.showMessageDialog(null, "Error!\nTidak ada data yang dipilih!!", "Error!", JOptionPane.ERROR_MESSAGE);
+                Message.showWarning(this, "Tidak ada data yang dipilih!!", true);
             }
         }else{
-            Audio.play(Audio.SOUND_WARNING);
-            JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk menghapus sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
+            Message.showWarning(this, "Access Denied!\nPetugas tidak diperbolehkan untuk menghapus sebuah data!", true);
         }
     }//GEN-LAST:event_btnHapusActionPerformed
 
@@ -1254,12 +1301,12 @@ public class DataKelas extends javax.swing.JFrame {
     private void inpCariKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inpCariKeyTyped
         String key = this.inpCari.getText();
         this.keyword = "WHERE id_kelas LIKE '%"+key+"%' OR nama_kelas LIKE '%"+key+"%'";
-        System.out.println("key = " + keyword);
-        this.lblTotalData.setText("Menampilkan "+acc.getJumlahData(Database.KELAS, keyword)+" data kelas dengan keyword = \""+key+"\"");
+        this.lblTotalData.setText("Menampilkan "+petugas.getJumlahData(Database.KELAS, keyword)+" data kelas dengan keyword = \""+key+"\"");
         this.updateTabel();
     }//GEN-LAST:event_inpCariKeyTyped
 
     private void tabelDataKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tabelDataKeyPressed
+        this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         if(evt.getKeyCode() == KeyEvent.VK_UP){
             this.idSelected = this.tabelData.getValueAt(tabelData.getSelectedRow() - 1, 0).toString();
             this.showData();
@@ -1267,12 +1314,37 @@ public class DataKelas extends javax.swing.JFrame {
             this.idSelected = this.tabelData.getValueAt(tabelData.getSelectedRow() + 1, 0).toString();
             this.showData();
         }
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }//GEN-LAST:event_tabelDataKeyPressed
 
     private void tabelDataMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelDataMouseClicked
+        this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        // menampilkan data kelas
         this.idSelected = this.tabelData.getValueAt(tabelData.getSelectedRow(), 0).toString();
         this.showData();
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }//GEN-LAST:event_tabelDataMouseClicked
+
+    private void btnDaftarSiswaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDaftarSiswaActionPerformed
+        if(tabelData.getSelectedRow() > -1){
+            Audio.play(Audio.SOUND_INFO);
+            new DaftarSiswa(this, true, this.idSelected).setVisible(true);
+        }else{
+            Message.showWarning(this, "Tidak ada data yang dipilih!!", true);
+        }
+    }//GEN-LAST:event_btnDaftarSiswaActionPerformed
+
+    private void btnDaftarSiswaMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnDaftarSiswaMouseEntered
+        this.btnDaftarSiswa.setIcon(Gambar.getIcon("ic-daftarpengguna-entered.png"));
+    }//GEN-LAST:event_btnDaftarSiswaMouseEntered
+
+    private void btnDaftarSiswaMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnDaftarSiswaMouseExited
+        this.btnDaftarSiswa.setIcon(Gambar.getIcon("ic-daftarpengguna.png"));
+    }//GEN-LAST:event_btnDaftarSiswaMouseExited
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        Log.addLog("Membuka Window " + getClass().getName());
+    }//GEN-LAST:event_formWindowOpened
 
     public static void main(String args[]) {
 
@@ -1297,6 +1369,7 @@ public class DataKelas extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
+    private javax.swing.JButton btnDaftarSiswa;
     private javax.swing.JButton btnDashboard;
     private javax.swing.JButton btnDataKelas;
     private javax.swing.JButton btnDataPetugas;
@@ -1311,27 +1384,22 @@ public class DataKelas extends javax.swing.JFrame {
     private javax.swing.JButton btnTambah;
     private javax.swing.JButton btnTentangApp;
     private javax.swing.JTextField inpCari;
-    private javax.swing.JTextField inpID;
-    private javax.swing.JComboBox inpJurusan;
-    private javax.swing.JComboBox inpLevel;
-    private javax.swing.JTextField inpNamaKelas;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblBgImage;
     private javax.swing.JLabel lblCari;
     private javax.swing.JLabel lblCopyright;
     private javax.swing.JLabel lblDashboard;
     private javax.swing.JLabel lblID;
-    private javax.swing.JLabel lblIdKelas;
-    private javax.swing.JLabel lblInfoKeamanan;
-    private javax.swing.JLabel lblJurusan;
     private javax.swing.JLabel lblJurusankelas;
-    private javax.swing.JLabel lblLevel;
+    private javax.swing.JLabel lblKetuaKelas;
     private javax.swing.JLabel lblLevelKelas;
     private javax.swing.JLabel lblNama;
-    private javax.swing.JLabel lblNamaKelas;
     private javax.swing.JLabel lblNamaUser;
     private javax.swing.JLabel lblPhotoProfile;
+    private javax.swing.JLabel lblPresentase;
     private javax.swing.JLabel lblSekolah;
+    private javax.swing.JLabel lblSiswaBelumLunas;
+    private javax.swing.JLabel lblSiswaLunas;
     private javax.swing.JLabel lblSppDibayar;
     private javax.swing.JLabel lblTipeAkun;
     private javax.swing.JLabel lblTitleInfo;
@@ -1339,14 +1407,14 @@ public class DataKelas extends javax.swing.JFrame {
     private javax.swing.JLabel lblTotalData;
     private javax.swing.JLabel lblTotalSiswa;
     private javax.swing.JLabel lblVersion;
+    private javax.swing.JLabel lblWaliKelas;
     private javax.swing.JSeparator lineBottom;
     private javax.swing.JSeparator lineCenter;
+    private javax.swing.JSeparator lineInfo;
     private javax.swing.JPanel pnlAccount;
     private javax.swing.JPanel pnlInfoData;
-    private javax.swing.JPanel pnlInfoKemananTitle;
     private javax.swing.JPanel pnlLeftBottom;
     private javax.swing.JPanel pnlMain;
-    private javax.swing.JPanel pnlManipulasiKelas;
     private javax.swing.JPanel pnlTitle;
     private javax.swing.JPanel pnlTitleInfo;
     private javax.swing.JPanel pnlTop;
@@ -1354,9 +1422,14 @@ public class DataKelas extends javax.swing.JFrame {
     private javax.swing.JTable tabelData;
     private javax.swing.JLabel valId;
     private javax.swing.JLabel valJurusan;
+    private javax.swing.JLabel valKetuaKelas;
     private javax.swing.JLabel valLevel;
     private javax.swing.JLabel valNama;
+    private javax.swing.JLabel valPresentase;
+    private javax.swing.JLabel valSiswaBelumLunas;
+    private javax.swing.JLabel valSiswaLunas;
     private javax.swing.JLabel valSppDibayar;
     private javax.swing.JLabel valTotalSiswa;
+    private javax.swing.JLabel valWaliKelas;
     // End of variables declaration//GEN-END:variables
 }
