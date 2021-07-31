@@ -186,8 +186,12 @@ public class Text {
      *         <strong>False</strong> Otherwise.
      */
     public boolean isNumber(String str){
+        // jika input null maka akan mengembalikan nilai false
+        if(str == null){
+            return false;
+        }
         try{
-            Integer.parseInt(this.removeDelim(str));
+            Long.parseLong(this.removeDelim(str));
             return true;
         }catch(NumberFormatException ex){
             return false;
@@ -248,6 +252,44 @@ public class Text {
      */
     public String removeDelim(String num){
         return num.replaceAll("_", "").replaceAll(",", "").replaceAll("\\.", "");
+    }
+    
+    /**
+     * Method ini digunakan untuk mendapatkan kode gender dari user berdasarkan nama gender yang diinputkan. 
+     * Hanya terdapat 2 nama gender yang ada di aplikasi ini yaitu Laki-Laki dan Perempuan. Laki-Laki bearti L 
+     * dan Perempuan bearti P. Jika input yang dimasukan bukan dari kedua nama gender tersebut maka method akan mengembalikan 
+     * nilai Tidak Dicantumkan.
+     * 
+     * @param genderName nama dari kode geder.
+     * @return kode gender.
+     */
+    public String getGenderCode(String genderName){
+        if(genderName.equalsIgnoreCase("Laki-Laki")){
+            return "L";
+        }else if(genderName.equalsIgnoreCase("Perempuan")){
+            return "P";
+        }else{
+            return "N";
+        }
+    }
+    
+    /**
+     * Method ini digunakan untuk mendapatkan nama gender dari user berdasarkan kode gender yang diinputkan. 
+     * Hanya terdapat 2 kode gender yang ada di aplikasi ini yaitu L dan P. L bearti Laki-Laki dan P bearti 
+     * Perempuan. Jika input yang dimasukan bukan dari kedua kode tersebut maka method akan mengembalikan 
+     * nilai Tidak Dicantumkan.
+     * 
+     * @param gender kode geder.
+     * @return nama gender.
+     */
+    public String getGenderName(String gender){
+        if(gender.equalsIgnoreCase("L")){
+            return "Laki-Laki";
+        }else if(gender.equalsIgnoreCase("P")){
+            return "Perempuan";
+        }else{
+            return "Tidak Dicantumkan";
+        }
     }
     
     /**
@@ -337,7 +379,7 @@ public class Text {
         // mengecek apakah input adalah sebuah number atau tidak
         if(this.isNumber(money)){
             // mengubah menjadi money case
-            return String.format("Rp. %,d.00", Integer.parseInt(money));
+            return String.format("Rp. %,d.00", Long.parseLong(money));
         }
         // jika input bukan sebuah number maka akan mengembalikan nilai 'Rp. -1.00'
         return "Rp. -1.00";
