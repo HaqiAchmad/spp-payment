@@ -1,17 +1,21 @@
 package com.window.siswa;
 
-import com.database.Account;
-import com.database.Kelas;
-import com.database.Transaksi;
+import com.data.app.Application;
+import com.data.app.Kelas;
+import com.data.app.Log;
+import com.data.app.Transaksi;
+import com.manage.Message;
+import com.manage.Text;
 import com.media.Gambar;
-import com.media.Waktu;
+import com.manage.Waktu;
+import com.users.UserPhotoSize;
+import com.users.Users;
 
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 /**
  * 
@@ -20,54 +24,66 @@ import javax.swing.JOptionPane;
  */
 public class DashboardSiswa extends javax.swing.JFrame {
     
-    private final Account acc = new Account();
+    private final Users.LevelSiswa siswa = Users.levelSiswa();
     private final Transaksi tr = new Transaksi();
     private final Kelas kls = new Kelas();
     private final Waktu waktu = new Waktu();
-    private final String userLogin, nis, nama, gender, kelas, email, wali, nominalSpp, sppDibayar , kekuranganSpp, foto;
+    private final Text txt = new Text();
+    
+    private boolean isVisible = true;
+    private final String currentLogin, nama, gender, kelas, levelKelas, email, wali, nominalSpp, sppDibayar , kekuranganSpp;
     private int x, y;
     
     public DashboardSiswa() {
         initComponents();
+        this.setLocationRelativeTo(null);
+        this.setIconImage(Gambar.getWindowIcon());
         
-        userLogin = acc.getLogin();
-        nis = userLogin;
-        nama = acc.getDataAkun(userLogin, "nama_siswa");
-        gender = acc.getDataAkun(userLogin, "gender");
-        kelas = kls.getNamaKelas(acc.getDataAkun(userLogin, "id_kelas")).replaceAll("-", " ");
-        email = acc.getDataAkun(userLogin, "email");
-        wali = acc.getDataAkun(userLogin, "nama_wali");
-        nominalSpp = tr.addRp(tr.getNominalSpp(Integer.parseInt(acc.getDataAkun(userLogin, "id_spp"))));
-        sppDibayar = tr.addRp(tr.sppDibayar(Integer.parseInt(nis), "2020-2021"));
-        kekuranganSpp = tr.addRp(tr.kekuranganSpp(Integer.parseInt(nis), "2020-2021"));
-        foto = acc.getProfile(Integer.parseInt(nis));
+        // mendapatkan data-data dari siswa
+        currentLogin = siswa.getCurrentLogin();
+        nama = txt.toCapitalize(siswa.getNama());
+        gender = txt.getGenderName(siswa.getGender());
+        kelas = kls.getNamaKelas(siswa.getIdKelas());
+        levelKelas = kls.getLevelKelas(siswa.getIdKelas());
+        email = siswa.getEmail().toLowerCase();
+        wali = txt.toCapitalize(siswa.getNama());
+        nominalSpp = tr.addRp(tr.getNominalSpp(Integer.parseInt(siswa.getIdSpp(siswa.getCurrentLogin()))));
+        sppDibayar = tr.addRp(tr.getTotalSppDibayarBySiswa(Integer.parseInt(siswa.getCurrentLogin()), "2020-2021"));
+        kekuranganSpp = tr.addRp(tr.getKekuranganSppBySiswa(Integer.parseInt(siswa.getCurrentLogin()), "2020-2021"));
         
+        // menampilkan data-data aplikasi
+        this.lblSekolah.setIcon(Gambar.getTopIcon());
+        this.lblSekolahBottom.setIcon(Gambar.getBottomIcon());
+        this.lblSekolah.setText(Application.getCompany() + " | " + Application.getNama());
+        this.lblNamaSekolahBottom.setText(Application.getCompany());
+        this.lblNamaAplikasiBottom.setText(Application.getNama());
+        this.lblVersion.setText("Versi " + Application.getVersi());
+        this.lblCopyright.setText(Application.getRightReserved());
+        
+        // menampilkan data-data siwa
         this.lblNamaFoto.setText("<html><p>"+nama+"</p></html>");
         this.lblNamaUser.setText("<html><p>"+nama+"</p></html>");
-        this.lblSiswa.setText("<html><p>Siswa Kelas "+kls.getLevelKelas(acc.getDataAkun(nis, "id_kelas"))+"</p></html>");
-        this.valNis.setText("<html><p>:&nbsp;"+nis+"</p></html>");
+        this.lblSiswa.setText("<html><p>Siswa Kelas "+levelKelas+"</p></html>");
+        this.valNis.setText("<html><p>:&nbsp;"+currentLogin+"</p></html>");
         this.valNama.setText("<html><p>:&nbsp;"+nama+"</p></html>");
-        this.valGender.setText("<html><p>:&nbsp;"+acc.getGenderName(gender)+"</p></html>");
+        this.valGender.setText("<html><p>:&nbsp;"+gender+"</p></html>");
         this.valKelas.setText("<html><p>:&nbsp;"+kelas+"</p></html>");
         this.valEmail.setText("<html><p>:&nbsp;"+email+"</p></html>");
         this.valWali.setText("<html><p>:&nbsp;"+wali+"</p></html>");
         this.valNominal.setText("<html><p>:&nbsp;"+nominalSpp+"</p></html>");
         this.valDibayar.setText("<html><p>:&nbsp;"+sppDibayar+"</p></html>");
         this.valKekurangan.setText("<html><p>:&nbsp;"+kekuranganSpp+"</p></html>");
+        this.lblProfile.setIcon(siswa.getPhoto(UserPhotoSize.DASHBOARD_SISWA_FOTO));
+        this.lblPhotoProfile.setIcon(siswa.getPhotoProfile());
 
-        this.setLocationRelativeTo(null);
-        this.setIconImage(Gambar.getWindowIcon());
+        // mengatur ui dari button
         this.btnDashboard.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnInfoAkun.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnHistori.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnTentangApp.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnClose.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnMinimaze.setUI(new javax.swing.plaf.basic.BasicButtonUI());
-        this.lblProfile.setIcon(Gambar.scaleImage(new java.io.File(foto), lblProfile.getWidth(), lblProfile.getHeight()));
-        this.lblPhotoProfile.setIcon(Gambar.scaleImage(new java.io.File(foto), lblPhotoProfile.getWidth(), lblPhotoProfile.getHeight()));
-        this.lblSekolah.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts-circle.png"), 35, 35));
-        this.lblSekolahBottom.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts.png"), 30, 37));       
-
+    
         this.btnDashboard.setBackground(new Color(85,101,114));
         JButton[] btns = new JButton[]{
             this.btnInfoAkun, this.btnHistori, this.btnTentangApp
@@ -140,22 +156,20 @@ public class DashboardSiswa extends javax.swing.JFrame {
             });
         }
         
-        waktu.updateWaktu();
         new Thread(new Runnable(){
             
             @Override
             public void run(){
                 try{
-                    while(waktu.isUpdate()){
+                    while(isVisible){
                         lblDataJam.setText(waktu.getUpdateWaktu());
                         Thread.sleep(500);
                     }
-                }catch(InterruptedException e){
-                    JOptionPane.showMessageDialog(null, "Terjadi Kesalahan : " + e.getMessage(), "Pesan", JOptionPane.WARNING_MESSAGE);
+                }catch(InterruptedException ex){
+                    Message.showException(this, "Terjadi Kesalahan Saat Mengupdate Tanggal!\n" + ex.getMessage(), ex, true);
                 }
             }
         }).start();
-       
     }
 
     @SuppressWarnings("unchecked")
@@ -217,6 +231,9 @@ public class DashboardSiswa extends javax.swing.JFrame {
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
+            }
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
             }
         });
 
@@ -336,7 +353,7 @@ public class DashboardSiswa extends javax.swing.JFrame {
         btnHistori.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         btnHistori.setForeground(new java.awt.Color(255, 255, 255));
         btnHistori.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-window-sidemenu-petugas-pembayaran.png"))); // NOI18N
-        btnHistori.setText("Histori Pembayaran");
+        btnHistori.setText("Riwayat Pembayaran");
         btnHistori.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         btnHistori.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         btnHistori.setIconTextGap(6);
@@ -451,7 +468,7 @@ public class DashboardSiswa extends javax.swing.JFrame {
 
         lblSekolah.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         lblSekolah.setForeground(new java.awt.Color(255, 255, 255));
-        lblSekolah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-nav-logosekolah.png"))); // NOI18N
+        lblSekolah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/logo-smkn1kts-circle_35x35.png"))); // NOI18N
         lblSekolah.setText("SMK Negeri 1 Kertosono | Aplikasi Pembayaran SPP");
         lblSekolah.setIconTextGap(13);
 
@@ -483,15 +500,17 @@ public class DashboardSiswa extends javax.swing.JFrame {
         pnlBottom.setBackground(new java.awt.Color(255, 255, 255));
 
         lblCopyright.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
+        lblCopyright.setForeground(new java.awt.Color(0, 0, 0));
         lblCopyright.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblCopyright.setText("Copyright © 2021. Achmad Baihaqi. All Rights Reserved.");
         lblCopyright.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
         lblSekolahBottom.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblSekolahBottom.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-dashboard-logo-dark.png"))); // NOI18N
+        lblSekolahBottom.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/logo-smkn1kts_30x37.png"))); // NOI18N
         lblSekolahBottom.setIconTextGap(8);
 
         lblVersion.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
+        lblVersion.setForeground(new java.awt.Color(0, 0, 0));
         lblVersion.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblVersion.setText("Version 1.0.0");
 
@@ -518,7 +537,7 @@ public class DashboardSiswa extends javax.swing.JFrame {
                 .addGroup(pnlBottomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(lblCopyright, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
                     .addComponent(lblVersion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addContainerGap(36, Short.MAX_VALUE))
         );
         pnlBottomLayout.setVerticalGroup(
             pnlBottomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -581,75 +600,75 @@ public class DashboardSiswa extends javax.swing.JFrame {
         pnlBiodata.setBackground(new java.awt.Color(255, 255, 255));
 
         lblNis.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        lblNis.setForeground(new java.awt.Color(38, 40, 46));
+        lblNis.setForeground(new java.awt.Color(0, 0, 0));
         lblNis.setText("NIS");
 
         lblNama.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        lblNama.setForeground(new java.awt.Color(38, 40, 46));
+        lblNama.setForeground(new java.awt.Color(0, 0, 0));
         lblNama.setText("Nama Siswa");
 
         lblKelas.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        lblKelas.setForeground(new java.awt.Color(38, 40, 46));
+        lblKelas.setForeground(new java.awt.Color(0, 0, 0));
         lblKelas.setText("Kelas");
 
         lblJenis.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        lblJenis.setForeground(new java.awt.Color(38, 40, 46));
+        lblJenis.setForeground(new java.awt.Color(0, 0, 0));
         lblJenis.setText("Jenis Kelamin");
 
         lblEmail.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        lblEmail.setForeground(new java.awt.Color(38, 40, 46));
+        lblEmail.setForeground(new java.awt.Color(0, 0, 0));
         lblEmail.setText("Email");
 
         lblWali.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        lblWali.setForeground(new java.awt.Color(38, 40, 46));
+        lblWali.setForeground(new java.awt.Color(0, 0, 0));
         lblWali.setText("Nama Wali");
 
         lblNominal.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        lblNominal.setForeground(new java.awt.Color(38, 40, 46));
+        lblNominal.setForeground(new java.awt.Color(0, 0, 0));
         lblNominal.setText("Nominal SPP");
 
         valGender.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        valGender.setForeground(new java.awt.Color(38, 40, 46));
+        valGender.setForeground(new java.awt.Color(0, 0, 0));
         valGender.setText(": Laki-Laki");
 
         valNis.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        valNis.setForeground(new java.awt.Color(38, 40, 46));
+        valNis.setForeground(new java.awt.Color(0, 0, 0));
         valNis.setText(": 6156");
 
         valNama.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        valNama.setForeground(new java.awt.Color(38, 40, 46));
+        valNama.setForeground(new java.awt.Color(0, 0, 0));
         valNama.setText(": Achmad Baihaqi");
 
         valKelas.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        valKelas.setForeground(new java.awt.Color(38, 40, 46));
+        valKelas.setForeground(new java.awt.Color(0, 0, 0));
         valKelas.setText(": XII RPL 1");
 
         valEmail.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        valEmail.setForeground(new java.awt.Color(38, 40, 46));
+        valEmail.setForeground(new java.awt.Color(0, 0, 0));
         valEmail.setText(": hakiahmad756@gmail.com");
 
         valWali.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        valWali.setForeground(new java.awt.Color(38, 40, 46));
+        valWali.setForeground(new java.awt.Color(0, 0, 0));
         valWali.setText(": Manusia");
 
         valNominal.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        valNominal.setForeground(new java.awt.Color(38, 40, 46));
+        valNominal.setForeground(new java.awt.Color(0, 0, 0));
         valNominal.setText(": Rp. 135.000.00");
 
         lblSppDibayar.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        lblSppDibayar.setForeground(new java.awt.Color(38, 40, 46));
+        lblSppDibayar.setForeground(new java.awt.Color(0, 0, 0));
         lblSppDibayar.setText("SPP Dibayar");
 
         lblKekurangan.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        lblKekurangan.setForeground(new java.awt.Color(38, 40, 46));
+        lblKekurangan.setForeground(new java.awt.Color(0, 0, 0));
         lblKekurangan.setText("Kekurangan ");
 
         valDibayar.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        valDibayar.setForeground(new java.awt.Color(38, 40, 46));
+        valDibayar.setForeground(new java.awt.Color(0, 0, 0));
         valDibayar.setText(": Rp. 1.080.000.00");
 
         valKekurangan.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        valKekurangan.setForeground(new java.awt.Color(38, 40, 46));
+        valKekurangan.setForeground(new java.awt.Color(0, 0, 0));
         valKekurangan.setText(": Rp. 540.000.00");
 
         javax.swing.GroupLayout pnlBiodataLayout = new javax.swing.GroupLayout(pnlBiodata);
@@ -762,10 +781,11 @@ public class DashboardSiswa extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        acc.closeConnection();
+        siswa.closeConnection();
         kls.closeConnection();
         tr.closeConnection();
-        waktu.closeUpdate();
+        isVisible = false;
+        Log.addLog("Menutup Window " + getClass().getName());
     }//GEN-LAST:event_formWindowClosed
 
     private void pnlMainMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlMainMousePressed
@@ -780,7 +800,7 @@ public class DashboardSiswa extends javax.swing.JFrame {
     }//GEN-LAST:event_pnlMainMouseDragged
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        System.exit(0);
+        Application.closeApplication();
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnCloseMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCloseMouseEntered
@@ -822,12 +842,12 @@ public class DashboardSiswa extends javax.swing.JFrame {
 
     private void lblNamaUserMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblNamaUserMouseEntered
         this.lblNamaUser.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        this.lblNamaUser.setText("<html><p style=\"text-decoration:underline;\">"+nama+"</p></html>");
+        this.lblNamaUser.setText("<html><p style=\"text-decoration:underline;\">"+siswa.getNama()+"</p></html>");
     }//GEN-LAST:event_lblNamaUserMouseEntered
 
     private void lblNamaUserMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblNamaUserMouseExited
         this.lblNamaUser.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        this.lblNamaUser.setText("<html><p style=\"text-decoration:none;\">"+nama+"</p></html>");
+        this.lblNamaUser.setText("<html><p style=\"text-decoration:none;\">"+siswa.getNama()+"</p></html>");
     }//GEN-LAST:event_lblNamaUserMouseExited
 
     private void lblPhotoProfileMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblPhotoProfileMouseClicked
@@ -870,7 +890,7 @@ public class DashboardSiswa extends javax.swing.JFrame {
 
     private void btnHistoriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistoriActionPerformed
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        HistoriPembayaranSiswa histori = new HistoriPembayaranSiswa();
+        RiwayatPembayaranSiswa histori = new RiwayatPembayaranSiswa();
         java.awt.EventQueue.invokeLater(new Runnable(){
             @Override
             public void run(){
@@ -894,8 +914,12 @@ public class DashboardSiswa extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_btnTentangAppActionPerformed
 
-    public static void main(String args[]) {
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        Log.addLog("Membuka Window " + getClass().getName());
+    }//GEN-LAST:event_formWindowOpened
 
+    public static void main(String args[]) {
+        
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
