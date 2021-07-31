@@ -1,8 +1,8 @@
 package com.manage;
 
+import com.data.app.Log;
 import java.util.Calendar;
 import java.util.StringTokenizer;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -11,25 +11,13 @@ import javax.swing.JOptionPane;
  */
 public class Waktu {
     
-    private boolean update = false;
+    private static final Calendar kalender = Calendar.getInstance();
     
-    private final Calendar kalender = Calendar.getInstance();
-    
-    private int tahun, bulan, tanggal, jam, menit, detik, milidetik;
+    private static int tahun, bulan, tanggal, jam, menit, detik, milidetik;
     
     public static final String JANUARI = "Januari", FEBRUARI = "Februari", MARET = "Maret", APRIL = "April", 
                                MEI = "Mei", JUNI = "Juni", JULI = "Juli", AGUSTUS = "Agustus", SEPTEMBER = "September", 
                                OKTOBER = "Oktober", NOVEMBER = "November", DESEMBER = "Desember";
-    
-    public Waktu(){
-        this.tahun = kalender.get(Calendar.YEAR);
-        this.bulan = kalender.get(Calendar.MONTH);
-        this.tanggal = kalender.get(Calendar.DAY_OF_MONTH);
-        this.jam = kalender.get(Calendar.HOUR_OF_DAY);
-        this.menit = kalender.get(Calendar.MINUTE);
-        this.detik = kalender.get(Calendar.SECOND);
-        this.milidetik = kalender.get(Calendar.MILLISECOND);
-    }
     
     public int getTahun(){
         return tahun;
@@ -59,24 +47,25 @@ public class Waktu {
         return milidetik;
     }
     
-    public String getDateNow(){
+    public String getCurrentDate(){
         return String.format("%d-%02d-%02d", getTahun(), getBulan()+1, getTanggal());
     }
     
     public String getCurrentDateTime(){
-        return String.format("%s %02d:%02d:%02d.%03d", this.getDateNow(), getJam(), getMenit(), getDetik(), getMiliDetik());
+        return String.format("%s %02d:%02d:%02d.%03d", this.getCurrentDate(), getJam(), getMenit(), getDetik(), getMiliDetik());
     }
     
-    public String getTanggal(String tgl){
-        int gHari, gBulan, gTahun;
-        StringTokenizer token = new StringTokenizer(tgl, "-");
-        gTahun = Integer.parseInt(token.nextToken());
-        gBulan = Integer.parseInt(token.nextToken());
-        gHari =  Integer.parseInt(token.nextToken());
-        return String.format("%02d %s %02d", gHari, getNamaBulan(gBulan-1), gTahun);
+    public String getDateFromInput(Calendar c){
+        // mendapatkatkan data tanggal
+        return String.format(
+                "%d-%d-%d", 
+                c.get(Calendar.YEAR), // mendapatkan tahun
+                c.get(Calendar.MONTH)+1, // mendapatkan bulan
+                c.get(Calendar.DAY_OF_MONTH) // mendapatkan tanggal
+        );
     }
     
-    public String getHari(){
+    public String getNamaHari(int dayOfWeek){
         switch(kalender.get(Calendar.DAY_OF_WEEK)){
             case Calendar.SUNDAY: return "Minggu";
             case Calendar.MONDAY: return "Senin";
@@ -87,6 +76,10 @@ public class Waktu {
             case Calendar.SATURDAY: return "Sabtu";
             default: return "null";
         }
+    }
+    
+    public String getNamaHari(){
+        return this.getNamaHari(kalender.get(Calendar.DAY_OF_WEEK));
     }
     
     public String getNamaBulan(int bulan){
@@ -107,6 +100,10 @@ public class Waktu {
         }
     }
     
+    public String getNamaBulan(){
+        return this.getNamaBulan(Waktu.bulan);
+    }
+    
     public int getNilaiBulan(String bulan){
         switch(bulan){
             case "Januari": return 1;
@@ -123,54 +120,6 @@ public class Waktu {
             case "Desember": return 12;
             default: return -11;
         }
-    }
-    
-    public void updateWaktu(){
-        update = true;
-        System.out.println("Update Waktu Aktif");
-        new Thread(new Runnable(){
-            
-            @Override
-            public void run(){
-                try{
-                    while(update){
-                        milidetik+=1;
-                        if(milidetik > 999){
-                            detik++;
-                            milidetik = 0;
-                        }else if(detik > 59){
-                            menit++;
-                            detik = 0;
-                        }else if(menit > 59){
-                            jam++;
-                            menit = 0;
-                        }else if(jam > 23){
-                            jam = 0;
-                            tanggal++;
-                        }
-                        Thread.sleep(1);
-                    }
-                }catch(InterruptedException ex){
-                    JOptionPane.showMessageDialog(null, "Terjadi Kesalahan : " + ex.getMessage(), "Pesan", JOptionPane.WARNING_MESSAGE);
-                }
-            }
-        }).start();
-    }
-    
-    public boolean isUpdate(){
-        return update;
-    }
-    
-    public void closeUpdate(){
-        System.out.println("Update Waktu Dimatikan");
-        update = false;
-    }
-    
-    public String getUpdateWaktu(){
-        return String.format(
-                "%s, %02d %s %d | %02d:%02d:%02d", 
-                this.getHari(), tanggal, this.getNamaBulan(bulan), tahun, jam, menit, detik
-        );
     }
     
     public int getTotalHari(int bulan){
@@ -196,17 +145,25 @@ public class Waktu {
         int hariInt, bulanInt, tahunInt;
         StringTokenizer token = new StringTokenizer(tanggal, "-");
         
+        // mengecek jumlah token dari tanggal yang diinputkan
         if(token.countTokens() >= 3){
+            // mendapatkan data dari tanggal
            tahunStr = token.nextToken();
            bulanStr = token.nextToken();
            hariStr = token.nextToken();
+           // mengecek apakah data dari tanggal adalah number atau bukan
            if(Validation.isNumber(hariStr) && Validation.isNumber(bulanStr) && Validation.isNumber(tahunStr)){
+               // mengkonversi data tanggal ke integer
                hariInt = Integer.parseInt(hariStr);
                bulanInt = Integer.parseInt(bulanStr);
                tahunInt = Integer.parseInt(tahunStr);
+               // mengecek apakah tahun valid atau tidak
                if(tahunInt >= 1 && tahunInt < 10000){
+                   // mengecek apakah bulan valid atau tidak
                    if(bulanInt >= 1 && bulanInt < 13){
+                       // mengecek apakah hari valid atau tidak
                        if(hariInt >= 1 && hariInt < this.getTotalHari(bulanInt)+1){
+                           // jika tahun, bulan dan hari valid maka method akan mengembalikan nilai true
                            return true;
                        }
                    }
@@ -216,10 +173,50 @@ public class Waktu {
         return false;
     }
     
-    public static void main(String[] args) {
-        Waktu w = new Waktu();
-        w.tahun = 2020;
-        System.out.println(w.getTotalHari(2));
+    public static void updateWaktuOld(){
+        Log.addLog("Update Waktu diaktifkan");
+        // mendapatkan waktu saat ini
+        Waktu.tahun = Waktu.kalender.get(Calendar.YEAR);
+        Waktu.bulan = Waktu.kalender.get(Calendar.MONTH);
+        Waktu.tanggal = Waktu.kalender.get(Calendar.DAY_OF_MONTH);
+        Waktu.jam = Waktu.kalender.get(Calendar.HOUR_OF_DAY);
+        Waktu.menit = Waktu.kalender.get(Calendar.MINUTE);
+        Waktu.detik = Waktu.kalender.get(Calendar.SECOND);
+        Waktu.milidetik = Waktu.kalender.get(Calendar.MILLISECOND);
+        
+        // mengupdate waktu
+        new Thread(new Runnable(){
+            
+            @Override
+            public void run(){
+                try{
+                    while(true){
+                        milidetik+=1;
+                        if(milidetik > 999){
+                            detik++;
+                            milidetik = 0;
+                        }else if(detik > 59){
+                            menit++;
+                            detik = 0;
+                        }else if(menit > 59){
+                            jam++;
+                            menit = 0;
+                        }else if(jam > 23){
+                            jam = 0;
+                            tanggal++;
+                        }
+                        Thread.sleep(1);
+                    }
+                }catch(InterruptedException ex){
+                    Message.showException(this, "Terjadi Kesalahan : " + ex.getMessage(), ex, true);
+                }
+            }
+        }).start();
     }
     
+    public String getUpdateWaktu(){
+        return String.format("%s, %02d %s %d %02d:%02d:%02d", 
+                this.getNamaHari(), tanggal, this.getNamaBulan(bulan), tahun, jam, menit, detik
+        );
+    }
 }
