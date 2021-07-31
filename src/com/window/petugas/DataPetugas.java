@@ -1,21 +1,29 @@
 package com.window.petugas;
 
-import com.database.Account;
-import com.database.Database;
+import com.data.app.Application;
+import com.data.app.Log;
+import com.data.db.Database;
+import com.data.db.DatabaseTables;
+import com.manage.Internet;
+import com.manage.Message;
+import com.manage.Text;
 import com.media.Audio;
 import com.media.Gambar;
-import com.media.Waktu;
-import com.window.petugas.admin.EditDataPetugas;
-import com.window.petugas.admin.TambahDataPetugas;
+import com.window.admin.EditDataPetugas;
 import com.sun.glass.events.KeyEvent;
+import com.users.UserPhotoSize;
+import com.users.Users;
+import com.window.admin.HapusData;
+import com.window.admin.TambahDataPetugas;
 
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
-import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -24,24 +32,33 @@ import javax.swing.JOptionPane;
  */
 public class DataPetugas extends javax.swing.JFrame {
     
-    private final Waktu waktu = new Waktu();
-    private final Account acc = new Account();
-    private final String name, foto, level;
-    private String keyword = "", idSelected = "", username, namaPetugas, gender, tempatLahir, 
-                  tanggalLahir, ttl, alamat, noHp, email, levelPetugas, transaksi, fotoPetugas;
+    private final Users.LevelPetugas petugas = Users.levelPetugas(), level = Users.levelPetugas();
+    private final Text txt = new Text();
+
+    private final String name;
+    private String keyword ="", idSelected, namaPetugas, gender, ttl, alamat, noHp, email, levelPetugas, transaksi, lastOn;
     private int x, y;
     
     public DataPetugas() {
         initComponents();
-        
-        idSelected = "11";
-        name = acc.getDataAkun(acc.getLogin(), "nama_petugas");
-        foto = acc.getProfile(acc.getLogin());
-        level = acc.getDataAkun(acc.getLogin(), "level");
-        
         this.setLocationRelativeTo(null);
         this.setIconImage(Gambar.getWindowIcon());
+        
+        idSelected = "11";
+        
+        // menampilkan data-data aplikasi
+        this.lblSekolah.setIcon(Gambar.getTopIcon());
+        this.lblSekolah.setText(Application.getCompany() + " | " + Application.getNama());
+        this.lblVersion.setText("Versi " + Application.getVersi());
+        this.lblCopyright.setText(Application.getRightReserved());
+        
+        // mendapatkan dan menampilkan data dari user
+        name = txt.toCapitalize(petugas.getNama());
         this.lblNamaUser.setText("<html><p>"+name+"</p></html>");
+        this.lblTotalData.setText("Menampilkan "+ (petugas.getTotalPetugas()+petugas.getTotalAdmin()) +" data petugas.");
+        this.lblPhotoProfile.setIcon(petugas.getPhotoProfile());
+        
+        // megatur ui pada button
         this.btnDashboard.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnInfoAkun.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnDataPetugas.setUI(new javax.swing.plaf.basic.BasicButtonUI());
@@ -56,9 +73,6 @@ public class DataPetugas extends javax.swing.JFrame {
         this.btnTambah.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnEdit.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnHapus.setUI(new javax.swing.plaf.basic.BasicButtonUI());
-        this.lblPhotoProfile.setIcon(Gambar.scaleImage(new java.io.File(foto), lblPhotoProfile.getWidth(), lblPhotoProfile.getHeight()));
-        this.lblSekolah.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts-circle.png"), 35, 35));     
-        this.lblTotalData.setText("Menampilkan "+acc.getJumlahData(Database.PETUGAS)+" data petugas.");
         
         this.tabelData.setRowHeight(29);
         this.tabelData.getTableHeader().setBackground(new java.awt.Color(255,255,255));
@@ -101,8 +115,8 @@ public class DataPetugas extends javax.swing.JFrame {
         }
         
         JLabel[] lbls = new JLabel[]{
-            this.valId, this.valUsername, this.valNama, this.valGender, this.valTtl,
-            this.valAlamat, this.valNoHp, this.valEmail, this.valLevel, this.valTransaksi
+            this.valId, this.valNama, this.valGender, this.valTtl, this.valAlamat, 
+            this.valNoHp, this.valEmail, this.valLevel, this.valTransaksi, this.valLastOn
         };
         
         for(JLabel lbl : lbls){
@@ -141,11 +155,40 @@ public class DataPetugas extends javax.swing.JFrame {
         this.showData();
     }
     
+    private Object[][] getData(){
+        try{
+            Object[][] obj;
+            int rows = 0;
+            String sql = "SELECT id_petugas, nama_petugas, gender FROM petugas " + keyword, id;
+            // mendefinisikan object berdasarkan total rows dan cols yang ada didalam tabel
+            obj = new Object[petugas.getJumlahData(Database.PETUGAS, keyword)][4];
+            // mengeksekusi query
+            petugas.res = petugas.stat.executeQuery(sql);
+            // mendapatkan semua data yang ada didalam tabel
+            while(petugas.res.next()){
+                id =  petugas.res.getString("id_petugas");
+                // jika id petugas adalah 1 maka data tidak akan ditampilkan
+                if(!id.equals("1")){
+                    // menyimpan data dari tabel ke object
+                    obj[rows][0] = id;
+                    obj[rows][1] = petugas.res.getString("nama_petugas");
+                    obj[rows][2] = txt.getGenderName(petugas.res.getString("gender"));
+                    obj[rows][3] = txt.toCapitalize(level.getLevel(id).name());                    
+                    rows++; // rows akan bertambah 1 setiap selesai membaca 1 row pada tabel
+                }
+            }
+            return obj;
+        }catch(SQLException ex){
+            Message.showException(this, "Terjadi kesalahan saat mengambil data dari database\n" + ex.getMessage(), ex, true);
+        }
+        return null;
+    }
+    
     private void updateTabel(){
         this.tabelData.setModel(new javax.swing.table.DefaultTableModel(
-            acc.getData(Database.PETUGAS, new String[]{"id_petugas", "username", "nama_petugas", "level"}, keyword),
+            getData(),
             new String [] {
-                "ID Petugas", "Username", "Nama Petugas", "Level"
+                "ID Petugas", "Nama Petugas", "Jenis Kelamin", "Level"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -160,30 +203,33 @@ public class DataPetugas extends javax.swing.JFrame {
     }
     
     private void showData(){
-        this.username = acc.getDataAkun(idSelected, "username");
-        this.namaPetugas  = acc.getDataAkun(idSelected, "nama_petugas");
-        this.gender = acc.getGenderName(this.acc.getDataAkun(idSelected, "gender"));
-        this.tempatLahir = acc.getDataAkun(idSelected, "tempat_lahir");
-        this.tanggalLahir = waktu.getTanggal(acc.getDataAkun(idSelected, "tanggal_lahir"));
-        this.ttl = tempatLahir + ", " + tanggalLahir;
-        this.alamat = acc.getDataAkun(idSelected, "alamat");
-        this.noHp = acc.getDataAkun(idSelected, "no_hp");
-        this.email = acc.getDataAkun(idSelected, "email");
-        this.levelPetugas = acc.getDataAkun(idSelected, "level");
-        this.transaksi = "" + acc.getJumlahData(Database.PEMBAYARAN, "WHERE id_petugas = '"+idSelected+"'");
-        this.fotoPetugas = acc.getProfile(idSelected);
+        // mendapatkan data dari petugas
+        this.namaPetugas = txt.toCapitalize(petugas.getNama(idSelected));
+        this.gender = txt.getGenderName(petugas.getGender(idSelected));
+        this.ttl = txt.toDateOfBirthCase(petugas.getTempatLahir(idSelected), petugas.getTanggalLahir(idSelected));
+        this.alamat = txt.toCapitalize(petugas.getAlamat(idSelected));
+        this.noHp = txt.toTelephoneCase(petugas.getNoHp(idSelected));
+        this.email = petugas.getEmail(idSelected).toLowerCase();
+        this.levelPetugas = petugas.getLevel(idSelected).name();
+        this.transaksi = txt.addDelim(petugas.getTotalTransaksi(idSelected));
+        this.lastOn = petugas.getLastOnline(idSelected);
         
+        if(this.lastOn.equals("null")){
+            lastOn = "Never";
+        }
+        
+        // menampilkan data dari petugas
         this.valId.setText("<html><p>:&nbsp;"+idSelected+"</p></html>");
-        this.valUsername.setText("<html><p>:&nbsp;"+username+"</p></html>");
         this.valNama.setText("<html><p>:&nbsp;"+namaPetugas+"</p></html>");
         this.valGender.setText("<html><p>:&nbsp;"+gender+"</p></html>");
         this.valTtl.setText("<html><p>:&nbsp;"+ttl+"</p></html>");
         this.valAlamat.setText("<html><p>:&nbsp;"+alamat+"</p></html>");
-        this.valNoHp.setText("<html><p>:&nbsp;"+noHp+"</p></html>");
+        this.valNoHp.setText("<html><p style=\"text-decoration:underline; color:rgb(0,0,0);\">:&nbsp;"+noHp+"</p></html>");
         this.valEmail.setText("<html><p>:&nbsp;"+email+"</p></html>");
         this.valLevel.setText("<html><p>:&nbsp;"+levelPetugas+"</p></html>");
         this.valTransaksi.setText("<html><p>:&nbsp;"+transaksi+" Transaksi Dilakukan</p></html>");
-        this.lblShowFoto.setIcon(Gambar.scaleImage(new File(fotoPetugas), lblShowFoto.getWidth(), lblShowFoto.getHeight()));
+        this.valLastOn.setText("<html><p>:&nbsp;"+lastOn+"</p></html>");
+        this.lblShowFoto.setIcon(petugas.getPhoto(idSelected, UserPhotoSize.DATA_PETUGAS));
     }
 
     @SuppressWarnings("unchecked")
@@ -220,7 +266,6 @@ public class DataPetugas extends javax.swing.JFrame {
         lblFoto = new javax.swing.JLabel();
         lblPenampilFoto = new javax.swing.JLabel();
         lblId = new javax.swing.JLabel();
-        lblUsername = new javax.swing.JLabel();
         lblGender = new javax.swing.JLabel();
         lblNama = new javax.swing.JLabel();
         lblEmail = new javax.swing.JLabel();
@@ -230,7 +275,6 @@ public class DataPetugas extends javax.swing.JFrame {
         lblLevel = new javax.swing.JLabel();
         lblTransaksi = new javax.swing.JLabel();
         valId = new javax.swing.JLabel();
-        valUsername = new javax.swing.JLabel();
         valNama = new javax.swing.JLabel();
         valGender = new javax.swing.JLabel();
         valTtl = new javax.swing.JLabel();
@@ -239,6 +283,8 @@ public class DataPetugas extends javax.swing.JFrame {
         valEmail = new javax.swing.JLabel();
         valLevel = new javax.swing.JLabel();
         valTransaksi = new javax.swing.JLabel();
+        lblLastOn = new javax.swing.JLabel();
+        valLastOn = new javax.swing.JLabel();
         lblCari = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelData = new javax.swing.JTable();
@@ -258,6 +304,9 @@ public class DataPetugas extends javax.swing.JFrame {
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
+            }
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
             }
         });
 
@@ -576,7 +625,7 @@ public class DataPetugas extends javax.swing.JFrame {
 
         lblSekolah.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         lblSekolah.setForeground(new java.awt.Color(255, 255, 255));
-        lblSekolah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-nav-logosekolah.png"))); // NOI18N
+        lblSekolah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/logo-smkn1kts-circle_35x35.png"))); // NOI18N
         lblSekolah.setText("SMK Negeri 1 Kertosono | Aplikasi Pembayaran SPP");
         lblSekolah.setIconTextGap(13);
 
@@ -605,7 +654,7 @@ public class DataPetugas extends javax.swing.JFrame {
 
         lblDashboard.setFont(new java.awt.Font("Ebrima", 1, 21)); // NOI18N
         lblDashboard.setForeground(new java.awt.Color(22, 19, 19));
-        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-datapetugas-logo.png"))); // NOI18N
+        lblDashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-window-datapetugas-logo.png"))); // NOI18N
         lblDashboard.setText("Data Petugas");
         lblDashboard.setIconTextGap(6);
         pnlMain.add(lblDashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 64, 400, -1));
@@ -636,11 +685,12 @@ public class DataPetugas extends javax.swing.JFrame {
         lblShowFoto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblShowFoto.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        lblFoto.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        lblFoto.setForeground(new java.awt.Color(0, 0, 0));
         lblFoto.setText("Foto Petugas");
         lblFoto.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
         lblPenampilFoto.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
+        lblPenampilFoto.setForeground(new java.awt.Color(0, 0, 0));
         lblPenampilFoto.setText("Tampilkan Foto");
         lblPenampilFoto.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -655,64 +705,95 @@ public class DataPetugas extends javax.swing.JFrame {
         });
 
         lblId.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblId.setForeground(new java.awt.Color(0, 0, 0));
         lblId.setText("ID Petugas");
 
-        lblUsername.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        lblUsername.setText("Username");
-
         lblGender.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblGender.setForeground(new java.awt.Color(0, 0, 0));
         lblGender.setText("Jenis Kelamin");
 
         lblNama.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblNama.setForeground(new java.awt.Color(0, 0, 0));
         lblNama.setText("Nama Petugas");
 
         lblEmail.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblEmail.setForeground(new java.awt.Color(0, 0, 0));
         lblEmail.setText("Email");
 
         lblNoHp.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblNoHp.setForeground(new java.awt.Color(0, 0, 0));
         lblNoHp.setText("Nomor HP");
 
         lblAlamat.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblAlamat.setForeground(new java.awt.Color(0, 0, 0));
         lblAlamat.setText("Alamat");
 
         lblTtl.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblTtl.setForeground(new java.awt.Color(0, 0, 0));
         lblTtl.setText("TTL");
 
         lblLevel.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblLevel.setForeground(new java.awt.Color(0, 0, 0));
         lblLevel.setText("Level");
 
         lblTransaksi.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblTransaksi.setForeground(new java.awt.Color(0, 0, 0));
         lblTransaksi.setText("Total Transaksi");
 
         valId.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valId.setForeground(new java.awt.Color(0, 0, 0));
         valId.setText(": 12");
 
-        valUsername.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
-        valUsername.setText(": levi");
-
         valNama.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valNama.setForeground(new java.awt.Color(0, 0, 0));
         valNama.setText(": Levi Ackerman");
 
         valGender.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valGender.setForeground(new java.awt.Color(0, 0, 0));
         valGender.setText(": Laki-Laki");
 
         valTtl.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valTtl.setForeground(new java.awt.Color(0, 0, 0));
         valTtl.setText(": Indonesia, 30 Maret 1980");
 
         valAlamat.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valAlamat.setForeground(new java.awt.Color(0, 0, 0));
         valAlamat.setText(": Jawa Timur, Indonesia");
 
         valNoHp.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valNoHp.setForeground(new java.awt.Color(0, 0, 0));
         valNoHp.setText(": 0856-5586-4624");
+        valNoHp.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                valNoHpMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                valNoHpMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                valNoHpMouseExited(evt);
+            }
+        });
 
         valEmail.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valEmail.setForeground(new java.awt.Color(0, 0, 0));
         valEmail.setText(": leviackerman@gmail.com");
 
         valLevel.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valLevel.setForeground(new java.awt.Color(0, 0, 0));
         valLevel.setText(": Admin");
 
         valTransaksi.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valTransaksi.setForeground(new java.awt.Color(0, 0, 0));
         valTransaksi.setText(": 180 Transaksi Dilakukan");
+
+        lblLastOn.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        lblLastOn.setForeground(new java.awt.Color(0, 0, 0));
+        lblLastOn.setText("Last Online");
+
+        valLastOn.setFont(new java.awt.Font("Dialog", 1, 15)); // NOI18N
+        valLastOn.setForeground(new java.awt.Color(0, 0, 0));
+        valLastOn.setText(": 2021-07-11 21:07");
 
         javax.swing.GroupLayout pnlInfoDataLayout = new javax.swing.GroupLayout(pnlInfoData);
         pnlInfoData.setLayout(pnlInfoDataLayout);
@@ -732,10 +813,6 @@ public class DataPetugas extends javax.swing.JFrame {
                         .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(lblFoto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lblPenampilFoto, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addComponent(lblUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(valUsername, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
                         .addComponent(lblGender, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -761,14 +838,17 @@ public class DataPetugas extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(valTtl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlInfoDataLayout.createSequentialGroup()
-                        .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(lblTransaksi, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblLevel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE))
+                        .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(lblTransaksi, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lblLevel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE))
+                            .addComponent(lblLastOn, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(valLastOn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(valLevel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(valTransaksi, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         pnlInfoDataLayout.setVerticalGroup(
             pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -785,10 +865,6 @@ public class DataPetugas extends javax.swing.JFrame {
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblId)
                     .addComponent(valId))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblUsername)
-                    .addComponent(valUsername))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblNama)
@@ -821,7 +897,11 @@ public class DataPetugas extends javax.swing.JFrame {
                 .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblTransaksi)
                     .addComponent(valTransaksi))
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnlInfoDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblLastOn)
+                    .addComponent(valLastOn))
+                .addContainerGap(31, Short.MAX_VALUE))
         );
 
         pnlMain.add(pnlInfoData, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 140, 510, 480));
@@ -829,25 +909,26 @@ public class DataPetugas extends javax.swing.JFrame {
         lblCari.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         lblCari.setForeground(new java.awt.Color(237, 12, 12));
         lblCari.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lblCari.setText("Cari ID / Username :");
+        lblCari.setText("Cari ID / Nama Petugas :");
         pnlMain.add(lblCari, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 130, 210, 30));
 
         tabelData.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
+        tabelData.setForeground(new java.awt.Color(0, 0, 0));
         tabelData.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"11", "admin", "Administrator", "Admin"},
-                {"12", "levi", "Levi Ackerman", "Admin"},
-                {"13", "eren", "Eren Jeager", "Admin"},
-                {"14", "mikasa", "Mikasa Ackerman", "Admin"},
-                {"15", "armin", "Armin Arlert", "Admin"},
-                {"16", "petugas", "Petugas SPP", "Admin"},
-                {"17", "reiner", "Reiner Braun", "Petugas"},
-                {"18", "falco", "Falco Grice", "Petugas"},
-                {"19", "sasha", "Sahsa Braus", "Petugas"},
-                {"20", "hange", "Hange Zoe", "Petugas"}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "ID Petugas", "Username", "Nama", "Level"
+                "ID Petugas", "Nama Petugas", "Jenis Kelamin", "Level"
             }
         ));
         tabelData.setGridColor(new java.awt.Color(0, 0, 0));
@@ -869,6 +950,7 @@ public class DataPetugas extends javax.swing.JFrame {
         pnlMain.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 170, 440, 440));
 
         inpCari.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        inpCari.setForeground(new java.awt.Color(0, 0, 0));
         inpCari.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 inpCariKeyTyped(evt);
@@ -886,11 +968,11 @@ public class DataPetugas extends javax.swing.JFrame {
         pnlMain.add(lineBottom, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 640, 1010, 10));
 
         lblTotalData.setFont(new java.awt.Font("Dialog", 1, 11)); // NOI18N
+        lblTotalData.setForeground(new java.awt.Color(0, 0, 0));
         lblTotalData.setText("Menampilkan 20 data petugas dengan keyword = \"\"");
         pnlMain.add(lblTotalData, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 615, 440, 20));
 
         btnTambah.setBackground(new java.awt.Color(41, 180, 50));
-        btnTambah.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         btnTambah.setForeground(new java.awt.Color(255, 255, 255));
         btnTambah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-tambah.png"))); // NOI18N
         btnTambah.setText("Tambah Data");
@@ -910,7 +992,6 @@ public class DataPetugas extends javax.swing.JFrame {
         pnlMain.add(btnTambah, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 660, 130, -1));
 
         btnEdit.setBackground(new java.awt.Color(34, 119, 237));
-        btnEdit.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         btnEdit.setForeground(new java.awt.Color(255, 255, 255));
         btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-edit.png"))); // NOI18N
         btnEdit.setText("Edit Data");
@@ -930,7 +1011,6 @@ public class DataPetugas extends javax.swing.JFrame {
         pnlMain.add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 660, 110, -1));
 
         btnHapus.setBackground(new java.awt.Color(220, 41, 41));
-        btnHapus.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         btnHapus.setForeground(new java.awt.Color(255, 255, 255));
         btnHapus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-data-hapus.png"))); // NOI18N
         btnHapus.setText("Hapus Data");
@@ -950,11 +1030,13 @@ public class DataPetugas extends javax.swing.JFrame {
         pnlMain.add(btnHapus, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 660, 120, -1));
 
         lblVersion.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
+        lblVersion.setForeground(new java.awt.Color(0, 0, 0));
         lblVersion.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblVersion.setText("Version 1.0.0");
         pnlMain.add(lblVersion, new org.netbeans.lib.awtextra.AbsoluteConstraints(900, 660, 370, -1));
 
         lblCopyright.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
+        lblCopyright.setForeground(new java.awt.Color(0, 0, 0));
         lblCopyright.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblCopyright.setText("Copyright © 2021. Achmad Baihaqi. All Rights Reserved.");
         pnlMain.add(lblCopyright, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 680, 390, -1));
@@ -981,7 +1063,8 @@ public class DataPetugas extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        acc.closeConnection();
+        petugas.closeConnection();
+        Log.addLog("Menutup Window " + getClass().getName());
     }//GEN-LAST:event_formWindowClosed
 
     private void pnlMainMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlMainMousePressed
@@ -996,7 +1079,7 @@ public class DataPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_pnlMainMouseDragged
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        System.exit(0);
+        Application.closeApplication();
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnCloseMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCloseMouseEntered
@@ -1151,7 +1234,7 @@ public class DataPetugas extends javax.swing.JFrame {
 
     private void btnLaporanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLaporanActionPerformed
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        LaporanSpp laporanSpp = new LaporanSpp();
+        LaporanPembayaran laporanSpp = new LaporanPembayaran();
         java.awt.EventQueue.invokeLater(new Runnable(){
             @Override
             public void run(){
@@ -1176,11 +1259,11 @@ public class DataPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTentangAppActionPerformed
 
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
-        if(level.equalsIgnoreCase("admin")){
-            
+        if(petugas.isAdmin()){
+            Audio.play(Audio.SOUND_INFO);
+            new TambahDataPetugas(this, true).setVisible(true);
         }else{
-            Audio.play(Audio.SOUND_WARNING);
-            JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk menambahkan sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
+            Message.showWarning(this, "Access Denied!\nPetugas tidak diperbolehkan untuk menambahkan sebuah data!", true);
         }
     }//GEN-LAST:event_btnTambahActionPerformed
 
@@ -1193,16 +1276,15 @@ public class DataPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTambahMouseExited
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        if(level.equalsIgnoreCase("admin")){
+        if(petugas.isAdmin()){
             if(tabelData.getSelectedRow() > -1){
-                
+                Audio.play(Audio.SOUND_INFO);
+                new EditDataPetugas(this, true, this.idSelected).setVisible(true);
             }else{
-                Audio.play(Audio.SOUND_WARNING);
-                JOptionPane.showMessageDialog(null, "Error!\nTidak ada data yang dipilih!!", "Error!", JOptionPane.ERROR_MESSAGE);
+                Message.showWarning(this, "Tidak ada data yang dipilih!!", true);
             }
         }else{
-            Audio.play(Audio.SOUND_WARNING);
-            JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk mengedit sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
+            Message.showWarning(this, "Access Denied!\nPetugas tidak diperbolehkan untuk mengedit sebuah data!", true);
         }
     }//GEN-LAST:event_btnEditActionPerformed
 
@@ -1215,16 +1297,15 @@ public class DataPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEditMouseExited
 
     private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
-        if(level.equalsIgnoreCase("admin")){
+        if(petugas.isAdmin()){
             if(tabelData.getSelectedRow() > -1){
-                
+                Audio.play(Audio.SOUND_INFO);
+                new HapusData(this, true, HapusData.DATA_PETUGAS, this.idSelected).setVisible(true);
             }else{
-                Audio.play(Audio.SOUND_WARNING);
-                JOptionPane.showMessageDialog(null, "Error!\nTidak ada data yang dipilih!!", "Error!", JOptionPane.ERROR_MESSAGE);
+                Message.showWarning(this, "Tidak ada data yang dipilih!!", true);
             }
         }else{
-            Audio.play(Audio.SOUND_WARNING);
-            JOptionPane.showMessageDialog(null, "Access Denied!\nPetugas tidak diperbolehkan untuk menghapus sebuah data!", "Peringatan!", JOptionPane.WARNING_MESSAGE);
+            Message.showWarning(this, "Access Denied!\nPetugas tidak diperbolehkan untuk menghapus sebuah data!", true);
         }
     }//GEN-LAST:event_btnHapusActionPerformed
 
@@ -1238,9 +1319,9 @@ public class DataPetugas extends javax.swing.JFrame {
 
     private void inpCariKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inpCariKeyTyped
         String key = this.inpCari.getText();
-        this.keyword = "WHERE id_petugas LIKE '%"+key+"%' OR username LIKE '%"+key+"%' OR nama_petugas LIKE '%"+key+"%'";
+        this.keyword = "WHERE id_petugas LIKE '%"+key+"%' OR nama_petugas LIKE '%"+key+"%'";
         System.out.println("key = " + keyword);
-        this.lblTotalData.setText("Menampilkan "+acc.getJumlahData(Database.PETUGAS, keyword)+" data petugas dengan keyword = \""+key+"\"");
+        this.lblTotalData.setText("Menampilkan "+petugas.getJumlahData(DatabaseTables.PETUGAS.name(), keyword)+" data petugas dengan keyword = \""+key+"\"");
         this.updateTabel();
     }//GEN-LAST:event_inpCariKeyTyped
 
@@ -1261,21 +1342,49 @@ public class DataPetugas extends javax.swing.JFrame {
 
     private void lblPenampilFotoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblPenampilFotoMouseClicked
         Audio.play(Audio.SOUND_INFO);
-        new PenampilFotoPetugas(this, true, fotoPetugas).setVisible(true);
+        new PenampilFotoPetugas(this, true, petugas.getPhoto(idSelected, UserPhotoSize.SHOW_FOTO_PETUGAS)).setVisible(true);
     }//GEN-LAST:event_lblPenampilFotoMouseClicked
 
     private void lblPenampilFotoMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblPenampilFotoMouseEntered
         this.lblPenampilFoto.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        this.lblPenampilFoto.setText("<html><p style=\"text-decoration:underline;\">Tampilkan Foto</p></html>");
+        this.lblPenampilFoto.setText("<html><p style=\"text-decoration:underline; color:rgb(0,0,255);\">Tampilkan Foto</p></html>");
     }//GEN-LAST:event_lblPenampilFotoMouseEntered
 
     private void lblPenampilFotoMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblPenampilFotoMouseExited
         this.lblPenampilFoto.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        this.lblPenampilFoto.setText("<html><p style=\"text-decoration:none;\">Tampilkan Foto</p></html>");
+        this.lblPenampilFoto.setText("<html><p style=\"text-decoration:none; color:rbg(0,0,0);\">Tampilkan Foto</p></html>");
     }//GEN-LAST:event_lblPenampilFotoMouseExited
 
-    public static void main(String args[]) {
+    private void valNoHpMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valNoHpMouseClicked
+        Internet net = new Internet();
+        String nomor = noHp.substring(1).replaceAll(" ", "").replaceAll("-", "");
+        if(net.isConnectInternet()){
+            try {
+                net.openLink("https://wa.me/"+nomor);
+            } catch (IOException | URISyntaxException ex) {
+                Message.showException(this, ex, true);
+            }
+        }else{
+            Message.showWarning(this, "Tidak terhubung ke Internet!", true);
+        }
+    }//GEN-LAST:event_valNoHpMouseClicked
 
+    private void valNoHpMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valNoHpMouseEntered
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        this.valNoHp.setText("<html><p style=\"text-decoration:underline; color:rgb(15,98,230);\">:&nbsp;"+noHp+"</p></html>");
+    }//GEN-LAST:event_valNoHpMouseEntered
+
+    private void valNoHpMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_valNoHpMouseExited
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        this.valNoHp.setText("<html><p style=\"text-decoration:underline; color:rgb(0,0,0);\">:&nbsp;"+noHp+"</p></html>");
+    }//GEN-LAST:event_valNoHpMouseExited
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        Log.addLog("Membuka Window " + getClass().getName());
+    }//GEN-LAST:event_formWindowOpened
+
+    public static void main(String args[]) {
+        Log.createLog();
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -1321,6 +1430,7 @@ public class DataPetugas extends javax.swing.JFrame {
     private javax.swing.JLabel lblFoto;
     private javax.swing.JLabel lblGender;
     private javax.swing.JLabel lblId;
+    private javax.swing.JLabel lblLastOn;
     private javax.swing.JLabel lblLevel;
     private javax.swing.JLabel lblNama;
     private javax.swing.JLabel lblNamaUser;
@@ -1335,7 +1445,6 @@ public class DataPetugas extends javax.swing.JFrame {
     private javax.swing.JLabel lblTotalData;
     private javax.swing.JLabel lblTransaksi;
     private javax.swing.JLabel lblTtl;
-    private javax.swing.JLabel lblUsername;
     private javax.swing.JLabel lblVersion;
     private javax.swing.JSeparator lineBottom;
     private javax.swing.JSeparator lineCenter;
@@ -1352,11 +1461,11 @@ public class DataPetugas extends javax.swing.JFrame {
     private javax.swing.JLabel valEmail;
     private javax.swing.JLabel valGender;
     private javax.swing.JLabel valId;
+    private javax.swing.JLabel valLastOn;
     private javax.swing.JLabel valLevel;
     private javax.swing.JLabel valNama;
     private javax.swing.JLabel valNoHp;
     private javax.swing.JLabel valTransaksi;
     private javax.swing.JLabel valTtl;
-    private javax.swing.JLabel valUsername;
     // End of variables declaration//GEN-END:variables
 }
