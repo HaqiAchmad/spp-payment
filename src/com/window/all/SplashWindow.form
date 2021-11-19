@@ -37,12 +37,7 @@
     <Container class="javax.swing.JPanel" name="pnlMain">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="ff" green="ff" red="ff" type="rgb"/>
-        </Property>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
-            <LineBorder thickness="3"/>
-          </Border>
+          <Color blue="27" green="21" red="1f" type="rgb"/>
         </Property>
       </Properties>
 
@@ -54,7 +49,7 @@
               <Component id="lblLogoSmk" alignment="0" max="32767" attributes="0"/>
               <Group type="102" alignment="1" attributes="0">
                   <Component id="lblMessage" min="-2" pref="287" max="-2" attributes="0"/>
-                  <EmptySpace pref="141" max="32767" attributes="0"/>
+                  <EmptySpace pref="147" max="32767" attributes="0"/>
                   <Component id="lblLoadVal" min="-2" pref="118" max="-2" attributes="0"/>
               </Group>
               <Component id="lblSekolah" alignment="0" max="32767" attributes="0"/>
@@ -85,11 +80,12 @@
         <Component class="javax.swing.JProgressBar" name="proLoad">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="f9" green="f5" red="f2" type="rgb"/>
+              <Color blue="ff" green="ff" red="ff" type="rgb"/>
             </Property>
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="ff" green="10" red="0" type="rgb"/>
+              <Color blue="ff" green="7d" red="0" type="rgb"/>
             </Property>
+            <Property name="value" type="int" value="85"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="lblTop">
@@ -97,22 +93,25 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Tahoma" size="18" style="1"/>
             </Property>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="79" green="df" red="a" type="rgb"/>
+            </Property>
             <Property name="horizontalAlignment" type="int" value="0"/>
-            <Property name="text" type="java.lang.String" value="Aplikasi Pembayaran SPP"/>
+            <Property name="text" type="java.lang.String" value="SPP Payment"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="lblLogoSmk">
           <Properties>
             <Property name="horizontalAlignment" type="int" value="0"/>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/resources/image/icons/ic-school.png"/>
+              <Image iconType="3" name="/resources/image/icons/ic-splashwindow-logosmkn1kts.png"/>
             </Property>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="lblLoadVal">
           <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Dialog" size="12" style="1"/>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="ff" red="ff" type="rgb"/>
             </Property>
             <Property name="horizontalAlignment" type="int" value="4"/>
             <Property name="text" type="java.lang.String" value="85%  "/>
@@ -123,6 +122,9 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Dialog" size="11" style="1"/>
             </Property>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="ff" red="ff" type="rgb"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="  Membuka Aplikasi..."/>
           </Properties>
         </Component>
@@ -132,7 +134,7 @@
               <Font name="Dialog" size="18" style="1"/>
             </Property>
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="0" green="0" red="ff" type="rgb"/>
+              <Color blue="27" green="27" red="e2" type="rgb"/>
             </Property>
             <Property name="horizontalAlignment" type="int" value="0"/>
             <Property name="text" type="java.lang.String" value="SMK Negeri 1 Kertosono"/>

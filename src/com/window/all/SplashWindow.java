@@ -1,7 +1,9 @@
 package com.window.all;
 
-import com.database.Database;
+import com.data.app.Application;
+import com.data.db.Database;
 import com.media.Gambar;
+import com.users.Users;
 import javax.swing.JOptionPane;
 
 
@@ -14,12 +16,16 @@ public class SplashWindow extends javax.swing.JFrame {
 
     private final Database db = new Database();
     
+    private Users user;
+    
     public SplashWindow() {
         initComponents();
         
+        this.lblTop.setText(Application.getNama());
         this.setLocationRelativeTo(null);
         this.setIconImage(Gambar.getWindowIcon());
-        this.lblLogoSmk.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts.png"), 138, 170));
+        
+        // menjalankan loding aplikasi
         loading();
     }
     
@@ -28,56 +34,98 @@ public class SplashWindow extends javax.swing.JFrame {
             
             @Override
             public void run(){
+                int val = 0, delay = 50;
                 try{
-//                    lblTop.setText("");
-//                    lblLogoSmk.setIcon(null);
-//                    lblSekolah.setText("");
-//                    Thread.sleep(90);
-//                    lblTop.setText("Aplikasi Pembayaran SPP");
-//                    Thread.sleep(60);
-//                    lblLogoSmk.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts.png"), 130, 160));
-//                    String text = "SMK Negeri 1 Kertosono";
-//                    Thread.sleep(500);
-//                    for(int i = 0; i <= text.length(); i++){
-//                        lblSekolah.setText(text.substring(0, i));
-//                        Thread.sleep(85);
-//                    }
-//                    Thread.sleep(300);
-                    int val = 0, delay;
+                    // CHANGE THIS ( SKIP SPLASH WINDOW )
+//                    val = 100;
+                    // melakukan loading dari 0% sampai 100%
                     while(val <= 100){
-                        proLoad.setValue(val);
                         if(val >= 0 && val < 9){
-                            delay = 100;
+                            delay = 50;
                             lblMessage.setText("  Menyiapkan Aplikasi...");
                         }else if(val >= 9 && val < 15){
+                            delay = 40;
                             lblMessage.setText("  Memulai Aplikasi...");
                         }else if(val >= 15 && val < 25){
-                            delay = 40;
+                            delay = 20;
+                            lblMessage.setText("  Menyiapkan Penyimpanan...");
+                        }else if(val >= 25 && val < 35){
+                            delay = 30;
+                            lblMessage.setText("  Menyiapkan Database...");
+                        }else if(val >= 35 && val < 50){
                             lblMessage.setText("  Mengecek Database...");
-                        }else if(val >= 25 && val < 40){
-                            Thread.sleep(440);
-                            delay = 40;
-                            val = 40;
-                            lblMessage.setText("  Menghubungkan ke Database...");
+                            Thread.sleep(300);
+                            val = 51;
                             db.startConnection();
                             db.closeConnection();
-                        }else{
+                        }else if(val >= 50 && val < 60){
+                            delay = 60;
+                            lblMessage.setText("  Menghubungkan ke Database Server...");
+                        }else if(val >= 60 && val < 70){
+                            delay = 50;
+                            lblMessage.setText("  Mendapatkan Data Aplikasi...");
+                        }else if(val >= 70 && val < 75){
+                            delay = 30;
+                            lblMessage.setText("  Mendapatkan Data Current Login...");
+                        }else if(val >= 75 && val < 80){
+                            delay = 25;
+                            lblMessage.setText("  Memuat Window...");
+                        }else if(val >= 80 && val < 90){
+                            delay = 25;
+                            lblMessage.setText("  Menyipakan Window...");
+                        }
+                        else{
                             lblMessage.setText("  Membuka Aplikasi...");
                         }
-                        lblLoadVal.setText("" + val + " %  ");
+                        
                         val++;
-                        Thread.sleep(50);
+                        proLoad.setValue(val);
+                        lblLoadVal.setText("" + val + " %  ");
+                        Thread.sleep(delay);
+                        System.out.println("Loading Values : "+ val+"/100%");
                     }
                     
+                    // jika proses loading sudah selesai
                     if(val >= 100){
-                        java.awt.EventQueue.invokeLater(new Runnable(){
-                            @Override
-                            public void run(){
-                                new LoginWindow().setVisible(true);
+                        user = new Users();
+                        // mengecek user sudah login atau belum
+                        if(user.isLogin()){
+                            // mengupdate last online
+                            user.updateLastOnline();
+                            // jika user login dengan level admin atau petugas
+                            if(user.isAdmin() || user.isPetugas()){
+                                // membuka window DashboardPetugas
+                                java.awt.EventQueue.invokeLater(new Runnable(){
+                                    @Override
+                                    public void run(){
+                                        new com.window.petugas.DashboardPetugas().setVisible(true);
+                                    }
+                                });
                             }
-                        });
-                        dispose();
+                            // jika user login login dengan level siswa
+                            else if(user.isSiswa()){
+                                // membuka window DashboardSiswa
+                                java.awt.EventQueue.invokeLater(new Runnable(){
+                                    @Override
+                                    public void run(){
+                                        new com.window.siswa.DashboardSiswa().setVisible(true);
+                                    }
+                                });
+                            }
+                        }else{
+                            // membuka window login jika user belum melakukan login
+                            java.awt.EventQueue.invokeLater(new Runnable(){
+                                
+                                @Override
+                                public void run(){
+                                    new LoginWindow().setVisible(true);
+                                }
+                            });
+                        }
                     }
+                    // menutup window
+                    user.closeConnection();
+                    dispose();
                 }catch(InterruptedException e){
                     JOptionPane.showMessageDialog(null, e.getMessage());
                 }
@@ -100,28 +148,30 @@ public class SplashWindow extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
 
-        pnlMain.setBackground(new java.awt.Color(255, 255, 255));
-        pnlMain.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
+        pnlMain.setBackground(new java.awt.Color(31, 33, 39));
 
-        proLoad.setBackground(new java.awt.Color(242, 245, 249));
-        proLoad.setForeground(new java.awt.Color(0, 16, 255));
+        proLoad.setBackground(new java.awt.Color(255, 255, 255));
+        proLoad.setForeground(new java.awt.Color(0, 125, 255));
+        proLoad.setValue(85);
 
         lblTop.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        lblTop.setForeground(new java.awt.Color(10, 223, 121));
         lblTop.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblTop.setText("Aplikasi Pembayaran SPP");
+        lblTop.setText("SPP Payment");
 
         lblLogoSmk.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblLogoSmk.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-school.png"))); // NOI18N
+        lblLogoSmk.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-splashwindow-logosmkn1kts.png"))); // NOI18N
 
-        lblLoadVal.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        lblLoadVal.setForeground(new java.awt.Color(255, 255, 255));
         lblLoadVal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblLoadVal.setText("85%  ");
 
         lblMessage.setFont(new java.awt.Font("Dialog", 1, 11)); // NOI18N
+        lblMessage.setForeground(new java.awt.Color(255, 255, 255));
         lblMessage.setText("  Membuka Aplikasi...");
 
         lblSekolah.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        lblSekolah.setForeground(new java.awt.Color(255, 0, 0));
+        lblSekolah.setForeground(new java.awt.Color(226, 39, 39));
         lblSekolah.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblSekolah.setText("SMK Negeri 1 Kertosono");
 
@@ -134,7 +184,7 @@ public class SplashWindow extends javax.swing.JFrame {
             .addComponent(lblLogoSmk, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlMainLayout.createSequentialGroup()
                 .addComponent(lblMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 141, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 147, Short.MAX_VALUE)
                 .addComponent(lblLoadVal, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addComponent(lblSekolah, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
