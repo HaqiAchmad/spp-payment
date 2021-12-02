@@ -1,6 +1,7 @@
 package com.data.db;
 
 import com.data.app.Log;
+import com.manage.Message;
 import com.media.Audio;
 
 import java.sql.Connection;
@@ -94,7 +95,19 @@ public class Database {
             
             Log.addLog(String.format("Berhasil terhubung ke Database '%s' / POOL = %d.", DB_NAME, POOL));
         }catch(ClassNotFoundException | SQLException ex){
-            Log.addLog(ex.getMessage());
+            // Menanggani exception yang terjadi dengan cara mendapatkan pesan error dari exception tersebut.
+            if(ex.getMessage().contains("com.mysql.jdbc.Driver")){
+                Message.showException(this, "MySQL Connector tidak dapat ditemukan", ex, true);
+            }else if(ex.getMessage().contains("Communications link failure")){
+                Message.showException(this, "Sepertinya MySQL Anda belum diaktifkan!! \nSilahkan aktifkan MySQL Anda dan buka kembali Aplikasi!!", ex, true);
+            }else if(ex.getMessage().contains("Access denied for user")){
+                Message.showException(this, "Maaf untuk membuka aplikasi ini \nUsername dan password dari MySQL anda harus diatur ke default!\nMohon maaf atas ketidaknyamanan ini!", ex, true);
+            }else if(ex.getMessage().contains("Unknown database")){
+                Message.showException(this, "Tidak dapat menemukan database '"+DB_NAME+"'\nSilahkan melakukan import Database secara manual dan buka kembali Aplikasi!", ex, true);
+            }else{
+                Message.showException(this, "Terjadi Kesalahan!\nError message : " + ex.getMessage(), ex, true);
+            }
+            System.exit(1);
         }
     }
     
@@ -130,16 +143,13 @@ public class Database {
     
     public int getJumlahData(String tabel, String kondisi){
         try{
-            int row = 0;
-            String query = "SELECT * FROM " + tabel + " " + kondisi;
+            String query = "SELECT COUNT(*) AS total FROM " + tabel + " " + kondisi;
             res = stat.executeQuery(query);
-            while(res.next()){
-                row++;
+            if(res.next()){
+                return res.getInt("total");
             }
-            return row;
         }catch(SQLException ex){
-            Audio.play(Audio.SOUND_ERROR);
-            JOptionPane.showMessageDialog(null, "Terjadi Kesalahan!\n\nError message : "+ex.getMessage(), "Peringatan!", JOptionPane.WARNING_MESSAGE);
+            Message.showException(this, "Terjadi Kesalahan!\n\nError message : "+ex.getMessage(), ex, true);
         }
         return -1;
     }
@@ -150,8 +160,7 @@ public class Database {
     
     public boolean isExistData(String tabel, String field, String data){
         try{
-            Log.addLog("Is Exist Data " + data);
-            String query = String.format("SELECT * FROM %s WHERE %s = '%s'", tabel, field, data);
+            String query = "SELECT * FROM " + tabel + " WHERE " + field + " = '" + data + "'";
             res = stat.executeQuery(query);
             return res.next();
         }catch(SQLException ex){
