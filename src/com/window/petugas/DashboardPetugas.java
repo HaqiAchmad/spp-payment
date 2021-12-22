@@ -1,18 +1,19 @@
 package com.window.petugas;
 
-import com.database.Account;
-import com.database.Database;
-import com.database.Transaksi;
-import com.media.Audio;
+import com.data.app.Application;
+import com.data.app.Log;
+import com.data.app.Transaksi;
+import com.data.db.DatabaseTables;
+import com.manage.Message;
+import com.manage.Text;
 import com.media.Gambar;
-import com.media.Waktu;
+import com.manage.Waktu;
+import com.users.Users;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -21,23 +22,50 @@ import javax.swing.JOptionPane;
  */
 public class DashboardPetugas extends javax.swing.JFrame {
     
-    private final Toolkit tk = Toolkit.getDefaultToolkit();
-    private final Account acc = new Account();
+    private final Users.LevelPetugas petugas = Users.levelPetugas();
+    private final Users.LevelSiswa siswa = Users.levelSiswa();
     private final Transaksi tr = new Transaksi();
     private final Waktu waktu = new Waktu();
-    private final String name, foto;
-    private final int LEBAR = (int) tk.getScreenSize().getWidth(), TINGGI = (int) tk.getScreenSize().getHeight();
+    private final Text txt = new Text();
+    
+    private boolean isVisible = true;
+    private final String name, totalAkun, totalAdmin, totalPetugas, totalSiswa, totalKelas, totalSpp;
     private int x, y;
     
     public DashboardPetugas() {
         initComponents();
-        
-        name = acc.getDataAkun(acc.getLogin(), "nama_petugas");
-        foto = acc.getProfile(acc.getLogin());
-        
         this.setLocationRelativeTo(null);
         this.setIconImage(Gambar.getWindowIcon());        
         
+        // mendapatkan data-data petugas
+        name = txt.toCapitalize(petugas.getNama());
+        totalAkun = txt.addDelim(petugas.getTotalUser());
+        totalAdmin = txt.addDelim(petugas.getTotalAdmin());
+        totalPetugas = txt.addDelim(petugas.getTotalPetugas());
+        totalSiswa = txt.addDelim(siswa.getTotalSiswa());
+        totalKelas = txt.addDelim(petugas.getJumlahData(DatabaseTables.KELAS.name()));
+        totalSpp = txt.toMoneyCase(Long.toString(tr.getTotalSppDibayar()));
+        
+        // menampilkan data-data aplikasi
+        this.lblSekolah.setIcon(Gambar.getTopIcon());
+        this.lblSekolahBottom.setIcon(Gambar.getBottomIcon());
+        this.lblSekolah.setText(Application.getCompany() + " | " + Application.getNama());
+        this.lblNamaSekolahBottom.setText(Application.getCompany());
+        this.lblNamaAplikasiBottom.setText(Application.getNama());
+        this.lblVersion.setText("Versi " + Application.getVersi());
+        this.lblCopyright.setText(Application.getRightReserved());
+        
+        // menampilkan data-data petugas
+        this.lblNamaUser.setText("<html><p>"+name+"</p></html>");
+        this.valDataUser.setText(totalAkun + " User");
+        this.valDataAdmin.setText(totalAdmin + " Admin");
+        this.valDataPetugas.setText(totalPetugas + " Petugas");
+        this.valDataSiswa.setText(totalSiswa + " Siswa");
+        this.valDataKelas.setText(totalKelas + " Kelas");
+        this.valDataSpp.setText(totalSpp);
+        this.lblPhotoProfile.setIcon(petugas.getPhotoProfile());
+        
+        // mengatur ui dari button
         this.btnDashboard.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnInfoAkun.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnDataPetugas.setUI(new javax.swing.plaf.basic.BasicButtonUI());
@@ -50,17 +78,6 @@ public class DashboardPetugas extends javax.swing.JFrame {
         this.btnClose.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         this.btnMinimaze.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         
-        this.lblNamaUser.setText("<html><p>"+name+"</p></html>");
-        this.valDataUser.setText("" + acc.getTotalAkun() + " User");
-        this.valDataAdmin.setText("" + acc.getTotalAkun(Account.LEVEL_ADMIN) + " Admin");
-        this.valDataPetugas.setText("" + acc.getTotalAkun(Account.LEVEL_PETUGAS) + " Petugas");
-        this.valDataSiswa.setText("" + acc.getTotalAkun(Account.LEVEL_SISWA) + " Siswa");
-        this.valDataKelas.setText("" + acc.getJumlahData(Database.KELAS) + " Kelas");
-        this.valDataSpp.setText(tr.addRp(tr.getTotalSppDibayar()));
-        this.lblPhotoProfile.setIcon(Gambar.scaleImage(new java.io.File(foto), lblPhotoProfile.getWidth(), lblPhotoProfile.getHeight()));
-        this.lblSekolah.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts-circle.png"), 35, 35));
-        this.lblSekolahBottom.setIcon(Gambar.scaleImage(new java.io.File("src\\resources\\image\\icons\\logo-smkn1kts.png"), 30, 37));
-
         this.btnDashboard.setBackground(new Color(85,101,114));
         JButton[] btns = new JButton[]{
             this.btnInfoAkun, this.btnDataPetugas, this.btnDataSiswa, this.btnDataKelas, 
@@ -97,22 +114,22 @@ public class DashboardPetugas extends javax.swing.JFrame {
             });
         }
         
-        waktu.updateWaktu();
+        // mengupdate waktu
         new Thread(new Runnable(){
             
             @Override
             public void run(){
                 try{
-                    while(waktu.isUpdate()){
+                    while(isVisible){
+                        System.out.println("mengudate waktu");
                         lblDataJam.setText(waktu.getUpdateWaktu());
                         Thread.sleep(500);
                     }
-                }catch(InterruptedException e){
-                    JOptionPane.showMessageDialog(null, "Terjadi Kesalahan : " + e.getMessage(), "Pesan", JOptionPane.WARNING_MESSAGE);
+                }catch(InterruptedException ex){
+                    Message.showException(this, "Terjadi Kesalahan Saat Mengupdate Tanggal!\n" + ex.getMessage(), ex, true);
                 }
             }
         }).start();
-       
     }
 
     @SuppressWarnings("unchecked")
@@ -188,6 +205,9 @@ public class DashboardPetugas extends javax.swing.JFrame {
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
+            }
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
             }
         });
 
@@ -454,11 +474,11 @@ public class DashboardPetugas extends javax.swing.JFrame {
                 .addComponent(btnLaporan, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnTentangApp, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 61, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 71, Short.MAX_VALUE)
                 .addComponent(pnlLeftBottom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        pnlMain.add(sidePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        pnlMain.add(sidePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 610));
 
         pnlTop.setBackground(new java.awt.Color(11, 114, 238));
 
@@ -506,8 +526,8 @@ public class DashboardPetugas extends javax.swing.JFrame {
 
         lblSekolah.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         lblSekolah.setForeground(new java.awt.Color(255, 255, 255));
-        lblSekolah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-nav-logosekolah.png"))); // NOI18N
-        lblSekolah.setText("SMK Negeri 1 Kertosono | Aplikasi Pembayaran SPP");
+        lblSekolah.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/logo-smkn1kts-circle_35x35.png"))); // NOI18N
+        lblSekolah.setText("SMK Negeri 1 Kertosono | SPP Payment");
         lblSekolah.setIconTextGap(13);
 
         javax.swing.GroupLayout pnlTopLayout = new javax.swing.GroupLayout(pnlTop);
@@ -579,6 +599,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
         );
 
         lblDataUser.setFont(new java.awt.Font("Ebrima", 1, 18)); // NOI18N
+        lblDataUser.setForeground(new java.awt.Color(0, 0, 0));
         lblDataUser.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lblDataUser.setText("Total Keseluruhan User");
         lblDataUser.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
@@ -595,6 +616,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
         });
 
         valDataUser.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        valDataUser.setForeground(new java.awt.Color(0, 0, 0));
         valDataUser.setText("1,446 User");
         valDataUser.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
@@ -641,6 +663,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
         );
 
         lblDataPetugas.setFont(new java.awt.Font("Ebrima", 1, 18)); // NOI18N
+        lblDataPetugas.setForeground(new java.awt.Color(0, 0, 0));
         lblDataPetugas.setText("Total Keseluruhan Petugas");
         lblDataPetugas.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         lblDataPetugas.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -656,6 +679,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
         });
 
         valDataPetugas.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        valDataPetugas.setForeground(new java.awt.Color(0, 0, 0));
         valDataPetugas.setText("7 Petugas");
         valDataPetugas.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
@@ -702,6 +726,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
         );
 
         lblDataKelas.setFont(new java.awt.Font("Ebrima", 1, 18)); // NOI18N
+        lblDataKelas.setForeground(new java.awt.Color(0, 0, 0));
         lblDataKelas.setText("Total Kelas");
         lblDataKelas.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         lblDataKelas.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -717,6 +742,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
         });
 
         valDataKelas.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        valDataKelas.setForeground(new java.awt.Color(0, 0, 0));
         valDataKelas.setText("40 Kelas");
         valDataKelas.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
@@ -763,6 +789,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
         );
 
         lblDataAdmin.setFont(new java.awt.Font("Ebrima", 1, 18)); // NOI18N
+        lblDataAdmin.setForeground(new java.awt.Color(0, 0, 0));
         lblDataAdmin.setText("Total Keseluruhan Admin");
         lblDataAdmin.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         lblDataAdmin.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -778,6 +805,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
         });
 
         valDataAdmin.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        valDataAdmin.setForeground(new java.awt.Color(0, 0, 0));
         valDataAdmin.setText("5 Admin");
         valDataAdmin.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
@@ -824,6 +852,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
         );
 
         lblDataSiswa.setFont(new java.awt.Font("Ebrima", 1, 18)); // NOI18N
+        lblDataSiswa.setForeground(new java.awt.Color(0, 0, 0));
         lblDataSiswa.setText("Total Keseluruhan Siswa");
         lblDataSiswa.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         lblDataSiswa.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -839,6 +868,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
         });
 
         valDataSiswa.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        valDataSiswa.setForeground(new java.awt.Color(0, 0, 0));
         valDataSiswa.setText("1.430 Siswa");
         valDataSiswa.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
@@ -885,6 +915,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
         );
 
         lblDataSpp.setFont(new java.awt.Font("Ebrima", 1, 18)); // NOI18N
+        lblDataSpp.setForeground(new java.awt.Color(0, 0, 0));
         lblDataSpp.setText("Total SPP Yang Sudah Dibayar");
         lblDataSpp.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         lblDataSpp.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -900,6 +931,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
         });
 
         valDataSpp.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        valDataSpp.setForeground(new java.awt.Color(0, 0, 0));
         valDataSpp.setText("Rp. 390.340.000");
         valDataSpp.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
@@ -977,21 +1009,23 @@ public class DashboardPetugas extends javax.swing.JFrame {
         pnlBottom.setBackground(new java.awt.Color(255, 255, 255));
 
         lblCopyright.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
+        lblCopyright.setForeground(new java.awt.Color(0, 0, 0));
         lblCopyright.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblCopyright.setText("Copyright © 2021. Achmad Baihaqi. All Rights Reserved.");
         lblCopyright.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
         lblSekolahBottom.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        lblSekolahBottom.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/ic-dashboard-logo-dark.png"))); // NOI18N
+        lblSekolahBottom.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/icons/logo-smkn1kts_30x37.png"))); // NOI18N
         lblSekolahBottom.setIconTextGap(8);
 
         lblVersion.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
+        lblVersion.setForeground(new java.awt.Color(0, 0, 0));
         lblVersion.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblVersion.setText("Version 1.0.0");
 
         lblNamaAplikasiBottom.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
         lblNamaAplikasiBottom.setForeground(new java.awt.Color(16, 81, 200));
-        lblNamaAplikasiBottom.setText("Aplikasi Pembayaran SPP");
+        lblNamaAplikasiBottom.setText("SPP Payment");
 
         lblNamaSekolahBottom.setFont(new java.awt.Font("Ebrima", 1, 14)); // NOI18N
         lblNamaSekolahBottom.setForeground(new java.awt.Color(231, 38, 38));
@@ -1012,7 +1046,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
                 .addGroup(pnlBottomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(lblCopyright, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
                     .addComponent(lblVersion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addContainerGap(36, Short.MAX_VALUE))
         );
         pnlBottomLayout.setVerticalGroup(
             pnlBottomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1056,9 +1090,11 @@ public class DashboardPetugas extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        waktu.closeUpdate();
-        acc.closeConnection();
+        petugas.closeConnection();
+        siswa.closeConnection();
         tr.closeConnection();
+        isVisible = false;
+        Log.addLog("Menutup Window " + getClass().getName());
     }//GEN-LAST:event_formWindowClosed
 
     private void pnlMainMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlMainMousePressed
@@ -1073,7 +1109,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_pnlMainMouseDragged
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        System.exit(0);
+        Application.closeApplication();
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnCloseMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCloseMouseEntered
@@ -1228,7 +1264,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
 
     private void btnLaporanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLaporanActionPerformed
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        LaporanSpp laporanSpp = new LaporanSpp();
+        LaporanPembayaran laporanSpp = new LaporanPembayaran();
         java.awt.EventQueue.invokeLater(new Runnable(){
             @Override
             public void run(){
@@ -1253,8 +1289,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTentangAppActionPerformed
 
     private void lblDataUserMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblDataUserMouseClicked
-        Audio.play(Audio.SOUND_INFO);
-        JOptionPane.showMessageDialog(null, "Total Keseluruhan User : " + acc.getTotalAkun(), "Pesan", JOptionPane.INFORMATION_MESSAGE);
+        Message.showInformation(this, "Total Keseluruhan Akun : " + totalAkun);
     }//GEN-LAST:event_lblDataUserMouseClicked
 
     private void lblDataUserMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblDataUserMouseEntered
@@ -1292,7 +1327,7 @@ public class DashboardPetugas extends javax.swing.JFrame {
 
     private void lblDataKelasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblDataKelasMouseClicked
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        DataSpp dataKelas = new DataSpp();
+        DataKelas dataKelas = new DataKelas();
         java.awt.EventQueue.invokeLater(new Runnable(){
             @Override
             public void run(){
@@ -1381,6 +1416,10 @@ public class DashboardPetugas extends javax.swing.JFrame {
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         this.lblDataSpp.setText("<html><p style=\"text-decoration:none; color:rgb(0,0,0)\">Total SPP Yang Sudah Dibayar</p></html>");
     }//GEN-LAST:event_lblDataSppMouseExited
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        Log.addLog("Membuka Window " + getClass().getName());
+    }//GEN-LAST:event_formWindowOpened
 
     public static void main(String args[]) {
 
