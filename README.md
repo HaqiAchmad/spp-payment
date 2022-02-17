@@ -61,11 +61,11 @@ Aplikasi ini merupakan project Uji Kopetensi Keahlian [SMKN 1 Kertosono](https:/
 
 ## Contoh Tampilan Aplikasi
 ### Tampilan Login :
-![Tampilan Login](images/ukk-version/window-login.png)
+![Tampilan Login](images/main/window-login.png)
 ### Dashboard Petugas : 
-![Dashboard Petugas](images/ukk-version/dashboard-petugas.png)
+![Dashboard Petugas](images/main/dashboard-petugas.png)
 ### Dashboard Siswa : 
-![dashboard 2](images/ukk-version/dashboard-siswa.png)
+![dashboard 2](images/main/dashboard-siswa.png)
 
 ## Cara Menjalankan Aplikasi
 
