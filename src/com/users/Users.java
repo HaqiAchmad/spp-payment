@@ -3147,7 +3147,7 @@ public class Users extends Database{
          * @return total user yang memiliki level siswa.
          */
         public int getTotalSiswa(){
-            return super.getJumlahData(DatabaseTables.USERS.name());
+            return super.getJumlahData(DatabaseTables.USERS.name(), "WHERE " + UserData.LEVEL + " = '" + UserLevels.SISWA + "'");
         }
         
         /**
