@@ -221,3 +221,14 @@ local.properties
 ### Eclipse Patch ###
 # Spring Boot Tooling
 .sts4-cache/
+
+
+# Ignored Local Files
+SPP_Payment.jar
+lib/commons-beanutils-1.8.2.jar
+lib/commons-collections-3.2.1.jar
+lib/commons-digester-2.1.jar
+lib/commons-javaflow-20060411.jar
+lib/commons-logging-1.1.jar
+lib/groovy-all-1.7.5.jar
+lib/jasperreports-5.0.0.jar
