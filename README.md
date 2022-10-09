@@ -42,14 +42,6 @@
         <li><a href=#dashboard-siswa->Dashboard Siswa</a></li>        
       </ul>
     </li>
-    <li>
-      <a href="#cara-menjalankan-aplikasi">Cara Menjalankan Aplikasi</a>
-      <ul>
-        <li><a href=#mendownload-data-aplikasi->Mendownload data aplikasi</a></li>
-        <li><a href="#menjalankan-aplikasi-di-ide-">Menjalankan Aplikasi di IDE</a></li>
-        <li><a href="#default-akun-">Default Akun</a></li>
-      </ul>
-    </li>
     <li><a href="#persyaratan-sistem-minimal">Persyaratan Sistem Minimal</a></li>
     <li><a href="#contributor">Contributor</a></li>
     <li><a href="#catatan">Catatan</a></li>
@@ -57,7 +49,7 @@
 </details>
 
 ## Deskripsi Project
-Aplikasi ini merupakan project Uji Kopetensi Keahlian [SMKN 1 Kertosono](https://smkn1kts.sch.id/) tahun pelajaran 2020/2021 yang dilaksanakan pada tanggal 29 Maret 2021. 
+Aplikasi ini merupakan project Uji Kopetensi Keahlian [SMKN 1 Kertosono](https://smkn1kts.sch.id/) dengan studi kasus membuat aplikasi pembayaran SPP. 
 
 ## Contoh Tampilan Aplikasi
 ### Tampilan Login :
@@ -66,20 +58,6 @@ Aplikasi ini merupakan project Uji Kopetensi Keahlian [SMKN 1 Kertosono](https:/
 ![Dashboard Petugas](images/main/dashboard-petugas.png)
 ### Dashboard Siswa : 
 ![dashboard 2](images/main/dashboard-siswa.png)
-
-## Cara Menjalankan Aplikasi
-
-### Mendownload data aplikasi :
-- Silahkan Anda mendownload data dari Aplikasi Pembayaran SPP [disini](https://drive.google.com/uc?export=download&id=1a7ZfiqQ41-pH_-YvWtCkSbZUFkXcvkj3)
-- Ekstrak data aplikasi yang sudah didownload
-- Pindahkan data aplikasi ke package _src/com/resources/image/user-profile_ yang ada dikomputer Anda
-
-### Menjalankan Aplikasi di IDE :
-- Import database aplikasi ke MySQL
-- Buka project di IDE
-- Tambahkan file library yang ada didalam folder _lib_ ke dalam project
-- Klik run untuk menjalankan aplikasi
-- Silahkan login dengan akun yang tersedia <a href="#default-akun-">dibawah</a>
 
 ### Default Akun :
 * Akun Admin 
@@ -91,7 +69,7 @@ Aplikasi ini merupakan project Uji Kopetensi Keahlian [SMKN 1 Kertosono](https:/
 
 ## Persyaratan Sistem Minimal
 - Java 8
-- 4 GB RAM
+- 2 GB RAM
 - 1440 x 900 screen resolution
 
 ## Contributor
@@ -99,7 +77,6 @@ NIS : 6156 <br>
 No. Peserta : 05-23-0123-238 <br>
 Nama : Achmad Baihaqi <br>
 Kelas : XII-RPL-1 <br>
-Tanggal UKK : 29 Maret 2021 <br>
 Platform : Desktop
 
 ## Catatan
